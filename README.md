@@ -9,7 +9,8 @@ implemented as a standalone addon mod. Works on top of the game's existing
 | Mob            | Model base (from VoxeLibre)      | Texture (Pixel-Perfection-Legacy)       | Spawn        | Sounds |
 |----------------|----------------------------------|-----------------------------------------|--------------|--------|
 | fox            | mobs_mc_wolf.b3d                 | fox.png (+ snow/sleep variants shipped) | Taiga family | TODO   |
-| panda          | mobs_mc_polarbear.b3d            | panda.png (+ 6 personality variants)    | BambooJungle | TODO   |
+|                |                                  | hunts chickens/rabbits (MC parity)     |              |        |
+| panda          | mobs_mc_polarbear.b3d            | panda.png (+ 6 personality variants)   | BambooJungle | TODO   |
 | camel          | mobs_mc_llama.b3d                | camel.png                               | Desert       | TODO   |
 | skeleton_horse | mobs_mc_horse.b3d                | horse_skeleton.png                      | trap only    | TODO   |
 | allay          | **new Blender model needed**     | allay.png                               | —            | TODO   |
@@ -43,8 +44,8 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
 
 1. [x] 4 retexture mobs registered (fox, panda, camel, skeleton_horse)
 2. [ ] Sounds for all mobs (CC0 sources: freesound.org, Kenney.nl)
-3. [ ] Fox: chicken hunting behavior (MC parity)
-4. [ ] Panda personalities (variant textures already shipped)
+3. [x] Fox: chicken/rabbit hunting behavior (MC parity)
+4. [x] Panda personalities (variant textures already shipped)
 5. [ ] Skeleton horse: skeleton trap (lightning conversion, riders)
 6. [ ] Camel riding (copy driver logic from llama.lua)
 7. [ ] Blender models for allay, frog, warden, phantom, turtle, sniffer, goat

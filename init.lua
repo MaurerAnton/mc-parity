@@ -21,6 +21,8 @@ API notes (verified 2026-08):
 
 local S = minetest.get_translator("mcl_mobs_addon")
 
+local pr = PseudoRandom(os.time() * 2)
+
 -- ---------------------------------------------------------------------------
 -- Helpers (dual-game)
 -- ---------------------------------------------------------------------------
@@ -77,18 +79,19 @@ local fox = {
 	walk_chance = 50,
 	walk_velocity = 2,
 	run_velocity = 3.4, -- foxes are fast
-	damage = 0,
+	damage = 2, -- MC fox attack damage
 	reach = 2,
+	attack_animals = true, -- MC foxes hunt chickens and rabbits
+	specific_attack = { "mobs_mc:chicken", "mobs_mc:rabbit" },
 	fear_height = 4,
 	jump = true,
 	floats = 1,
-	-- TODO: MC foxes hunt chickens (attack_animals = true, specific_attack chicken)
+	-- TODO(sounds): CC0 fox sounds from freesound.org
 	animation = {
 		stand_start = 0, stand_end = 0,
 		walk_start = 0, walk_end = 40, walk_speed = 50,
 		run_start = 0, run_end = 40, run_speed = 100,
 	},
-	-- TODO(sounds): CC0 fox sounds from freesound.org
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:fox", fox)
@@ -148,8 +151,29 @@ local panda = {
 	jump = true,
 	floats = 1,
 	follow = { "mcl_bamboo:bamboo" },
-	-- TODO: panda personalities (aggressive/lazy/playful/weak/worried) use
-	-- the variant textures already shipped: mcl_mobs_addon_panda_*.png
+	on_spawn = function(self)
+		-- MC panda personalities (approximate genetics weights).
+		-- Variant textures are shipped in textures/.
+		local r = pr:next(1, 100)
+		local tex
+		if r <= 40 then
+			tex = "mcl_mobs_addon_panda.png" -- normal
+		elseif r <= 55 then
+			tex = "mcl_mobs_addon_panda_playful.png"
+		elseif r <= 65 then
+			tex = "mcl_mobs_addon_panda_lazy.png"
+		elseif r <= 75 then
+			tex = "mcl_mobs_addon_panda_worried.png"
+		elseif r <= 85 then
+			tex = "mcl_mobs_addon_panda_weak.png"
+		elseif r <= 95 then
+			tex = "mcl_mobs_addon_panda_aggressive.png"
+		else
+			tex = "mcl_mobs_addon_panda_brown.png"
+		end
+		self.base_texture[1] = tex
+		self.object:set_properties({ textures = self.base_texture })
+	end,
 	-- TODO(sounds): CC0
 }
 
