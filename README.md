@@ -8,11 +8,13 @@ implemented as a standalone addon mod. Works on top of the game's existing
 
 | Mob            | Model base (from VoxeLibre)      | Texture (Pixel-Perfection-Legacy)       | Spawn        | Sounds |
 |----------------|----------------------------------|-----------------------------------------|--------------|--------|
-| fox            | mobs_mc_wolf.b3d                 | fox.png (+ snow/sleep variants shipped) | Taiga family | TODO   |
+| fox            | mobs_mc_wolf.b3d                 | fox.png (+ snow/sleep variants shipped) | Taiga family | in-game*|
 |                |                                  | hunts chickens/rabbits (MC parity)     |              |        |
-| panda          | mobs_mc_polarbear.b3d            | panda.png (+ 6 personality variants)   | BambooJungle | TODO   |
-| camel          | mobs_mc_llama.b3d                | camel.png                               | Desert       | TODO   |
-| skeleton_horse | mobs_mc_horse.b3d                | horse_skeleton.png                      | trap only    | TODO   |
+| panda          | mobs_mc_polarbear.b3d            | panda.png (+ 6 personality variants)   | BambooJungle | in-game*|
+| camel          | mobs_mc_llama.b3d                | camel.png                               | Desert       | in-game*|
+|                |                                  | rideable (llama driver pattern)        |              |        |
+| skeleton_horse | mobs_mc_horse.b3d                | horse_skeleton.png                      | trap only    | in-game*|
+|                |                                  | lightning skeleton trap (VL)           |              |        |
 | allay          | **new Blender model needed**     | allay.png                               | —            | TODO   |
 | frog           | **new Blender model needed**     | frog_{temperate,cold,warm}.png          | —            | TODO   |
 | warden         | **new Blender model needed**     | warden.png (+ glow/ears layers)         | —            | TODO   |
@@ -43,18 +45,37 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
 ## Work plan (in order)
 
 1. [x] 4 retexture mobs registered (fox, panda, camel, skeleton_horse)
-2. [ ] Sounds for all mobs (CC0 sources: freesound.org, Kenney.nl)
+2. [x] Sounds for all 4 mobs — in-game free sounds (CC BY-SA); *CC0 external
+        sounds remain optional (fox uses wolf barks as placeholder)
 3. [x] Fox: chicken/rabbit hunting behavior (MC parity)
 4. [x] Panda personalities (variant textures already shipped)
-5. [ ] Skeleton horse: skeleton trap (lightning conversion, riders)
-6. [ ] Camel riding (copy driver logic from llama.lua)
+5. [x] Skeleton horse: lightning skeleton trap (VL; 4 skeletons, hostile)
+6. [x] Camel riding (llama driver pattern; MC 2-seat = TODO)
 7. [ ] Blender models for allay, frog, warden, phantom, turtle, sniffer, goat
-     (VL cuboid style, .b3d export, walk/idle/run animation frames)
+        (see Model pipeline below)
 8. [ ] Warden AI: hook into existing mcl_sculk vibration sensor events
-9. [ ] Mineclonia spawn API support (mcl_mobs.register_spawner shape)
+9. [x] Mineclonia spawn API support (mcl_mobs.register_spawner)
+
+## Model pipeline (WIP mobs)
+
+New mobs need .b3d models in the game's cuboid style with walk/idle/run
+animation frames (see the existing models/ for frame conventions).
+
+- Formats overview: https://docs.luanti.org/for-creators/models/
+- Blender:        https://docs.luanti.org/for-creators/models/using-blender/
+- Blockbench:     https://docs.luanti.org/for-creators/models/using-blockbench/
+- Texture bases: Pixel Perfection / REFI (CC BY-SA 4.0), see Asset provenance.
+- After export: place as `models/mcl_mobs_addon_<mob>.b3d` and uncomment the
+  registration template in init.lua (WIP section).
 
 ## Pitfalls (verified with luanti 5.16.1 + VoxeLibre 0.92.1, headless)
 
+- **Mineclonia spawn API**: `mcl_mobs.spawn_setup` still EXISTS in Mineclonia
+  but only as a deprecated shim — it logs "Calling spawn_setup() is
+  deprecated" and the mob "will not spawn naturally". Always prefer
+  `mcl_mobs.register_spawner` when present (feature-detect order matters:
+  register_spawner first, spawn_setup second). Biome tags: `#is_taiga`,
+  `#is_jungle`, ... — there is NO `#is_desert` tag, use the `"Desert"` name.
 - **Entity id prefix**: `mcl_mobs.register_mob` requires the id to start with
   the ADDON's own mod name (`mcl_mobs_addon:fox`), NOT `mobs_mc:fox` — the
   `mobs_mc:` prefix is only valid inside the game's own `mobs_mc` mod.

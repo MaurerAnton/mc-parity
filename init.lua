@@ -3,20 +3,24 @@ mcl_mobs_addon — Extra Minecraft-style mobs for VoxeLibre / Mineclonia.
 
 Implemented (retexture of existing game models, assets from
 Pixel-Perfection-Legacy, CC BY-SA 4.0):
-  fox           (mesh base: mobs_mc_wolf.b3d)
-  panda         (mesh base: mobs_mc_polarbear.b3d)
-  camel         (mesh base: mobs_mc_llama.b3d)
-  skeleton_horse(mesh base: mobs_mc_horse.b3d)
+  fox            (mesh base: mobs_mc_wolf.b3d)      — hunts chickens/rabbits
+  panda          (mesh base: mobs_mc_polarbear.b3d) — 7 personalities
+  camel          (mesh base: mobs_mc_llama.b3d)     — rideable (1 driver)
+  skeleton_horse (mesh base: mobs_mc_horse.b3d)     — lightning skeleton trap
 
 WIP (need new .b3d models in Blender — no model exists anywhere in Luanti):
   allay, frog, warden, phantom, turtle, sniffer, goat
 
 API notes (verified 2026-08):
-  - registration: mcl_mobs.register_mob("mobs_mc:<name>", def)  (both games)
-  - spawn: VoxeLibre uses mcl_mobs:spawn_setup{...}; Mineclonia uses
-    mcl_mobs.register_spawner{...} (different shape) — Mineclonia spawn
-    support is TODO.
+  - registration: mcl_mobs.register_mob("<mod>:<name>", def) — both games;
+    the id MUST use this mod's own prefix (mcl_mobs_addon:)
+  - spawn: VoxeLibre = mcl_mobs:spawn_setup{...}; Mineclonia =
+    mcl_mobs.register_spawner(table.merge(mobs_mc.animal_spawner, {...}))
+    with "#is_*" biome tags (no is_desert tag — use "Desert" name there)
   - egg: mcl_mobs.register_egg(id, desc, c1, c2, 0)
+  - riding: mcl_mobs.attach(self, player) / mcl_mobs.detach(player, offset)
+    / mcl_mobs.drive(self, walk_anim, stand_anim, reverse, dtime)
+  - skeleton trap: lightning.register_on_strike(pos, pos2, objects) (VL only)
 ]]
 
 local S = minetest.get_translator("mcl_mobs_addon")
@@ -33,15 +37,35 @@ local function register_egg(id, desc, c1, c2)
 	end
 end
 
-local function register_spawn(def)
-	if mcl_mobs.spawn_setup then
+-- Registers natural spawning on both games.
+-- vl_biomes: VoxeLibre biome names; mcln_biomes: Mineclonia names/#is_* tags.
+-- NOTE: Mineclonia keeps spawn_setup only as a deprecated shim, so
+-- register_spawner must be preferred when present.
+local function register_spawn(name, vl_biomes, mcln_biomes, weight)
+	if mcl_mobs.register_spawner and mobs_mc and mobs_mc.animal_spawner then
+		-- Mineclonia style
+		mcl_mobs.register_spawner(table.merge(mobs_mc.animal_spawner, {
+			name = name,
+			biomes = mcln_biomes,
+			weight = weight,
+		}))
+	elseif mcl_mobs.spawn_setup then
 		-- VoxeLibre style
-		mcl_mobs:spawn_setup(def)
+		mcl_mobs:spawn_setup({
+			name = name,
+			dimension = "overworld",
+			type_of_spawning = "ground",
+			biomes = vl_biomes,
+			min_light = 0,
+			max_light = minetest.LIGHT_MAX + 1,
+			chance = weight,
+			interval = 30,
+			aoc = 7,
+			min_height = mobs_mc.water_level + 3,
+			max_height = mcl_vars.mg_overworld_max,
+		})
 	else
-		-- Mineclonia style: needs a spawner table (name, spawn_placement,
-		-- pack_min/max, weight, biomes with "#is_*" tags) — TODO(port)
-		minetest.log("warning", "[mcl_mobs_addon] Mineclonia spawn API not "
-			.. "implemented yet, skipping natural spawn for " .. def.name)
+		minetest.log("warning", "[mcl_mobs_addon] no spawn API available for " .. name)
 	end
 end
 
@@ -86,7 +110,13 @@ local fox = {
 	fear_height = 4,
 	jump = true,
 	floats = 1,
-	-- TODO(sounds): CC0 fox sounds from freesound.org
+	-- Placeholder: game's wolf sounds (free, CC BY-SA). TODO: CC0 fox barks.
+	sounds = {
+		random = "mobs_mc_wolf_bark",
+		damage = {name = "mobs_mc_wolf_hurt", gain = 0.6},
+		death = {name = "mobs_mc_wolf_death", gain = 0.6},
+		distance = 16,
+	},
 	animation = {
 		stand_start = 0, stand_end = 0,
 		walk_start = 0, walk_end = 40, walk_speed = 50,
@@ -96,21 +126,9 @@ local fox = {
 
 mcl_mobs.register_mob("mcl_mobs_addon:fox", fox)
 register_egg("mcl_mobs_addon:fox", S("Fox"), "#d98245", "#f2e9dc", 0)
-register_spawn({
-	name = "mcl_mobs_addon:fox",
-	dimension = "overworld",
-	type_of_spawning = "ground",
-	biomes = {
-		"Taiga", "ColdTaiga", "MegaTaiga", "MegaSpruceTaiga",
-	},
-	min_light = 0,
-	max_light = minetest.LIGHT_MAX + 1,
-	chance = 60,
-	interval = 30,
-	aoc = 7,
-	min_height = mobs_mc.water_level + 3,
-	max_height = mcl_vars.mg_overworld_max,
-})
+register_spawn("mcl_mobs_addon:fox",
+	{"Taiga", "ColdTaiga", "MegaTaiga", "MegaSpruceTaiga"},
+	{"#is_taiga"}, 60)
 
 -- ---------------------------------------------------------------------------
 -- PANDA  (base model: polar bear)
@@ -151,6 +169,13 @@ local panda = {
 	jump = true,
 	floats = 1,
 	follow = { "mcl_bamboo:bamboo" },
+	sounds = {
+		random = "mobs_mc_bear_random",
+		attack = "mobs_mc_bear_attack",
+		damage = {name = "mobs_mc_bear_hurt", gain = 0.6},
+		death = {name = "mobs_mc_bear_death", gain = 0.6},
+		distance = 16,
+	},
 	on_spawn = function(self)
 		-- MC panda personalities (approximate genetics weights).
 		-- Variant textures are shipped in textures/.
@@ -174,26 +199,13 @@ local panda = {
 		self.base_texture[1] = tex
 		self.object:set_properties({ textures = self.base_texture })
 	end,
-	-- TODO(sounds): CC0
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:panda", panda)
 register_egg("mcl_mobs_addon:panda", S("Panda"), "#f0f0f0", "#222222", 0)
-register_spawn({
-	name = "mcl_mobs_addon:panda",
-	dimension = "overworld",
-	type_of_spawning = "ground",
-	biomes = {
-		"BambooJungle", "BambooJungleM", "Jungle",
-	},
-	min_light = 0,
-	max_light = minetest.LIGHT_MAX + 1,
-	chance = 30,
-	interval = 30,
-	aoc = 7,
-	min_height = mobs_mc.water_level + 3,
-	max_height = mcl_vars.mg_overworld_max,
-})
+register_spawn("mcl_mobs_addon:panda",
+	{"BambooJungle", "BambooJungleM", "Jungle"},
+	{"#is_jungle"}, 30)
 
 -- ---------------------------------------------------------------------------
 -- CAMEL  (base model: llama)
@@ -233,27 +245,64 @@ local camel = {
 	fear_height = 4,
 	jump = true,
 	floats = 1,
-	-- TODO: MC camels are rideable by 2 players (llama has driver logic to copy)
-	-- TODO(sounds): CC0
+	sounds = {
+		random = "mobs_mc_llama",
+		eat = "mobs_mc_animal_eat_generic",
+		distance = 16,
+	},
+	-- Riding (llama driver pattern; MC camels seat 2 — TODO: second seat)
+	do_custom = function(self, dtime)
+		if not self.v3 then
+			self.v3 = 0
+			self.max_speed_forward = 3.5
+			self.max_speed_reverse = 1.5
+			self.accel = 3
+			self.driver_attach_at = {x = 0, y = 12.7, z = -5}
+			self.driver_eye_offset = {x = 0, y = 6, z = 0}
+			self.driver_scale = {
+				x = 1 / self.initial_properties.visual_size.x,
+				y = 1 / self.initial_properties.visual_size.y,
+			}
+		end
+		if self.driver then
+			mcl_mobs.drive(self, "walk", "stand", false, dtime)
+			return false -- skip rest of mob functions
+		end
+		return true
+	end,
+	on_die = function(self, pos)
+		if self.driver then
+			mcl_mobs.detach(self.driver, {x = 1, y = 0, z = 1})
+		end
+	end,
+	on_rightclick = function(self, clicker)
+		if not clicker or not clicker:is_player() then
+			return
+		end
+		if mcl_mobs:protect(self, clicker) then
+			return
+		end
+		if self.driver and clicker == self.driver then
+			-- Dismount
+			mcl_mobs.detach(clicker, {x = 1, y = 0, z = 1})
+		elseif not self.driver then
+			-- Mount
+			self.object:set_properties({stepheight = 1.1})
+			mcl_mobs.attach(self, clicker)
+		end
+	end,
+	animation = {
+		stand_start = 0, stand_end = 0,
+		walk_start = 0, walk_end = 40, walk_speed = 35,
+		run_start = 0, run_end = 40, run_speed = 70,
+	},
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:camel", camel)
 register_egg("mcl_mobs_addon:camel", S("Camel"), "#c89b5a", "#e8d5a8", 0)
-register_spawn({
-	name = "mcl_mobs_addon:camel",
-	dimension = "overworld",
-	type_of_spawning = "ground",
-	biomes = {
-		"Desert",
-	},
-	min_light = 0,
-	max_light = minetest.LIGHT_MAX + 1,
-	chance = 20,
-	interval = 30,
-	aoc = 7,
-	min_height = mobs_mc.water_level + 3,
-	max_height = mcl_vars.mg_overworld_max,
-})
+register_spawn("mcl_mobs_addon:camel",
+	{"Desert"},
+	{"Desert"}, 20)
 
 -- ---------------------------------------------------------------------------
 -- SKELETON HORSE  (base model: horse)
@@ -296,14 +345,44 @@ local skeleton_horse = {
 	drops = {
 		{name = "mcl_mobitems:bone", chance = 1, min = 0, max = 2},
 	},
-	-- TODO: MC skeleton trap (lightning converts to skeleton riders) —
-	-- no natural spawn on purpose; egg only for now
-	-- TODO(sounds): reuse game skeleton sounds (mobs_mc_skeleton_*)
+	sounds = {
+		random = "mobs_mc_skeleton_random",
+		damage = {name = "mobs_mc_skeleton_hurt", gain = 0.6},
+		death = {name = "mobs_mc_skeleton_death", gain = 0.6},
+		distance = 16,
+	},
+	-- No natural spawn on purpose (MC: skeleton trap via lightning only)
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:skeleton_horse", skeleton_horse)
 register_egg("mcl_mobs_addon:skeleton_horse", S("Skeleton Horse"), "#8a8a8a", "#e8e8e8", 0)
--- No natural spawn (MC: skeleton trap only)
+
+-- Skeleton trap (MC 1.11): lightning converts the horse and summons 4
+-- skeletons. Approximation: horse turns hostile, skeletons spawn around it.
+-- VoxeLibre only (Mineclonia has its own weather/lightning — TODO).
+if minetest.get_modpath("lightning") and lightning and lightning.register_on_strike then
+	lightning.register_on_strike(function(pos, pos2, objects)
+		for _, obj in pairs(objects or {}) do
+			local ent = obj:get_luaentity()
+			if ent and ent.name == "mcl_mobs_addon:skeleton_horse" and not ent._trap then
+				ent._trap = true
+				ent.damage = 2
+				local p = obj:get_pos()
+				for i = 1, 4 do
+					local sp = {
+						x = p.x + math.random(-2, 2),
+						y = p.y + 1,
+						z = p.z + math.random(-2, 2),
+					}
+					if minetest.get_node(sp).name == "air" then
+						minetest.add_entity(sp, "mobs_mc:skeleton")
+					end
+				end
+				break
+			end
+		end
+	end)
+end
 
 minetest.log("action", "[mcl_mobs_addon] loaded: fox, panda, camel, skeleton_horse registered")
 
@@ -317,6 +396,9 @@ minetest.log("action", "[mcl_mobs_addon] loaded: fox, panda, camel, skeleton_hor
 --   turtle    mcl_mobs_addon_turtle.png
 --   sniffer   mcl_mobs_addon_sniffer.png
 --   goat      mcl_mobs_addon_goat.png
+-- Model pipeline docs: https://docs.luanti.org/for-creators/models/
+--   Using Blender:      https://docs.luanti.org/for-creators/models/using-blender/
+--   Using Blockbench:   https://docs.luanti.org/for-creators/models/using-blockbench/
 -- Registration template (uncomment once the model exists):
 --
 -- local warden = {
@@ -334,6 +416,6 @@ minetest.log("action", "[mcl_mobs_addon] loaded: fox, panda, camel, skeleton_hor
 --     visual_size = {x = 3.0, y = 3.0},
 --     -- TODO: vibration sensing via mcl_sculk sensor events
 -- }
--- mcl_mobs.register_mob("mobs_mc:warden", warden)
--- register_egg("mobs_mc:warden", S("Warden"), "#0a3b2e", "#7ef0c8", 0)
+-- mcl_mobs.register_mob("mcl_mobs_addon:warden", warden)
+-- register_egg("mcl_mobs_addon:warden", S("Warden"), "#0a3b2e", "#7ef0c8", 0)
 -- ---------------------------------------------------------------------------
