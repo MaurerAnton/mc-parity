@@ -305,6 +305,54 @@ register_spawn("mcl_mobs_addon:camel",
 	{"Desert"}, 20)
 
 -- ---------------------------------------------------------------------------
+-- GOAT  (model: procedurally generated b3d — tools/gen_b3d.py, unique:
+-- no goat exists in VoxeLibre, Mineclonia, Bettercraft or ContentDB)
+-- ---------------------------------------------------------------------------
+local goat = {
+	description = S("Goat"),
+	type = "animal",
+	spawn_class = "passive",
+	can_despawn = true,
+	initial_properties = {
+		hp_min = 10,
+		hp_max = 10,
+		collisionbox = {-0.45, -0.01, -0.45, 0.45, 1.3, 0.45},
+	},
+	xp_min = 1,
+	xp_max = 3,
+	passive = true,
+	visual = "mesh",
+	mesh = "mcl_mobs_addon_goat.b3d",
+	textures = {
+		{"mcl_mobs_addon_goat.png"},
+	},
+	visual_size = {x = 1.0, y = 1.0},
+	makes_footstep_sound = true,
+	pathfinding = 1,
+	view_range = 16,
+	walk_chance = 50,
+	walk_velocity = 1.5,
+	run_velocity = 2.5,
+	damage = 0,
+	reach = 2,
+	fear_height = 4,
+	jump = true,
+	floats = 1,
+	animation = {
+		stand_start = 0, stand_end = 0,
+		walk_start = 0, walk_end = 0,
+		run_start = 0, run_end = 0,
+	},
+	-- TODO(sounds): CC0 goat sounds; TODO: MC goat ramming + horns drop
+}
+
+mcl_mobs.register_mob("mcl_mobs_addon:goat", goat)
+register_egg("mcl_mobs_addon:goat", S("Goat"), "#f2e2d0", "#9a8a7a", 0)
+register_spawn("mcl_mobs_addon:goat",
+	{"ExtremeHills", "ExtremeHillsM"},
+	{"#is_mountain"}, 30)
+
+-- ---------------------------------------------------------------------------
 -- SKELETON HORSE  (base model: horse)
 -- ---------------------------------------------------------------------------
 local skeleton_horse = {
@@ -384,7 +432,100 @@ if minetest.get_modpath("lightning") and lightning and lightning.register_on_str
 	end)
 end
 
-minetest.log("action", "[mcl_mobs_addon] loaded: fox, panda, camel, skeleton_horse registered")
+minetest.log("action", "[mcl_mobs_addon] loaded: fox, panda, camel, skeleton_horse, goat registered")
+
+-- ---------------------------------------------------------------------------
+-- BUNDLE  (MC 1.17 item — no implementation exists in VoxeLibre/Mineclonia/
+-- Bettercraft/ContentDB). Contents travel with the item (serialized in item
+-- metadata), so a dropped bundle keeps its items — the MC bundle property.
+-- v1: craft, view, take items out. TODO: shift-click insert (MC parity).
+-- ---------------------------------------------------------------------------
+local BUNDLE_MAX_ITEMS = 64
+local BUNDLE_SLOTS = 16
+
+local function bundle_get_inv(itemstack)
+	local raw = itemstack:get_meta():get_string("inv")
+	if raw == "" then
+		return {}
+	end
+	local ok, list = pcall(minetest.deserialize, raw)
+	return ok and type(list) == "table" and list or {}
+end
+
+local function bundle_set_inv(itemstack, list)
+	itemstack:get_meta():set_string("inv", minetest.serialize(list))
+end
+
+local function bundle_count(list)
+	local n = 0
+	for _, s in pairs(list) do
+		n = n + ItemStack(s):get_count()
+	end
+	return n
+end
+
+local function bundle_formspec(list)
+	local parts = {"size[7.2,3.2]", "label[0,0;Bundle (" .. bundle_count(list) .. "/" .. BUNDLE_MAX_ITEMS .. ")]"}
+	for i = 0, BUNDLE_SLOTS - 1 do
+		local x, y = (i % 8) * 0.9, math.floor(i / 8) * 0.9 + 0.5
+		local s = list[i]
+		local img = "blank.png"
+		if s then
+			img = ItemStack(s):get_name()
+		end
+		parts[#parts + 1] = "item_image[" .. x .. "," .. y .. ";0.85,0.85;" .. img .. "]"
+		parts[#parts + 1] = "button[" .. x .. "," .. y .. ";0.85,0.85;" .. tostring(i) .. ";take]"
+	end
+	parts[#parts + 1] = "button[2.9,2.3;1.4,0.7;close;Close]"
+	return table.concat(parts)
+end
+
+minetest.register_craftitem("mcl_mobs_addon:bundle", {
+	description = S("Bundle"),
+	inventory_image = "mcl_mobs_addon_bundle.png",
+	stack_max = 1,
+	groups = { bundle = 1 },
+	on_use = function(itemstack, user)
+		minetest.show_formspec(user:get_player_name(), "mcl_mobs_addon:bundle",
+			bundle_formspec(bundle_get_inv(itemstack)))
+		return itemstack
+	end,
+})
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if formname ~= "mcl_mobs_addon:bundle" then
+		return
+	end
+	local itemstack = player:get_wielded_item()
+	if itemstack:get_name() ~= "mcl_mobs_addon:bundle" then
+		return
+	end
+	local list = bundle_get_inv(itemstack)
+	for i = 0, BUNDLE_SLOTS - 1 do
+		if fields[tostring(i)] then
+			local s = list[i]
+			if s then
+				local leftover = player:get_inventory():add_item("main", s)
+				if leftover:is_empty() then
+					list[i] = nil
+					bundle_set_inv(itemstack, list)
+					player:set_wielded_item(itemstack)
+				end
+			end
+			break
+		end
+	end
+end)
+
+-- MC recipe: 6 rabbit hide + 2 string (VL: rabbit hide = leather_piece)
+minetest.register_craft({
+	output = "mcl_mobs_addon:bundle",
+	recipe = {
+		{"mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece"},
+		{"mcl_mobitems:leather_piece", "mcl_mobitems:string", "mcl_mobitems:leather_piece"},
+		{"mcl_mobitems:leather_piece", "mcl_mobitems:string", "mcl_mobitems:leather_piece"},
+	},
+})
 
 -- ---------------------------------------------------------------------------
 -- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already

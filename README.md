@@ -15,6 +15,8 @@ implemented as a standalone addon mod. Works on top of the game's existing
 |                |                                  | rideable (llama driver pattern)        |              |        |
 | skeleton_horse | mobs_mc_horse.b3d                | horse_skeleton.png                      | trap only    | in-game*|
 |                |                                  | lightning skeleton trap (VL)           |              |        |
+| goat           | **procedural b3d** (tools/gen_b3d.py, no Blender needed!) | goat.png (Pixel-Perfection) | ExtremeHills/#is_mountain | TODO   |
+| bundle (item)  | — (craftitem)                     | bundle.png                              | —            | —      |
 | allay          | **new Blender model needed**     | allay.png                               | —            | TODO   |
 | frog           | **new Blender model needed**     | frog_{temperate,cold,warm}.png          | —            | TODO   |
 | warden         | **new Blender model needed**     | warden.png (+ glow/ears layers)         | —            | TODO   |
@@ -51,10 +53,18 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
 4. [x] Panda personalities (variant textures already shipped)
 5. [x] Skeleton horse: lightning skeleton trap (VL; 4 skeletons, hostile)
 6. [x] Camel riding (llama driver pattern; MC 2-seat = TODO)
-7. [ ] Blender models for allay, frog, warden, phantom, turtle, sniffer, goat
-        (see Model pipeline below)
-8. [ ] Warden AI: hook into existing mcl_sculk vibration sensor events
-9. [x] Mineclonia spawn API support (mcl_mobs.register_spawner)
+7. [x] GOAT — first mob with a procedurally generated .b3d (tools/gen_b3d.py,
+        no Blender needed) — unique: no goat exists in VL/Mineclonia/
+        Bettercraft/ContentDB
+8. [x] BUNDLE (MC 1.17) — contents travel in item metadata; craft 6 leather
+        + 2 string; v1: view + take out (insert = TODO)
+9. [ ] Import from Bettercraft (GPLv3): warden/allay/frog+tadpole/phantom/
+        sniffer/turtle mobs + real panda/camel models + bubble column +
+        daylight detector + trial spawners/mace + froglight
+10. [ ] Warden AI: vibration sensing + anger + sonic boom (VL sculk sensor
+        is a stub — the vibration system must be built; genuinely unique)
+11. [ ] Deep dark biome + ancient city (unique — nowhere)
+12. [ ] Mineclonia spawn API support (mcl_mobs.register_spawner) — DONE, was #9
 
 ## Model pipeline (WIP mobs)
 
