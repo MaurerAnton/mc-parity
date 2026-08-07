@@ -121,6 +121,33 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           in initial_properties — register with initial_properties, then add
           def.hp_min/hp_max post-registration on Mineclonia
           (mcl_mobs.register_spawner is the Mineclonia marker)
+15. [x] Bettercraft import batch 1 (mobs_import.lua) — frog, turtle,
+        phantom, sniffer + REAL panda/camel models (replacing the
+        polar-bear/llama retextures). Bettercraft = Mineclonia fork,
+        GPLv3 + free media (LEGAL.md verified):
+        - FROG: biome textures (cold/temperate/warm via the game's
+          _mcl_biome_type), hops, eats tiny slimes/magma cubes and drops
+          froglight from magma cubes; spawns Swampland/MangroveSwamp
+        - TURTLE: slow beach walker, swims, seagrass-breedable on
+          Mineclonia (feed_tame feature-detected; egg-laying TODO — needs
+          the nest block); spawns StoneBeach
+        - PHANTOM: full Bettercraft AI — circles 18-20 blocks above the
+          nearest non-creative player, random dives (punch fleshy 6),
+          retreats upward 2s when damaged, burns in daylight (light>12);
+          drops phantom membrane; egg-only spawn (the spawn systems have
+          no time-of-day filter — MC night-only spawning is TODO)
+        - SNIFFER: peaceful relic hunter, egg-only for now
+        - PANDA: real model + Bettercraft animations (stand 0-25, walk/
+          punch 30-70); personality textures stay ours
+        - CAMEL: real model + animations (stand 1-40, walk 70-100, run
+          130-146); our riding logic kept
+        - FIXED latent Mineclonia bug: fox/panda/camel/goat/skeleton_horse
+          had hp only in initial_properties -> math.random(nil) crash at
+          spawn on Mineclonia — all base mobs now get the mcln_base_hp
+          post-registration patch (helpers exposed on mcl_mobs_addon.* so
+          dofile'd modules can call them — dofile chunks see only globals)
+        - NOT imported: allay (Mineclonia-only motion_step/run_ai hooks —
+          needs a VoxeLibre-compatible movement rewrite; TODO)
 
 ## Model pipeline (WIP mobs)
 

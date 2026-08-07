@@ -69,6 +69,27 @@ local function register_spawn(name, vl_biomes, mcln_biomes, weight)
 	end
 end
 
+-- Expose the helpers on the global table so dofile'd modules can use them
+-- (dofile chunks only see globals, never the caller's locals).
+mcl_mobs_addon = rawget(_G, "mcl_mobs_addon") or {}
+mcl_mobs_addon.register_egg = register_egg
+mcl_mobs_addon.register_spawn = register_spawn
+
+-- Mineclonia's mob activate reads hp from the DEF BASE (math.random(
+-- self.hp_min, ...) at mcl_mobs/api.lua:429); VoxeLibre from
+-- initial_properties (and warns on base placement). Register with hp in
+-- initial_properties, then add the base fields for Mineclonia.
+-- (register_spawner = the Mineclonia marker)
+local function mcln_base_hp(name, hp_min, hp_max)
+	if mcl_mobs.register_spawner then
+		local def = mcl_mobs.registered_mobs[name]
+		if def then
+			def.hp_min = hp_min
+			def.hp_max = hp_max
+		end
+	end
+end
+
 -- ---------------------------------------------------------------------------
 -- FOX  (base model: wolf)
 -- ---------------------------------------------------------------------------
@@ -125,13 +146,15 @@ local fox = {
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:fox", fox)
+mcln_base_hp("mcl_mobs_addon:fox", 10, 10)
 register_egg("mcl_mobs_addon:fox", S("Fox"), "#d98245", "#f2e9dc", 0)
 register_spawn("mcl_mobs_addon:fox",
 	{"Taiga", "ColdTaiga", "MegaTaiga", "MegaSpruceTaiga"},
 	{"#is_taiga"}, 60)
 
 -- ---------------------------------------------------------------------------
--- PANDA  (base model: polar bear)
+-- PANDA  (real model imported from Bettercraft — replaces the polar-bear
+-- retexture; personality textures stay ours)
 -- ---------------------------------------------------------------------------
 local panda = {
 	description = S("Panda"),
@@ -141,7 +164,7 @@ local panda = {
 	initial_properties = {
 		hp_min = 20,
 		hp_max = 20,
-		collisionbox = {-0.6, -0.01, -0.6, 0.6, 1.2, 0.6},
+		collisionbox = {-0.6, 0, -0.6, 0.6, 1.4, 0.6},
 	},
 	xp_min = 1,
 	xp_max = 3,
@@ -151,7 +174,13 @@ local panda = {
 	textures = {
 		{"mcl_mobs_addon_panda.png"},
 	},
-	visual_size = {x = 2.4, y = 2.4}, -- polar bear base is 3.0
+	visual_size = {x = 1, y = 1},
+	animation = {
+		stand_start = 0, stand_end = 25, stand_speed = 10,
+		walk_start = 30, walk_end = 70, speed_normal = 10,
+		run_start = 30, run_end = 70, speed_run = 15,
+		punch_start = 30, punch_end = 70, punch_speed = 15,
+	},
 	makes_footstep_sound = true,
 	head_swivel = "head.control",
 	head_eye_height = 1.0,
@@ -202,13 +231,15 @@ local panda = {
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:panda", panda)
+mcln_base_hp("mcl_mobs_addon:panda", 20, 20)
 register_egg("mcl_mobs_addon:panda", S("Panda"), "#f0f0f0", "#222222", 0)
 register_spawn("mcl_mobs_addon:panda",
 	{"BambooJungle", "BambooJungleM", "Jungle"},
 	{"#is_jungle"}, 30)
 
 -- ---------------------------------------------------------------------------
--- CAMEL  (base model: llama)
+-- CAMEL  (real model imported from Bettercraft — replaces the llama
+-- retexture; our riding logic stays)
 -- ---------------------------------------------------------------------------
 local camel = {
 	description = S("Camel"),
@@ -218,7 +249,7 @@ local camel = {
 	initial_properties = {
 		hp_min = 32,
 		hp_max = 32,
-		collisionbox = {-0.5, -0.01, -0.5, 0.5, 2.0, 0.5},
+		collisionbox = {-0.6, 0, -0.6, 0.6, 1.8, 0.6},
 	},
 	xp_min = 1,
 	xp_max = 3,
@@ -228,7 +259,12 @@ local camel = {
 	textures = {
 		{"mcl_mobs_addon_camel.png"},
 	},
-	visual_size = {x = 1.15, y = 1.15},
+	visual_size = {x = 1, y = 1},
+	animation = {
+		stand_start = 1, stand_end = 40, stand_speed = 10,
+		walk_start = 70, walk_end = 100, speed_normal = 10,
+		run_start = 130, run_end = 146, speed_run = 10,
+	},
 	makes_footstep_sound = true,
 	head_swivel = "head.control",
 	head_eye_height = 1.6,
@@ -299,6 +335,7 @@ local camel = {
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:camel", camel)
+mcln_base_hp("mcl_mobs_addon:camel", 32, 32)
 register_egg("mcl_mobs_addon:camel", S("Camel"), "#c89b5a", "#e8d5a8", 0)
 register_spawn("mcl_mobs_addon:camel",
 	{"Desert"},
@@ -347,6 +384,7 @@ local goat = {
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:goat", goat)
+mcln_base_hp("mcl_mobs_addon:goat", 10, 10)
 register_egg("mcl_mobs_addon:goat", S("Goat"), "#f2e2d0", "#9a8a7a", 0)
 register_spawn("mcl_mobs_addon:goat",
 	{"ExtremeHills", "ExtremeHillsM"},
@@ -403,6 +441,7 @@ local skeleton_horse = {
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:skeleton_horse", skeleton_horse)
+mcln_base_hp("mcl_mobs_addon:skeleton_horse", 15, 15)
 register_egg("mcl_mobs_addon:skeleton_horse", S("Skeleton Horse"), "#8a8a8a", "#e8e8e8", 0)
 
 -- Skeleton trap (MC 1.11): lightning converts the horse and summons 4
@@ -552,6 +591,12 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/deepdark.lua")
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/vibrations.lua")
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/warden.lua")
+
+-- ---------------------------------------------------------------------------
+-- IMPORTED MOBS (Bettercraft, GPLv3): frog, turtle, phantom, sniffer —
+-- see mobs_import.lua. Must load AFTER register_spawn helper + register_egg.
+-- ---------------------------------------------------------------------------
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_import.lua")
 
 -- ---------------------------------------------------------------------------
 -- GLASS CHESTS — MC mod parity (Iron Chests "Crystal Chest"); unique for
