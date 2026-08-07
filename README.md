@@ -247,6 +247,21 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           never reaches live entities. mcln_base_hp is exposed on the
           global table for dofile'd modules (armadillo would crash on
           Mineclonia otherwise: math.random(nil)).
+20. [x] Polish pass (MC-accurate values):
+        - WARDEN: melee 45 -> 30, sonic boom 25 -> 10 (MC; Bettercraft's
+          were over-tuned).
+        - GOAT: horns ONLY from charged rams (death drop removed, MC);
+          charged rams always drop 1-2 horns.
+        - SKELETON TRAP: MC parity — 4 skeleton horses WITH skeleton
+          riders (jockeys) instead of 4 loose skeletons. Jockey API:
+          VL = horse:jock_to(name, rel), Mineclonia =
+          rider:jock_to_existing(horse, bone, rel, rot); attach offsets
+          in NODE units (y=1.6 — Mineclonia's own trap value).
+          PITFALL: lightning.strike needs a solid block below the strike
+          point (cleared test areas silently no-op the strike).
+        - TAMED WOLF VARIANTS: tamed variant wolves keep their fur +
+          collar (wolf_<v>_tame.png); the dye handler still wins. Angry
+          textures: the game never swaps to angry (VL dead asset) — TODO.
 
 ## Model pipeline (WIP mobs)
 
