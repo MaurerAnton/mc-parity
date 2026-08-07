@@ -392,8 +392,40 @@ mcl_mobs.register_mob("mcl_mobs_addon:phantom", {
 })
 
 mcl_mobs_addon.register_egg("mcl_mobs_addon:phantom", S("Phantom"), "#162328", "#a078db", 0)
--- no natural spawn: the spawn systems have no time-of-day filter, so a
--- night-only phantom spawn (MC parity) isn't expressible — TODO
+-- MC-parity night spawn: neither spawn system has a time-of-day filter, so
+-- a lightweight globalstep spawns phantoms at night near non-creative
+-- players (no sleep-tracking yet — MC requires 3 sleepless nights; TODO).
+local ph_timer = 0
+minetest.register_globalstep(function(dtime)
+	ph_timer = ph_timer + dtime
+	if ph_timer < 2 then return end
+	ph_timer = 0
+	if not minetest.get_connected_players() then return end
+	local t = minetest.get_timeofday()
+	if t > 0.25 and t < 0.75 then return end  -- daytime: no phantoms
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local name = player:get_player_name()
+		if not minetest.check_player_privs(name, { creative = true }) then
+			local ppos = player:get_pos()
+			if ppos and math.random(60) == 1 then
+				local exists = false
+				for _, o in ipairs(minetest.get_objects_inside_radius(ppos, 32)) do
+					local le = o:get_luaentity()
+					if le and le.name == "mcl_mobs_addon:phantom" then
+						exists = true
+						break
+					end
+				end
+				if not exists then
+					local sp = vector.offset(ppos, 0, 20 + math.random(0, 10), 0)
+					if minetest.get_node(sp).name == "air" then
+						minetest.add_entity(sp, "mcl_mobs_addon:phantom")
+					end
+				end
+			end
+		end
+	end
+end)
 mcln_base_hp("mcl_mobs_addon:phantom", 20, 20)
 
 -- ---------------------------------------------------------------------------

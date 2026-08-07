@@ -310,6 +310,10 @@ local camel = {
 		if self.driver then
 			mcl_mobs.detach(self.driver, {x = 1, y = 0, z = 1})
 		end
+		if self.passenger and self.passenger:is_valid() then
+			mcl_mobs.detach(self.passenger, {x = 1, y = 0, z = 1})
+			self.passenger = nil
+		end
 	end,
 	on_rightclick = function(self, clicker)
 		if not clicker or not clicker:is_player() then
@@ -319,19 +323,24 @@ local camel = {
 			return
 		end
 		if self.driver and clicker == self.driver then
-			-- Dismount
+			-- Dismount (driver + any passenger)
 			mcl_mobs.detach(clicker, {x = 1, y = 0, z = 1})
+			if self.passenger and self.passenger:is_valid() then
+				mcl_mobs.detach(self.passenger, {x = 1, y = 0, z = 1})
+				self.passenger = nil
+			end
+		elseif self.driver then
+			-- Second seat (MC: camels seat 2)
+			if not self.passenger or not self.passenger:is_valid() then
+				self.passenger = clicker
+				clicker:set_attach(self.object, "", {x = 0, y = 12.7, z = 5}, {x = 0, y = 0, z = 0})
+			end
 		elseif not self.driver then
 			-- Mount
 			self.object:set_properties({stepheight = 1.1})
 			mcl_mobs.attach(self, clicker)
 		end
 	end,
-	animation = {
-		stand_start = 0, stand_end = 0,
-		walk_start = 0, walk_end = 40, walk_speed = 35,
-		run_start = 0, run_end = 40, run_speed = 70,
-	},
 }
 
 mcl_mobs.register_mob("mcl_mobs_addon:camel", camel)
@@ -380,8 +389,77 @@ local goat = {
 		walk_start = 0, walk_end = 0,
 		run_start = 0, run_end = 0,
 	},
-	-- TODO(sounds): CC0 goat sounds; TODO: MC goat ramming + horns drop
+	sounds = {
+		random = "mobs_mc_llama",
+		damage = { name = "mobs_mc_cow_hurt", gain = 0.6 },
+		death = { name = "mobs_mc_cow_hurt", gain = 0.6 },
+		distance = 16,
+	},
+	drops = {
+		{ name = "mcl_mobs_addon:goat_horn", chance = 2, min = 1, max = 2 },
+	},
+	-- MC goat ramming: provoked goats wind up ~0.7s then charge, knocking
+	-- back and damaging; charged rams drop horns
+	on_attack = function(self, hitter)
+		if hitter and hitter:is_player() then
+			self.attack = hitter
+			self._ram_cooldown = 0
+		end
+	end,
+	do_custom = function(self, dtime)
+		self._ram_cooldown = (self._ram_cooldown or 0) - dtime
+		if self._ramming then
+			if not self.attack or not self.attack:is_valid() then
+				self._ramming = nil
+				return true
+			end
+			local pos = self.object:get_pos()
+			local tpos = self.attack:get_pos()
+			if pos and tpos then
+				local dist = vector.distance(pos, tpos)
+				self.object:set_velocity(vector.multiply(self._ram_dir, 6))
+				if dist < 1.8 then
+					-- impact: damage + knockback + maybe a horn
+					self.attack:punch(self.object, 1.0, {
+						full_punch_interval = 1.0,
+						damage_groups = { fleshy = 2 },
+					})
+					if math.random(2) == 1 then
+						minetest.add_item(pos, "mcl_mobs_addon:goat_horn")
+					end
+					self._ramming = nil
+					self._ram_cooldown = 8
+				elseif dist > 16 then
+					self._ramming = nil
+				end
+			end
+			return false  -- full control while charging
+		end
+		if self.attack and self.attack:is_valid() and self._ram_cooldown <= 0 then
+			local pos = self.object:get_pos()
+			local tpos = self.attack:get_pos()
+			if pos and tpos and vector.distance(pos, tpos) < 8 then
+				-- wind up, then charge
+				self._ram_windup = (self._ram_windup or 0) - dtime
+				if self._ram_windup <= 0 then
+					self._ramming = true
+					self._ram_dir = vector.direction(pos, tpos)
+				end
+				return false  -- stand still while winding up
+			end
+		end
+		self._ram_windup = 0.7
+		return true
+	end,
 }
+
+-- Goat horn (MC: dropped by charged rams; playable instrument TODO)
+minetest.register_craftitem("mcl_mobs_addon:goat_horn", {
+	description = S("Goat Horn"),
+	inventory_image = "mcl_mobs_addon_goat_horn.png",
+	groups = { craftitem = 1 },
+	stack_max = 64,
+})
 
 mcl_mobs.register_mob("mcl_mobs_addon:goat", goat)
 mcln_base_hp("mcl_mobs_addon:goat", 10, 10)
@@ -446,7 +524,8 @@ register_egg("mcl_mobs_addon:skeleton_horse", S("Skeleton Horse"), "#8a8a8a", "#
 
 -- Skeleton trap (MC 1.11): lightning converts the horse and summons 4
 -- skeletons. Approximation: horse turns hostile, skeletons spawn around it.
--- VoxeLibre only (Mineclonia has its own weather/lightning — TODO).
+-- Works on BOTH games: Mineclonia ships a COMPAT "lightning" shim whose
+-- metatable resolves lightning.* to mcl_lightning (same API as VL).
 if minetest.get_modpath("lightning") and lightning and lightning.register_on_strike then
 	lightning.register_on_strike(function(pos, pos2, objects)
 		for _, obj in pairs(objects or {}) do
@@ -597,6 +676,11 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/warden.lua")
 -- see mobs_import.lua. Must load AFTER register_spawn helper + register_egg.
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_import.lua")
+
+-- ---------------------------------------------------------------------------
+-- ALLAY (Bettercraft import + movement rewrite for both games) — allay.lua
+-- ---------------------------------------------------------------------------
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/allay.lua")
 
 -- ---------------------------------------------------------------------------
 -- GLASS CHESTS — MC mod parity (Iron Chests "Crystal Chest"); unique for

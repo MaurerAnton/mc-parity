@@ -148,6 +148,30 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           dofile'd modules can call them — dofile chunks see only globals)
         - NOT imported: allay (Mineclonia-only motion_step/run_ai hooks —
           needs a VoxeLibre-compatible movement rewrite; TODO)
+16. [x] Allay (allay.lua) — Bettercraft import with a cross-game movement
+        rewrite. Bettercraft's motion_step/run_ai are Mineclonia-native;
+        both games call do_custom (returning false skips the framework's
+        own step logic — VL mcl_mobs/api.lua:403, Mineclonia api.lua:705):
+        - Mineclonia: motion_step/run_ai hooks (native); VoxeLibre: do_custom
+        - the movement + item-drop logic are LOCAL functions (forward
+          declared) captured by the hook closures — NOT def fields, because
+          VoxeLibre's register_mob builds a WHITELISTED final_def and drops
+          unknown fields (a def field _motion was silently nil -> crash)
+        - delivery AI: give an item -> collects matching drops within 32
+          nodes -> returns them to you; persistent state; creative egg only
+        - PITFALL: pass a Lua function as a table FIELD and it survives;
+          store it as a custom field and VoxeLibre drops it.
+17. [x] Goat polish (init.lua): MC ramming — provoked goats wind up 0.7s,
+        charge (damage fleshy 2 + knockback), charged rams drop goat horns
+        (new mcl_mobs_addon:goat_horn item, Pixel-Perfection texture); horn
+        drop on death; llama/cow sounds (the game's own CC BY-SA media).
+        Skeleton trap: confirmed working on BOTH games — Mineclonia ships a
+        COMPAT "lightning" shim whose metatable resolves lightning.* to
+        mcl_lightning (same register_on_strike API as VL).
+        Phantom night spawn: globalstep spawns phantoms at night near
+        non-creative players (no 3-sleepless-nights tracking yet — TODO).
+        Camel: second seat (MC parity) — passenger attaches behind the
+        driver, both dismount together.
 
 ## Model pipeline (WIP mobs)
 
