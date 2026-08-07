@@ -21,6 +21,7 @@ jobs:
 
       - name: Build luanti 5.16 server (Ubuntu's minetest 5.8 is too old for the 2026 games)
         run: |
+          cd /tmp
           git clone -q --depth 1 --branch 5.16.0 https://github.com/luanti-org/luanti.git
           cmake -S luanti -B luanti/build -G Ninja -DBUILD_CLIENT=FALSE -DBUILD_SERVER=TRUE \
             -DENABLE_CURL=TRUE -DENABLE_GETTEXT=FALSE -DENABLE_LEVELDB=FALSE \
