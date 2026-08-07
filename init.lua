@@ -30,6 +30,8 @@ local pr = PseudoRandom(os.time() * 2)
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/config.lua")
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/legacy.lua")
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/legacy_items.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_final.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/port_items.lua")
 
 -- ---------------------------------------------------------------------------
 -- Helpers (dual-game)
