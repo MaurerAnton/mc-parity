@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Extract Mineclonia mob defs for porting into mcl_mobs_addon (GPLv3).
-Transforms: mobs_mc:<id> -> mcl_mobs_addon:<id> for the REGISTERED id and
+"""Extract Mineclonia mob defs for porting into mc_parity (GPLv3).
+Transforms: mobs_mc:<id> -> mc_parity:<id> for the REGISTERED id and
 its internal self-references; the register_spawner block -> a dual-game
 spawn comment (spawn registration is hand-written in the port module);
 mobs_mc.* helpers -> guarded local calls.
@@ -14,11 +14,11 @@ def extract_def(path):
 def port_file(path, out, mob_id, mob_name):
     src = extract_def(path)
     # registered id + self references
-    src = src.replace(f'"mobs_mc:{mob_id}"', f'"mcl_mobs_addon:{mob_id}"')
+    src = src.replace(f'"mobs_mc:{mob_id}"', f'"mc_parity:{mob_id}"')
     src = src.replace(f'mcl_mobs.register_mob ("mobs_mc:{mob_id}"',
-                      f'mcl_mobs.register_mob ("mcl_mobs_addon:{mob_id}"')
+                      f'mcl_mobs.register_mob ("mc_parity:{mob_id}"')
     src = src.replace(f'mcl_mobs.register_egg("mobs_mc:{mob_id}"',
-                      f'mcl_mobs.register_egg("mcl_mobs_addon:{mob_id}"')
+                      f'mcl_mobs.register_egg("mc_parity:{mob_id}"')
     open(out, "w", encoding="utf-8").write(src)
     print(f"{mob_name}: {len(src.splitlines())} lines -> {out}")
 

@@ -16,9 +16,9 @@
 --   - HEARTBEAT: while agitated the warden plays a heartbeat (synthesized
 --     CC0 sound, tools/gen_sounds.py)
 
-local S = minetest.get_translator("mcl_mobs_addon")
-local BOOM_SOUND = "mcl_mobs_addon_warden_boom"
-local HEARTBEAT = "mcl_mobs_addon_warden_heartbeat"
+local S = minetest.get_translator("mc_parity")
+local BOOM_SOUND = "mc_parity_warden_boom"
+local HEARTBEAT = "mc_parity_warden_heartbeat"
 
 -- MC: the sonic boom is a shockwave along the warden's facing direction,
 -- 4-15 nodes, IGNORING blocks (no line-of-sight check). Aimed at the
@@ -56,13 +56,13 @@ local function register_darkness_effect()
 	pcall(mcl_potions.register_effect, {
 		name = "darkness",
 		description = S("Darkness"),
-		icon = "mcl_mobs_addon_effect_darkness.png",
+		icon = "mc_parity_effect_darkness.png",
 	})
-	minetest.log("action", "[mcl_mobs_addon] darkness effect registered")
+	minetest.log("action", "[mc_parity] darkness effect registered")
 end
 minetest.register_on_mods_loaded(register_darkness_effect)
 
-mcl_mobs.register_mob("mcl_mobs_addon:warden", {
+mcl_mobs.register_mob("mc_parity:warden", {
 	description = S("Warden"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -93,8 +93,8 @@ mcl_mobs.register_mob("mcl_mobs_addon:warden", {
 	view_range = 16,
 	knock_back = false,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_warden.b3d",
-	textures = { "mcl_mobs_addon_warden.png" },
+	mesh = "mc_parity_warden.b3d",
+	textures = { "mc_parity_warden.png" },
 	visual_size = { x = 1, y = 1 },
 	glow = 4,
 	fire_resistant = true,
@@ -169,7 +169,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:warden", {
 	end,
 })
 
-mcl_mobs.register_egg("mcl_mobs_addon:warden", S("Warden"), "#061118", "#b6a180", 0)
+mcl_mobs.register_egg("mc_parity:warden", S("Warden"), "#061118", "#b6a180", 0)
 
 -- Mineclonia's mob activate reads hp_min/hp_max from the DEF BASE
 -- (mcl_mobs/api.lua:429 math.random(self.hp_min, ...)); VoxeLibre reads them
@@ -177,7 +177,7 @@ mcl_mobs.register_egg("mcl_mobs_addon:warden", S("Warden"), "#061118", "#b6a180"
 -- Register with initial_properties only, then add the base fields for
 -- Mineclonia (register_spawner is the Mineclonia marker).
 if mcl_mobs.register_spawner then
-	local def = mcl_mobs.registered_mobs["mcl_mobs_addon:warden"]
+	local def = mcl_mobs.registered_mobs["mc_parity:warden"]
 	if def then
 		def.hp_min = 500
 		def.hp_max = 500
@@ -189,18 +189,18 @@ end
 -- passes through blocks like MC and works on both games.
 
 -- hearing: the blind warden reacts to vibrations within 24 nodes
-if mcl_mobs_addon.vibrations and mcl_mobs_addon.vibrations.register_listener then
-	mcl_mobs_addon.vibrations.register_listener(function(vpos, freq, player)
+if mc_parity.vibrations and mc_parity.vibrations.register_listener then
+	mc_parity.vibrations.register_listener(function(vpos, freq, player)
 		for _, obj in ipairs(minetest.get_objects_inside_radius(vpos, 24)) do
 			local le = obj:get_luaentity()
-			if le and le.name == "mcl_mobs_addon:warden" then
+			if le and le.name == "mc_parity:warden" then
 				le._mca_target = player
 				le._mca_target_pos = vpos
 				le._mca_target_t = 60
 			end
 		end
 	end)
-	minetest.log("action", "[mcl_mobs_addon] warden hearing: vibration listener attached")
+	minetest.log("action", "[mc_parity] warden hearing: vibration listener attached")
 end
 
-minetest.log("action", "[mcl_mobs_addon] warden registered (shrieker-summoned, hears vibrations, sonic boom)")
+minetest.log("action", "[mc_parity] warden registered (shrieker-summoned, hears vibrations, sonic boom)")

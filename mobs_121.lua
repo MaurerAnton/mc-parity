@@ -12,12 +12,12 @@
 --     tamed wolf to equip (texture overlay + ~60% damage reduction; drops
 --     on the wolf's death).
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("armadillo") then
+if mc_parity.feature_enabled("armadillo") then
 -- ---------------------------------------------------------------------------
-mcl_mobs.register_mob("mcl_mobs_addon:armadillo", {
+mcl_mobs.register_mob("mc_parity:armadillo", {
 	description = S("Armadillo"),
 	type = "animal",
 	spawn_class = "passive",
@@ -30,8 +30,8 @@ mcl_mobs.register_mob("mcl_mobs_addon:armadillo", {
 	xp_min = 1,
 	xp_max = 3,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_armadillo.b3d",
-	textures = { "mcl_mobs_addon_armadillo.png" },
+	mesh = "mc_parity_armadillo.b3d",
+	textures = { "mc_parity_armadillo.png" },
 	visual_size = { x = 0.85, y = 0.85 },
 	makes_footstep_sound = true,
 	walk_velocity = 0.8,
@@ -51,7 +51,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:armadillo", {
 		self._mca_scute_t = (self._mca_scute_t or 300 + math.random(0, 300)) - dtime
 		if self._mca_scute_t <= 0 then
 			self._mca_scute_t = 300 + math.random(0, 300)
-			minetest.add_item(self.object:get_pos(), "mcl_mobs_addon:armadillo_scute")
+			minetest.add_item(self.object:get_pos(), "mc_parity:armadillo_scute")
 		end
 
 		-- roll / unroll (MC: rolls when a player or hostile mob runs close)
@@ -80,7 +80,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:armadillo", {
 				self._mca_rolled = true
 				self._mca_roll_t = 4
 				self.armor = 100  -- near-invulnerable while rolled
-				self.object:set_properties({ mesh = "mcl_mobs_addon_armadillo_rolled.b3d" })
+				self.object:set_properties({ mesh = "mc_parity_armadillo_rolled.b3d" })
 			end
 		else
 			self._mca_roll_t = (self._mca_roll_t or 4) - dtime
@@ -90,7 +90,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:armadillo", {
 				else
 					self._mca_rolled = nil
 					self.armor = 0
-					self.object:set_properties({ mesh = "mcl_mobs_addon_armadillo.b3d" })
+					self.object:set_properties({ mesh = "mc_parity_armadillo.b3d" })
 				end
 			end
 			return false  -- cannot move while rolled
@@ -99,61 +99,61 @@ mcl_mobs.register_mob("mcl_mobs_addon:armadillo", {
 	end,
 })
 
-mcl_mobs_addon.register_egg("mcl_mobs_addon:armadillo", S("Armadillo"), "#8c6b4a", "#d8c9a8", 0)
-mcl_mobs_addon.register_spawn("mcl_mobs_addon:armadillo",
+mc_parity.register_egg("mc_parity:armadillo", S("Armadillo"), "#8c6b4a", "#d8c9a8", 0)
+mc_parity.register_spawn("mc_parity:armadillo",
 	{ "Savanna", "SavannaM" },
 	{ "Savanna", "SavannaM" }, 40)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:armadillo", 12, 12)
+mc_parity.mcln_base_hp("mc_parity:armadillo", 12, 12)
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("wolf_armor") then
+if mc_parity.feature_enabled("wolf_armor") then
 -- ---------------------------------------------------------------------------
-minetest.register_craftitem("mcl_mobs_addon:armadillo_scute", {
+minetest.register_craftitem("mc_parity:armadillo_scute", {
 	description = S("Armadillo Scute"),
-	inventory_image = "mcl_mobs_addon_armadillo_scute.png",
+	inventory_image = "mc_parity_armadillo_scute.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
 })
 
-minetest.register_craftitem("mcl_mobs_addon:wolf_armor", {
+minetest.register_craftitem("mc_parity:wolf_armor", {
 	description = S("Wolf Armor"),
-	inventory_image = "mcl_mobs_addon_wolf_armor.png",
+	inventory_image = "mc_parity_wolf_armor.png",
 	groups = { craftitem = 1 },
 	stack_max = 1,
 	_tt_help = S("Right-click a tamed wolf to equip"),
 })
 
 minetest.register_craft({
-	output = "mcl_mobs_addon:wolf_armor",
+	output = "mc_parity:wolf_armor",
 	recipe = {
-		{ "mcl_mobs_addon:armadillo_scute", "mcl_mobs_addon:armadillo_scute" },
-		{ "mcl_mobs_addon:armadillo_scute", "mcl_mobs_addon:armadillo_scute" },
-		{ "mcl_mobs_addon:armadillo_scute", "mcl_mobs_addon:armadillo_scute" },
+		{ "mc_parity:armadillo_scute", "mc_parity:armadillo_scute" },
+		{ "mc_parity:armadillo_scute", "mc_parity:armadillo_scute" },
+		{ "mc_parity:armadillo_scute", "mc_parity:armadillo_scute" },
 	},
 })
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("wolf_variants") then
+if mc_parity.feature_enabled("wolf_variants") then
 -- ---------------------------------------------------------------------------
 -- MC 1.20.5 biome map, adapted to the games' actual biome names:
 -- (VL and Mineclonia both use the classic names: ColdTaiga, MegaTaiga...
 -- Mineclonia additionally has Grove.)
 local WOLF_VARIANTS = {
-	pale = { tex = "mcl_mobs_addon_wolf.png", biomes = nil },          -- default (taiga)
-	spotted = { tex = "mcl_mobs_addon_wolf_spotted.png",
+	pale = { tex = "mc_parity_wolf.png", biomes = nil },          -- default (taiga)
+	spotted = { tex = "mc_parity_wolf_spotted.png",
 		biomes = { "Savanna", "SavannaM", "SavannaPlateau", "SavannaPlateauM" } },
-	snowy = { tex = "mcl_mobs_addon_wolf_snowy.png", biomes = { "Grove" } },
-	black = { tex = "mcl_mobs_addon_wolf_black.png",
+	snowy = { tex = "mc_parity_wolf_snowy.png", biomes = { "Grove" } },
+	black = { tex = "mc_parity_wolf_black.png",
 		biomes = { "MegaTaiga", "MegaSpruceTaiga" } },
-	ashen = { tex = "mcl_mobs_addon_wolf_ashen.png", biomes = { "ColdTaiga" } },
-	rusty = { tex = "mcl_mobs_addon_wolf_rusty.png",
+	ashen = { tex = "mc_parity_wolf_ashen.png", biomes = { "ColdTaiga" } },
+	rusty = { tex = "mc_parity_wolf_rusty.png",
 		biomes = { "Jungle", "JungleM", "BambooJungle", "BambooJungleM" } },
-	woods = { tex = "mcl_mobs_addon_wolf_woods.png", biomes = { "Forest" } },
-	chestnut = { tex = "mcl_mobs_addon_wolf_chestnut.png",
+	woods = { tex = "mc_parity_wolf_woods.png", biomes = { "Forest" } },
+	chestnut = { tex = "mc_parity_wolf_chestnut.png",
 		biomes = { "MegaSpruceTaiga" } },
-	striped = { tex = "mcl_mobs_addon_wolf_striped.png",
+	striped = { tex = "mc_parity_wolf_striped.png",
 		biomes = { "Mesa", "MesaM", "MesaBryce", "MesaPlateauF", "MesaPlateauFM" } },
 }
 
@@ -172,7 +172,7 @@ local function wolf_variant_tex(pos)
 	return WOLF_VARIANTS.pale.tex
 end
 
-local WOLF_ARMOR_TEX = "mcl_mobs_addon_wolf_armor.png"
+local WOLF_ARMOR_TEX = "mc_parity_wolf_armor.png"
 
 minetest.register_on_mods_loaded(function()
 	-- patch the ENTITY class (the framework builds a whitelisted final_def
@@ -180,7 +180,7 @@ minetest.register_on_mods_loaded(function()
 	-- the live entity table is what actually takes effect at runtime)
 	local cls = minetest.registered_entities and minetest.registered_entities["mobs_mc:wolf"]
 	if not cls then
-		minetest.log("warning", "[mcl_mobs_addon] mobs_mc:wolf entity not found — variants/armor skipped")
+		minetest.log("warning", "[mc_parity] mobs_mc:wolf entity not found — variants/armor skipped")
 		return
 	end
 
@@ -202,7 +202,7 @@ minetest.register_on_mods_loaded(function()
 	cls.on_rightclick = function(self, clicker, itemstack, pointed_thing)
 		if clicker and clicker:is_player() and self.tamed then
 			local wi = clicker:get_wielded_item()
-			if wi:get_name() == "mcl_mobs_addon:wolf_armor" then
+			if wi:get_name() == "mc_parity:wolf_armor" then
 				self._mca_wolf_armor = true
 				if not minetest.settings:get_bool("creative_mode") then
 					wi:take_item()
@@ -248,28 +248,28 @@ minetest.register_on_mods_loaded(function()
 	cls.on_die = function(self, pos)
 		if orig_die then orig_die(self, pos) end
 		if self._mca_wolf_armor then
-			minetest.add_item(pos, "mcl_mobs_addon:wolf_armor")
+			minetest.add_item(pos, "mc_parity:wolf_armor")
 		end
 	end
 
-	minetest.log("action", "[mcl_mobs_addon] wolf patched: biome variants + armor")
+	minetest.log("action", "[mc_parity] wolf patched: biome variants + armor")
 end)
 
 end
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("bogged") then
+if mc_parity.feature_enabled("bogged") then
 -- shoots poison arrows, drops slimeballs. Textures from Bettercraft (GPLv3)
 -- on the game's skeleton model (no new model needed).
 -- ---------------------------------------------------------------------------
-minetest.register_craftitem("mcl_mobs_addon:breeze_rod", {
+minetest.register_craftitem("mc_parity:breeze_rod", {
 	description = S("Breeze Rod"),
-	inventory_image = "mcl_mobs_addon_breeze_rod.png",
+	inventory_image = "mc_parity_breeze_rod.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
 })
 
 -- poison arrow (the framework's "shoot" attack fires registered arrows)
-mcl_mobs.register_arrow("mcl_mobs_addon:poison_arrow", {
+mcl_mobs.register_arrow("mc_parity:poison_arrow", {
 	visual = "sprite",
 	visual_size = { x = 0.4, y = 0.4 },
 	textures = { "mcl_bows_arrow.png^[colorize:#4a9e4a:180" },
@@ -314,7 +314,7 @@ local bogged = {
 	textures = {
 		{
 			"mobs_mc_empty.png",  -- armor
-			"mcl_mobs_addon_bogged.png^mcl_mobs_addon_bogged_overlay.png",  -- mossy body
+			"mc_parity_bogged.png^mc_parity_bogged_overlay.png",  -- mossy body
 			"mcl_bows_bow_0.png",  -- wielded bow
 		},
 	},
@@ -331,7 +331,7 @@ local bogged = {
 	view_range = 16,
 	fear_height = 4,
 	attack_type = "shoot",
-	arrow = "mcl_mobs_addon:poison_arrow",
+	arrow = "mc_parity:poison_arrow",
 	shoot_interval = 2,
 	shoot_offset = 1.5,
 	dogshoot_switch = 1,
@@ -351,21 +351,21 @@ local bogged = {
 	},
 }
 
-mcl_mobs.register_mob("mcl_mobs_addon:bogged", bogged)
-mcl_mobs_addon.register_egg("mcl_mobs_addon:bogged", S("Bogged"), "#4a9e4a", "#7a5c3a", 0)
-mcl_mobs_addon.register_spawn("mcl_mobs_addon:bogged",
+mcl_mobs.register_mob("mc_parity:bogged", bogged)
+mc_parity.register_egg("mc_parity:bogged", S("Bogged"), "#4a9e4a", "#7a5c3a", 0)
+mc_parity.register_spawn("mc_parity:bogged",
 	{ "Swampland", "MangroveSwamp", "Swampland_shore" },
 	{ "Swampland", "MangroveSwamp", "Swampland_shore" }, 40)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:bogged", 20, 20)
+mc_parity.mcln_base_hp("mc_parity:bogged", 20, 20)
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("breeze") then
+if mc_parity.feature_enabled("breeze") then
 -- charges (a 3-ray fan that knocks targets back hard). Cuboid model via
 -- tools/gen_b3d.py + painted texture. MC spawns it only in trial chambers
 -- (no such structure here yet) — spawn egg only for now.
 -- ---------------------------------------------------------------------------
-mcl_mobs.register_mob("mcl_mobs_addon:breeze", {
+mcl_mobs.register_mob("mc_parity:breeze", {
 	description = S("Breeze"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -381,8 +381,8 @@ mcl_mobs.register_mob("mcl_mobs_addon:breeze", {
 	armor = 20,
 	pathfinding = 1,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_breeze.b3d",
-	textures = { "mcl_mobs_addon_breeze.png" },
+	mesh = "mc_parity_breeze.b3d",
+	textures = { "mc_parity_breeze.png" },
 	visual_size = { x = 1.1, y = 1.1 },
 	glow = 5,
 	makes_footstep_sound = false,  -- it floats
@@ -394,7 +394,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:breeze", {
 	fall_damage = 0,
 	fire_resistant = true,
 	drops = {
-		{ name = "mcl_mobs_addon:breeze_rod", chance = 1, min = 1, max = 1 },
+		{ name = "mc_parity:breeze_rod", chance = 1, min = 1, max = 1 },
 	},
 	animation = {
 		stand_start = 0, stand_end = 40, stand_speed = 15,
@@ -429,7 +429,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:breeze", {
 					self._mca_volley_t = 2.5
 					local dir = vector.normalize(vector.subtract(tp, sp))
 					dir.y = 0
-					minetest.sound_play("mcl_mobs_addon_warden_boom",
+					minetest.sound_play("mc_parity_warden_boom",
 						{ pos = sp, gain = 0.4, max_hear_distance = 20 }, true)
 					for _, ang in ipairs({ -0.45, 0, 0.45 }) do
 						local c = math.cos(ang)
@@ -469,14 +469,14 @@ mcl_mobs.register_mob("mcl_mobs_addon:breeze", {
 	end,
 })
 
-mcl_mobs_addon.register_egg("mcl_mobs_addon:breeze", S("Breeze"), "#e8ecf5", "#8cb8e8", 0)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:breeze", 30, 30)
+mc_parity.register_egg("mc_parity:breeze", S("Breeze"), "#e8ecf5", "#8cb8e8", 0)
+mc_parity.mcln_base_hp("mc_parity:breeze", 30, 30)
 
-minetest.log("action", "[mcl_mobs_addon] bogged + breeze registered (MC 1.21)")
+minetest.log("action", "[mc_parity] bogged + breeze registered (MC 1.21)")
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("drowned") then
+if mc_parity.feature_enabled("drowned") then
 -- drops fishing rods / nautilus shells / tridents. Textures: the game's
 -- zombie tinted teal-green (legal — game media, CC BY-SA).
 -- ---------------------------------------------------------------------------
@@ -521,10 +521,10 @@ local DROWNED = {
 	sounds = {},
 }
 
-mcl_mobs.register_mob("mcl_mobs_addon:drowned", DROWNED)
-mcl_mobs.register_egg("mcl_mobs_addon:drowned", S("Drowned"), "#3f9e8e", "#15433c", 0)
+mcl_mobs.register_mob("mc_parity:drowned", DROWNED)
+mcl_mobs.register_egg("mc_parity:drowned", S("Drowned"), "#3f9e8e", "#15433c", 0)
 -- the games' oceans are the "<Biome>_ocean" variants (no plain "Ocean")
-mcl_mobs_addon.register_spawn("mcl_mobs_addon:drowned",
+mc_parity.register_spawn("mc_parity:drowned",
 	{
 		"Jungle_ocean", "Savanna_ocean", "Desert_ocean", "Swampland_ocean",
 		"Plains_ocean", "Forest_ocean", "BirchForest_ocean", "FlowerForest_ocean",
@@ -535,5 +535,5 @@ mcl_mobs_addon.register_spawn("mcl_mobs_addon:drowned",
 		"Plains_ocean", "Forest_ocean", "BirchForest_ocean", "FlowerForest_ocean",
 		"Taiga_ocean", "ColdTaiga_ocean",
 	}, 30)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:drowned", 20, 20)
+mc_parity.mcln_base_hp("mc_parity:drowned", 20, 20)
 end

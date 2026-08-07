@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Wrap feature sections in `if mcl_mobs_addon.feature_enabled(...) then ... end`
+"""Wrap feature sections in `if mc_parity.feature_enabled(...) then ... end`
 for the version-gating menu. Sections are defined by line ranges; the script
 inserts from the bottom up so line numbers stay valid."""
 
@@ -33,7 +33,7 @@ FILES = {
 }
 
 import sys
-BASE = "/home/llm/questions/mcl_mobs_addon"
+BASE = "/home/llm/questions/mc_parity"
 
 for fname, sections in FILES.items():
     path = f"{BASE}/{fname}"
@@ -50,7 +50,7 @@ for fname, sections in FILES.items():
                            if "Mineclonia reads hp from the def base" in lines[j]), None)
             if footer:
                 end = footer - 1
-        lines[start - 1:start] = [f'if mcl_mobs_addon.feature_enabled("{gate}") then']
+        lines[start - 1:start] = [f'if mc_parity.feature_enabled("{gate}") then']
         lines[end:end] = ["end"]
     open(path, "w").write("\n".join(lines))
     print(f"{fname}: wrapped {len(sections)} sections")

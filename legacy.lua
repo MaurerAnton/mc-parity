@@ -4,7 +4,7 @@
 -- pre-1.13 music discs (cat, stal, ward, 11).
 -- ---------------------------------------------------------------------------
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- dual-game dark oak (VL legacy names vs Mineclonia modern names)
 local PICK = {}
@@ -79,7 +79,7 @@ local function chest(area, p, pr)
 	end
 end
 
-function mcl_mobs_addon.build_woodland_mansion(pos, def, pr, blockseed)
+function mc_parity.build_woodland_mansion(pos, def, pr, blockseed)
 	local pr = pr or PseudoRandom(pos.x + pos.y + pos.z)
 	-- 27x27 floor, up to y+12; centre at pos
 	local area = make_area_legacy(vector.offset(pos, -14, 0, -14), { x = 29, y = 13, z = 29 })
@@ -164,7 +164,7 @@ function mcl_mobs_addon.build_woodland_mansion(pos, def, pr, blockseed)
 		area:set_node(vector.offset(pos, -2, 3, z), { name = FENCE })
 		area:set_node(vector.offset(pos, 2, 3, z), { name = FENCE })
 	end
-	local allay = minetest.add_entity(vector.offset(pos, 0, 2, 8), "mcl_mobs_addon:allay")
+	local allay = minetest.add_entity(vector.offset(pos, 0, 2, 8), "mc_parity:allay")
 	if allay and allay:get_luaentity() then allay:get_luaentity()._mca_cage = true end
 
 	-- floor 2: bedrooms (beds), obsidian room, arena (vindicator/evoker)
@@ -190,23 +190,23 @@ function mcl_mobs_addon.build_woodland_mansion(pos, def, pr, blockseed)
 	chest(area, vector.offset(pos, -10, 1, 10), pr)
 
 	area:write_to_map()
-	minetest.log("action", "[mcl_mobs_addon] woodland mansion built @ " .. minetest.pos_to_string(pos))
+	minetest.log("action", "[mc_parity] woodland mansion built @ " .. minetest.pos_to_string(pos))
 end
 
 if mcl_structures and mcl_structures.register_structure then
-	mcl_structures.register_structure("mcl_mobs_addon:woodland_mansion", {
+	mcl_structures.register_structure("mc_parity:woodland_mansion", {
 		place_on = { "group:grass_block", "group:dirt", "mcl_core:dirt_with_grass" },
 		biomes = { "RoofedForest", "RoofedForestM" },
 		y_min = 1,
 		y_max = 40,
-		place_func = mcl_mobs_addon.build_woodland_mansion,
+		place_func = mc_parity.build_woodland_mansion,
 		flags = "place_center_x, place_center_z",
 		chunk_probability = 700,
 	})
 end
 
 -- ------------------------------------------------------------ end city ----
-function mcl_mobs_addon.build_end_city_tower(pos, def, pr, blockseed)
+function mc_parity.build_end_city_tower(pos, def, pr, blockseed)
 	local pr = pr or PseudoRandom(pos.x * 3 + pos.y * 7 + pos.z)
 	local PURPUR = pick("mcl_end:purpur_block")
 	local PURPUR_PILLAR = pick("mcl_end:purpur_pillar")
@@ -254,16 +254,16 @@ function mcl_mobs_addon.build_end_city_tower(pos, def, pr, blockseed)
 	minetest.add_entity(vector.offset(pos, 0, 10, 0), "mobs_mc:shulker")
 
 	area:write_to_map()
-	minetest.log("action", "[mcl_mobs_addon] end city tower built @ " .. minetest.pos_to_string(pos))
+	minetest.log("action", "[mc_parity] end city tower built @ " .. minetest.pos_to_string(pos))
 end
 
 if mcl_structures and mcl_structures.register_structure then
-	mcl_structures.register_structure("mcl_mobs_addon:end_city_tower", {
+	mcl_structures.register_structure("mc_parity:end_city_tower", {
 		place_on = { "mcl_end:end_stone" },
 		biomes = { "End", "EndHighlands", "EndMidlands", "EndBarrens", "EndSmallIslands" },
 		y_min = -40,
 		y_max = -10,
-		place_func = mcl_mobs_addon.build_end_city_tower,
+		place_func = mc_parity.build_end_city_tower,
 		flags = "place_center_x, place_center_z",
 		chunk_probability = 800,
 	})
@@ -275,13 +275,13 @@ end
 -- license); the labels are painted.
 if mcl_jukebox and mcl_jukebox.register_record then
 	mcl_jukebox.register_record("Cat", "Jordach", "cat",
-		"mcl_mobs_addon_record_cat.png", "mcl_jukebox_track_3")
+		"mc_parity_record_cat.png", "mcl_jukebox_track_3")
 	mcl_jukebox.register_record("Stal", "Jordach", "stal",
-		"mcl_mobs_addon_record_stal.png", "mcl_jukebox_track_6")
+		"mc_parity_record_stal.png", "mcl_jukebox_track_6")
 	mcl_jukebox.register_record("Ward", "Tom Peter", "ward",
-		"mcl_mobs_addon_record_ward.png", "mcl_jukebox_track_5")
+		"mc_parity_record_ward.png", "mcl_jukebox_track_5")
 	mcl_jukebox.register_record("11", "SoundHelix", "11",
-		"mcl_mobs_addon_record_11.png", "mcl_jukebox_track_8")
+		"mc_parity_record_11.png", "mcl_jukebox_track_8")
 end
 
-minetest.log("action", "[mcl_mobs_addon] legacy closers: mansion + end city + discs")
+minetest.log("action", "[mc_parity] legacy closers: mansion + end city + discs")

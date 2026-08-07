@@ -1,4 +1,4 @@
-# mcl_mobs_addon
+# MC Parity (mc_parity)
 
 Extra Minecraft-style mobs for **VoxeLibre** (and eventually Mineclonia),
 implemented as a standalone addon mod. Works on top of the game's existing
@@ -27,8 +27,8 @@ implemented as a standalone addon mod. Works on top of the game's existing
 
 ## Install
 
-Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
-`mods/mcl_mobs_addon/`), or use it as a world modpack. Requires
+Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
+`mods/mc_parity/`), or use it as a world modpack. Requires
 `mcl_mobs` (bundled with both games). Enable in the world settings.
 
 ## Asset provenance
@@ -39,9 +39,9 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
   https://github.com/minetest-texture-packs/Pixel-Perfection-Legacy
   Original: https://www.planetminecraft.com/texture_pack/131pixel-perfection/
 - Models: copied from VoxeLibre (GPLv3+ code / free media) and renamed with
-  the `mcl_mobs_addon_` prefix so they don't clash with the game's files:
+  the `mc_parity_` prefix so they don't clash with the game's files:
   - https://git.minetest.land/VoxeLibre/VoxeLibre (mods/ENTITIES/mobs_mc/models/)
-- All new files in this mod are prefixed `mcl_mobs_addon_` to stay unique
+- All new files in this mod are prefixed `mc_parity_` to stay unique
   across the game's global texture/model namespace.
 
 ## Work plan (in order)
@@ -144,7 +144,7 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         - FIXED latent Mineclonia bug: fox/panda/camel/goat/skeleton_horse
           had hp only in initial_properties -> math.random(nil) crash at
           spawn on Mineclonia — all base mobs now get the mcln_base_hp
-          post-registration patch (helpers exposed on mcl_mobs_addon.* so
+          post-registration patch (helpers exposed on mc_parity.* so
           dofile'd modules can call them — dofile chunks see only globals)
         - NOT imported: allay (Mineclonia-only motion_step/run_ai hooks —
           needs a VoxeLibre-compatible movement rewrite; TODO)
@@ -163,7 +163,7 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           store it as a custom field and VoxeLibre drops it.
 17. [x] Goat polish (init.lua): MC ramming — provoked goats wind up 0.7s,
         charge (damage fleshy 2 + knockback), charged rams drop goat horns
-        (new mcl_mobs_addon:goat_horn item, Pixel-Perfection texture); horn
+        (new mc_parity:goat_horn item, Pixel-Perfection texture); horn
         drop on death; llama/cow sounds (the game's own CC BY-SA media).
         Skeleton trap: confirmed working on BOTH games — Mineclonia ships a
         COMPAT "lightning" shim whose metatable resolves lightning.* to
@@ -174,7 +174,7 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         driver, both dismount together.
 18. [x] TODO-tail + far items:
         - TURTLE EGGS (MC parity): breeding turtles walk back to their
-          home beach and lay eggs on sand (mcl_mobs_addon:turtle_egg, PP
+          home beach and lay eggs on sand (mc_parity:turtle_egg, PP
           texture); eggs hatch after 2-5 minutes into baby turtles
           (visual_size 0.6) that grow to full size after ~5 minutes
           (dropping a scute — MC parity).
@@ -183,8 +183,8 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           used for projectiles) — hatchling state travels via an on_spawn
           registry instead of staticdata.
         - SCUTE + TURTLE SHELL (MC 1.13; missed in the original port):
-          mcl_mobs_addon:scute item (PP texture) + the turtle shell helmet
-          via mcl_armor.register_set — mcl_mobs_addon:helmet_turtle
+          mc_parity:scute item (PP texture) + the turtle shell helmet
+          via mcl_armor.register_set — mc_parity:helmet_turtle
           (2 armor points, durability 275, craft = 5 scute — MC recipe);
           wearing it grants water breathing while the head is underwater.
           PITFALLS: register_set names items element.name..'_'..def.name
@@ -213,12 +213,12 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           spawn for them); state persists in player meta, re-applied on
           join.
         - NETHER LAVA (MC parity, unique): a new liquid pair
-          (mcl_mobs_addon:nether_lava_source/_flowing) with liquid_viscosity
+          (mc_parity:nether_lava_source/_flowing) with liquid_viscosity
           = 1 and liquid_range = 7 — nether lava flows like water (MC).
           The nether's existing lava lakes are converted by an ABM: lava
           sitting on netherrack (overworld lava sits on stone — untouched).
           The conversion logic is extracted to
-          mcl_mobs_addon.convert_nether_lava for testability (ABMs don't
+          mc_parity.convert_nether_lava for testability (ABMs don't
           run headless — no active blocks without players).
         - MC-ACCURATE FLUID SOLVER: NOT feasible as an addon — Luanti's
           liquid simulation runs natively in the engine
@@ -289,7 +289,7 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         - BOGGED: moss-covered skeleton on the game's skeleton model +
           Bettercraft textures (GPLv3); does NOT burn in daylight (the
           skeleton's ignited_by_sunlight flag is omitted); shoots POISON
-          arrows (mcl_mobs_addon:poison_arrow — damage 4 + poison 8s,
+          arrows (mc_parity:poison_arrow — damage 4 + poison 8s,
           green [colorize on the game's arrow texture); drops slimeball
           + bones; swamps (Swampland/Swampland_shore/MangroveSwamp —
           verified in both games).
@@ -383,11 +383,11 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         - Stored per world (mod storage); changes apply after a server
           restart (registrations happen at load).
         - Gating: every registration wrapped in
-          mcl_mobs_addon.feature_enabled(id) — version group AND not
+          mc_parity.feature_enabled(id) — version group AND not
           individually disabled; ~35 features tagged in the FEATURES
           table (tools/wrap_gates.py wrapped the module sections).
         - PITFALLS: config.lua loads FIRST (dofile before the helpers)
-          so it creates the mcl_mobs_addon global itself; the port
+          so it creates the mc_parity global itself; the port
           footer's mcln_base_hp stays OUTSIDE the trader wrap (it
           patches all 8 entities — safe no-op for unregistered names);
           the mod storage file is a JSON object of strings.
@@ -470,7 +470,7 @@ animation frames (see the existing models/ for frame conventions).
 - Blender:        https://docs.luanti.org/for-creators/models/using-blender/
 - Blockbench:     https://docs.luanti.org/for-creators/models/using-blockbench/
 - Texture bases: Pixel Perfection / REFI (CC BY-SA 4.0), see Asset provenance.
-- After export: place as `models/mcl_mobs_addon_<mob>.b3d` and uncomment the
+- After export: place as `models/mc_parity_<mob>.b3d` and uncomment the
   registration template in init.lua (WIP section).
 
 ## Pitfalls (verified with luanti 5.16.1 + VoxeLibre 0.92.1, headless)
@@ -482,7 +482,7 @@ animation frames (see the existing models/ for frame conventions).
   register_spawner first, spawn_setup second). Biome tags: `#is_taiga`,
   `#is_jungle`, ... — there is NO `#is_desert` tag, use the `"Desert"` name.
 - **Entity id prefix**: `mcl_mobs.register_mob` requires the id to start with
-  the ADDON's own mod name (`mcl_mobs_addon:fox`), NOT `mobs_mc:fox` — the
+  the ADDON's own mod name (`mc_parity:fox`), NOT `mobs_mc:fox` — the
   `mobs_mc:` prefix is only valid inside the game's own `mobs_mc` mod.
   Violation → ModError: "Name does not follow naming conventions".
   References to game mobs inside fields (`specific_attack`, `follow`, drops)
@@ -493,7 +493,7 @@ animation frames (see the existing models/ for frame conventions).
   in `worlddir/mods/` need matching `load_mod_<name> = true` in world.mt.
 - **Headless test recipe**:
   `timeout 90 luanti --server --world <path> --logfile /tmp/t.log`
-  then grep the log for `[mcl_mobs_addon]` banner / `ModError` / `ERROR`.
+  then grep the log for `[mc_parity]` banner / `ModError` / `ERROR`.
 - Runtime check: the banner log line sits AFTER all register calls in
   init.lua — its presence in the log proves every registration succeeded.
 

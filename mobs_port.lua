@@ -3,13 +3,13 @@
 -- wandering trader. These close the LAST ecosystem gaps: VoxeLibre
 -- 0.92 lacks creeper/enderman/blaze/pufferfish/wandering_trader
 -- entirely; Mineclonia has them but NOT ravager-friendly targeting here.
--- Adapted: ids -> mcl_mobs_addon:*, Mineclonia-only spawn API ->
+-- Adapted: ids -> mc_parity:*, Mineclonia-only spawn API ->
 -- dual-game register_monster_spawn, raid/targeting-rule machinery ->
 -- standard framework aggro (the targeting-rule API is Mineclonia-only).
 -- Media (models/textures) keeps the mobs_mc_* names (the media namespace
 -- is global; on Mineclonia our identical copies simply shadow the game's).
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- Mineclonia's table.merge is missing in VoxeLibre — shim it
 if not table.merge then
@@ -63,12 +63,12 @@ local function register_monster_spawn(name, biomes, weight, pack_min, pack_max, 
 	end
 	end)
 	if not ok then
-		minetest.log("action", "[mcl_mobs_addon] spawn FAIL " .. tostring(name) .. ": " .. tostring(err))
+		minetest.log("action", "[mc_parity] spawn FAIL " .. tostring(name) .. ": " .. tostring(err))
 	end
 end
 
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("creeper") then
+if mc_parity.feature_enabled("creeper") then
 -- ---------------------------------------------------------------------------
 --License for code WTFPL and otherwise stated in readmes
 
@@ -308,11 +308,11 @@ local regular_creeper = table.merge (creeper_defs, {
 })
 
 function regular_creeper:_on_lightning_strike ()
-	mcl_util.replace_mob(self.object, "mcl_mobs_addon:creeper_charged")
+	mcl_util.replace_mob(self.object, "mc_parity:creeper_charged")
 	return true
 end
 
-mcl_mobs.register_mob ("mcl_mobs_addon:creeper", regular_creeper)
+mcl_mobs.register_mob ("mc_parity:creeper", regular_creeper)
 
 local charged_creeper = table.merge (creeper_defs, {
 	description = S("Charged Creeper"),
@@ -329,20 +329,20 @@ local charged_creeper = table.merge (creeper_defs, {
 	use_texture_alpha = true,
 })
 
-mcl_mobs.register_mob ("mcl_mobs_addon:creeper_charged", charged_creeper)
+mcl_mobs.register_mob ("mc_parity:creeper_charged", charged_creeper)
 
 -- spawn eggs
-mcl_mobs.register_egg("mcl_mobs_addon:creeper", S("Creeper"), "#0da70a", "#000000", 0)
+mcl_mobs.register_egg("mc_parity:creeper", S("Creeper"), "#0da70a", "#000000", 0)
 
 ---------------------------------------------------------------
 -- Modern Creeper spawning.
 ---------------------------------------------------------------
 
-register_monster_spawn("mcl_mobs_addon:creeper", OW_MONSTERS, 100, 4, 4)
+register_monster_spawn("mc_parity:creeper", OW_MONSTERS, 100, 4, 4)
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("blaze") then
+if mc_parity.feature_enabled("blaze") then
 -- ---------------------------------------------------------------------------
 -- daufinsyd
 -- My work is under the LGPL terms
@@ -409,7 +409,7 @@ local blaze = {
 	fire_damage_resistant = true,
 	gravity_drag = 0.6,
 	attack_type = "null",
-	arrow = "mcl_mobs_addon:blaze_fireball",
+	arrow = "mc_parity:blaze_fireball",
 	makes_footstep_sound = false,
 	glow = 14,
 	view_range = 48.0,
@@ -626,18 +626,18 @@ end
 
 
 
-mcl_mobs.register_mob ("mcl_mobs_addon:blaze", blaze)
+mcl_mobs.register_mob ("mc_parity:blaze", blaze)
 
 ------------------------------------------------------------------------
 -- Blaze spawning.
 ------------------------------------------------------------------------
 
-register_monster_spawn("mcl_mobs_addon:blaze", NETHER_BIOMES, 20, 1, 2, "nether")
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:blaze", 20, 20)
+register_monster_spawn("mc_parity:blaze", NETHER_BIOMES, 20, 1, 2, "nether")
+mc_parity.mcln_base_hp("mc_parity:blaze", 20, 20)
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("enderman") then
+if mc_parity.feature_enabled("enderman") then
 -- ---------------------------------------------------------------------------
 --MCmobs v0.4
 --maikerumine
@@ -659,7 +659,7 @@ if mcl_mobs_addon.feature_enabled("enderman") then
 -- added rain damage.
 -- fixed the grass_with_dirt issue.
 
-core.register_entity ("mcl_mobs_addon:ender_eyes", {
+core.register_entity ("mc_parity:ender_eyes", {
 	initial_properties = {
 		visual = "mesh",
 		mesh = "mobs_mc_spider.b3d",
@@ -944,9 +944,9 @@ function enderman:mob_activate (staticdata, dtime)
 	if not mcl_mobs.mob_class.mob_activate(self, staticdata, dtime) then
 		return false
 	end
-	core.add_entity (self.object:get_pos(), "mcl_mobs_addon:ender_eyes")
+	core.add_entity (self.object:get_pos(), "mc_parity:ender_eyes")
 		:set_attach(self.object, "head.top", vector.new(0,2.54,-1.99), vector.new(90,0,180))
-	core.add_entity (self.object:get_pos(), "mcl_mobs_addon:ender_eyes")
+	core.add_entity (self.object:get_pos(), "mc_parity:ender_eyes")
 		:set_attach(self.object, "head.top", vector.new(1,2.54,-1.99), vector.new(90,0,180))
 	return true
 end
@@ -1374,27 +1374,27 @@ end
 
 -- Prevent endermen from crossing water.
 
-mcl_mobs.register_mob ("mcl_mobs_addon:enderman", enderman)
+mcl_mobs.register_mob ("mc_parity:enderman", enderman)
 
 ------------------------------------------------------------------------
 -- Enderman spawning.
 ------------------------------------------------------------------------
 
 -- spawn eggs
-mcl_mobs.register_egg("mcl_mobs_addon:enderman", S("Enderman"), "#252525", "#151515", 0)
+mcl_mobs.register_egg("mc_parity:enderman", S("Enderman"), "#252525", "#151515", 0)
 
 ------------------------------------------------------------------------
 -- Modern Enderman spawning.
 ------------------------------------------------------------------------
 
-register_monster_spawn("mcl_mobs_addon:enderman", OW_MONSTERS, 1, 1, 4)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:enderman", 40, 40)
-register_monster_spawn("mcl_mobs_addon:enderman", NETHER_BIOMES, 1, 1, 4, "nether")
-register_monster_spawn("mcl_mobs_addon:enderman", END_BIOMES, 10, 4, 4, "end")
+register_monster_spawn("mc_parity:enderman", OW_MONSTERS, 1, 1, 4)
+mc_parity.mcln_base_hp("mc_parity:enderman", 40, 40)
+register_monster_spawn("mc_parity:enderman", NETHER_BIOMES, 1, 1, 4, "nether")
+register_monster_spawn("mc_parity:enderman", END_BIOMES, 10, 4, 4, "end")
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("pufferfish") then
+if mc_parity.feature_enabled("pufferfish") then
 -- ---------------------------------------------------------------------------
 local S = core.get_translator ("mobs_mc")
 
@@ -1410,7 +1410,7 @@ local pufferfish_ignored_mobs = {
 	"mobs_mc:glow_squid",
 	"mobs_mc:guardian",
 	"mobs_mc:guardian_elder",
-	"mcl_mobs_addon:pufferfish",
+	"mc_parity:pufferfish",
 	"mobs_mc:salmon",
 	"mobs_mc:squid",
 	"mobs_mc:tropical_fish",
@@ -1641,18 +1641,18 @@ local function pufferfish_defend_self (self, self_pos, dtime)
 end
 
 
-mcl_mobs.register_mob ("mcl_mobs_addon:pufferfish", pufferfish)
+mcl_mobs.register_mob ("mc_parity:pufferfish", pufferfish)
 
 ------------------------------------------------------------------------
 -- Modern Pufferfish spawning.
 ------------------------------------------------------------------------
 
-register_monster_spawn("mcl_mobs_addon:pufferfish", OCEAN_BIOMES, 10, 1, 3)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:pufferfish", 6, 6)
+register_monster_spawn("mc_parity:pufferfish", OCEAN_BIOMES, 10, 1, 3)
+mc_parity.mcln_base_hp("mc_parity:pufferfish", 6, 6)
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("ravager") then
+if mc_parity.feature_enabled("ravager") then
 -- ---------------------------------------------------------------------------
 local S = core.get_translator ("mobs_mc")
 local raid_mob = {}  -- raid system not ported (Mineclonia-only)
@@ -2142,10 +2142,10 @@ end
 -- Ravager spawning.
 ------------------------------------------------------------------------
 
-mcl_mobs.register_mob ("mcl_mobs_addon:ravager", ravager)
+mcl_mobs.register_mob ("mc_parity:ravager", ravager)
 
 -- Spawn eggs.
-mcl_mobs.register_egg ("mcl_mobs_addon:ravager", S ("Ravager"), "#757470", "#5b5049")
+mcl_mobs.register_egg ("mc_parity:ravager", S ("Ravager"), "#757470", "#5b5049")
 
 ------------------------------------------------------------------------
 -- Modern Ravager spawning.
@@ -2154,7 +2154,7 @@ mcl_mobs.register_egg ("mcl_mobs_addon:ravager", S ("Ravager"), "#757470", "#5b5
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("wandering_trader") then
+if mc_parity.feature_enabled("wandering_trader") then
 -- ---------------------------------------------------------------------------
 local modname = core.get_current_modname ()
 local S = core.get_translator (modname)
@@ -2414,7 +2414,7 @@ function wandering_trader:ai_step (dtime)
 		local self_pos = self.object:get_pos ()
 		for object in core.objects_inside_radius (self_pos, 16) do
 			local entity = object:get_luaentity ()
-			if entity and entity.name == "mcl_mobs_addon:trader_llama"
+			if entity and entity.name == "mc_parity:trader_llama"
 				and entity._trader_id == self._trader_id then
 				entity._get_owner = self._provide_owner
 				table.insert (valid_llamas, object)
@@ -2564,7 +2564,7 @@ function wandering_trader:post_load_staticdata ()
 	end
 end
 
-mcl_mobs.register_mob ("mcl_mobs_addon:wandering_trader", wandering_trader)
+mcl_mobs.register_mob ("mc_parity:wandering_trader", wandering_trader)
 
 ------------------------------------------------------------------------
 -- Wandering Trader spawning.
@@ -2578,7 +2578,7 @@ local function spawn_one_llama (around, entity)
 		local dz = pr:next (-4, 4)
 		local pos = vector.offset (around, dx, 0, dz)
 		local surface = mobs_mc.find_surface_position (pos)
-		local llama = mcl_mobs.spawn_abnormally (surface, "mcl_mobs_addon:trader_llama",
+		local llama = mcl_mobs.spawn_abnormally (surface, "mc_parity:trader_llama",
 							 nil, "trader_spawning")
 		if llama then
 			local llama = llama:get_luaentity ()
@@ -2644,7 +2644,7 @@ local function spawn_wandering_trader ()
 		-- Spawn a trader and attempt to link llamas to the
 		-- same.
 		local trader = mcl_mobs.spawn_abnormally (surface,
-							  "mcl_mobs_addon:wandering_trader",
+							  "mc_parity:wandering_trader",
 							  nil, "trader_spawning")
 		if trader then
 			local trader_id = storage:get_int ("last_trader_id") + 1
@@ -2698,7 +2698,7 @@ end)
 
 end
 
-mcl_mobs.register_egg ("mcl_mobs_addon:wandering_trader", S("Wandering Trader"), "#1E90FF", "#bc8b72", 0)
+mcl_mobs.register_egg ("mc_parity:wandering_trader", S("Wandering Trader"), "#1E90FF", "#bc8b72", 0)
 
 
 ------------------------------------------------------------------------------
@@ -2816,36 +2816,36 @@ end
 -- Trader Llama spawning & registration.
 ------------------------------------------------------------------------
 
-mcl_mobs.register_mob ("mcl_mobs_addon:trader_llama", trader_llama)
-mcl_mobs.register_egg ("mcl_mobs_addon:trader_llama", S("Trader Llama"), "#eaa430", "#456296", 0)
-mcl_entity_invs.register_inv ("mcl_mobs_addon:trader_llama", S ("Trader Llama"), nil, true)
+mcl_mobs.register_mob ("mc_parity:trader_llama", trader_llama)
+mcl_mobs.register_egg ("mc_parity:trader_llama", S("Trader Llama"), "#eaa430", "#456296", 0)
+mcl_entity_invs.register_inv ("mc_parity:trader_llama", S ("Trader Llama"), nil, true)
 
 -- natural spawn: rare, like MC; traders wander with their llamas.
 -- Mineclonia branch FIRST (their spawn_setup is a broken compat shim).
 if mcl_mobs.register_spawner and mobs_mc and mobs_mc.animal_spawner then
 	mcl_mobs.register_spawner(table.merge(mobs_mc.animal_spawner, {
-		name = "mcl_mobs_addon:wandering_trader", biomes = OW_MONSTERS, weight = 5,
+		name = "mc_parity:wandering_trader", biomes = OW_MONSTERS, weight = 5,
 	}))
 elseif mcl_mobs.spawn_setup then
-	mcl_mobs:spawn_setup({ name = "mcl_mobs_addon:wandering_trader", dimension = "overworld", biomes = OW_MONSTERS, weight = 5 })
+	mcl_mobs:spawn_setup({ name = "mc_parity:wandering_trader", dimension = "overworld", biomes = OW_MONSTERS, weight = 5 })
 end
 
-minetest.log("action", "[mcl_mobs_addon] ported mobs registered (creeper/enderman/blaze/pufferfish/ravager/trader)")
+minetest.log("action", "[mc_parity] ported mobs registered (creeper/enderman/blaze/pufferfish/ravager/trader)")
 end
 
 -- Mineclonia reads hp from the def base (math.random at activate) — the
 -- same latent crash as the other addon mobs; patch after registration.
 for _name, _hp in pairs({
-	["mcl_mobs_addon:creeper"] = {20, 20},
-	["mcl_mobs_addon:creeper_charged"] = {20, 20},
-	["mcl_mobs_addon:blaze"] = {20, 20},
-	["mcl_mobs_addon:enderman"] = {40, 40},
-	["mcl_mobs_addon:pufferfish"] = {6, 6},
-	["mcl_mobs_addon:ravager"] = {100, 100},
-	["mcl_mobs_addon:wandering_trader"] = {20, 20},
-	["mcl_mobs_addon:trader_llama"] = {30, 30},
+	["mc_parity:creeper"] = {20, 20},
+	["mc_parity:creeper_charged"] = {20, 20},
+	["mc_parity:blaze"] = {20, 20},
+	["mc_parity:enderman"] = {40, 40},
+	["mc_parity:pufferfish"] = {6, 6},
+	["mc_parity:ravager"] = {100, 100},
+	["mc_parity:wandering_trader"] = {20, 20},
+	["mc_parity:trader_llama"] = {30, 30},
 }) do
-	mcl_mobs_addon.mcln_base_hp(_name, _hp[1], _hp[2])
+	mc_parity.mcln_base_hp(_name, _hp[1], _hp[2])
 end
 
-minetest.log("action", "[mcl_mobs_addon] ported mobs registered (creeper/enderman/blaze/pufferfish/ravager/trader)")
+minetest.log("action", "[mc_parity] ported mobs registered (creeper/enderman/blaze/pufferfish/ravager/trader)")

@@ -52,7 +52,7 @@ def sonic_boom():
 
 write_wav("/tmp/hb.wav", heartbeat())
 write_wav("/tmp/boom.wav", sonic_boom())
-ogg_from("/tmp/hb.wav", "sounds/mcl_mobs_addon_warden_heartbeat.ogg")
-ogg_from("/tmp/boom.wav", "sounds/mcl_mobs_addon_warden_boom.ogg")
-print("sounds written:", os.path.getsize("sounds/mcl_mobs_addon_warden_heartbeat.ogg"),
-      os.path.getsize("sounds/mcl_mobs_addon_warden_boom.ogg"), "bytes")
+ogg_from("/tmp/hb.wav", "sounds/mc_parity_warden_heartbeat.ogg")
+ogg_from("/tmp/boom.wav", "sounds/mc_parity_warden_boom.ogg")
+print("sounds written:", os.path.getsize("sounds/mc_parity_warden_heartbeat.ogg"),
+      os.path.getsize("sounds/mc_parity_warden_boom.ogg"), "bytes")

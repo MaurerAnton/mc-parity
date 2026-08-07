@@ -12,7 +12,7 @@
 -- commented out / inert — walking near one now screams + warns).
 
 local modpath = minetest.get_modpath(minetest.get_current_modname())
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 if not mcl_vars or not mcl_vars.mg_overworld_min then
 	return
@@ -43,14 +43,14 @@ local SCULK = "mcl_sculk:sculk"
 local VEIN = "mcl_sculk:vein"
 -- Neither game registers sensor/shrieker (commented out in both!) — we
 -- register our own with the game's textures, and use OUR ids everywhere.
-local SENSOR = "mcl_mobs_addon:sculk_sensor"
-local SHRIEKER = "mcl_mobs_addon:sculk_shrieker"
+local SENSOR = "mc_parity:sculk_sensor"
+local SHRIEKER = "mc_parity:sculk_shrieker"
 local SOUL_LANTERN = pick("mcl_lanterns:soul_lantern", "mcl_lanterns:soul_lantern_floor")
 local CHAIN = "mcl_lanterns:chain"
 local CHEST = "mcl_chests:chest_small"
 
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("sculk") then
+if mc_parity.feature_enabled("sculk") then
 -- ---------------------------------------------------------------------------
 if not node_exists(SENSOR) then
 	minetest.register_node(SENSOR, {
@@ -83,9 +83,9 @@ if not node_exists(SENSOR) then
 			receptor = { state = mesecon.state.on, rules = mesecon.rules.alldirs },
 		}
 		minetest.register_node(SENSOR .. "_active", active)
-		minetest.log("action", "[mcl_mobs_addon] sculk sensor: mesecons output enabled")
+		minetest.log("action", "[mc_parity] sculk sensor: mesecons output enabled")
 	end
-	minetest.log("action", "[mcl_mobs_addon] registered " .. SENSOR)
+	minetest.log("action", "[mc_parity] registered " .. SENSOR)
 end
 if not node_exists(SHRIEKER) then
 	minetest.register_node(SHRIEKER, {
@@ -104,12 +104,12 @@ if not node_exists(SHRIEKER) then
 		_mcl_hardness = 3,
 		_mcl_silk_touch_drop = true,
 	})
-	minetest.log("action", "[mcl_mobs_addon] registered " .. SHRIEKER)
+	minetest.log("action", "[mc_parity] registered " .. SHRIEKER)
 end
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("deep_dark") then
+if mc_parity.feature_enabled("deep_dark") then
 -- Checked in on_mods_loaded: our mod loads BEFORE Mineclonia's mcl_biomes,
 -- so the biome may not exist yet at load time.
 -- ---------------------------------------------------------------------------
@@ -143,7 +143,7 @@ minetest.register_on_mods_loaded(function()
 		flags = "all_floors",
 	})
 
-	minetest.log("action", "[mcl_mobs_addon] DeepDark biome + sculk generation: VoxeLibre")
+	minetest.log("action", "[mc_parity] DeepDark biome + sculk generation: VoxeLibre")
 	end
 
 	-- sensor/shrieker scatter in the deep dark — BOTH games (Mineclonia's
@@ -309,7 +309,7 @@ local function build_ancient_city(pos, def, pr)
 end
 
 if mcl_structures and mcl_structures.register_structure then
-	mcl_structures.register_structure("mcl_mobs_addon:ancient_city", {
+	mcl_structures.register_structure("mc_parity:ancient_city", {
 		place_on = { "mcl_deepslate:deepslate", "mcl_core:stone", SCULK },
 		biomes = { "DeepDark" },
 		y_min = DD_BOTTOM,
@@ -336,6 +336,6 @@ if mcl_structures and mcl_structures.register_structure then
 			} },
 		},
 	})
-	minetest.log("action", "[mcl_mobs_addon] Ancient City structure registered")
+	minetest.log("action", "[mc_parity] Ancient City structure registered")
 end
 end

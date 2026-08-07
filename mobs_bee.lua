@@ -6,7 +6,7 @@
 -- We add the bee: it pollinates flowers, fills nests, stings when provoked.
 -- ---------------------------------------------------------------------------
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 local FLOWERS = {
 	"mcl_flowers:dandelion", "mcl_flowers:poppy", "mcl_flowers:blue_orchid",
@@ -63,9 +63,9 @@ local BEE = {
 	hp_max = 10,
 	collisionbox = { -0.3, 0.0, -0.3, 0.3, 0.7, 0.3 },
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_bee.b3d",
+	mesh = "mc_parity_bee.b3d",
 	textures = {
-		"mcl_mobs_addon_bee.png^mcl_mobs_addon_bee_wings.png",
+		"mc_parity_bee.png^mc_parity_bee_wings.png",
 	},
 	light_weight = 2,
 	visual_size = { x = 0.7, y = 0.7 },
@@ -148,11 +148,11 @@ local BEE = {
 	end,
 }
 
-mcl_mobs.register_mob("mcl_mobs_addon:bee", BEE)
-mcl_mobs.register_egg("mcl_mobs_addon:bee", S("Bee"), "#f6b201", "#5b5b5b", 0)
-mcl_mobs_addon.register_spawn("mcl_mobs_addon:bee",
+mcl_mobs.register_mob("mc_parity:bee", BEE)
+mcl_mobs.register_egg("mc_parity:bee", S("Bee"), "#f6b201", "#5b5b5b", 0)
+mc_parity.register_spawn("mc_parity:bee",
 	{ "FlowerForest", "Plains", "SunflowerPlains" },
 	{ "FlowerForest", "Plains", "SunflowerPlains" }, 60)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:bee", 10, 10)
+mc_parity.mcln_base_hp("mc_parity:bee", 10, 10)
 
-minetest.log("action", "[mcl_mobs_addon] bee registered")
+minetest.log("action", "[mc_parity] bee registered")

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ---------------------------------------------------------------------------
-# mcl_mobs_addon verification — runs on every push via GitHub Actions and
+# mc_parity verification — runs on every push via GitHub Actions and
 # locally. Checks:
 #   1. luac syntax of every Lua module
 #   2. code markers (mobs registered, key mechanics present)
@@ -39,21 +39,21 @@ fi
 
 # ---- 2. code markers ----
 echo "== [2/5] code markers =="
-grep -q 'register_mob ("mcl_mobs_addon:creeper"' "$SRC/mobs_port.lua" && PASS "creeper" || BAD "creeper"
-grep -q 'register_mob ("mcl_mobs_addon:enderman"' "$SRC/mobs_port.lua" && PASS "enderman" || BAD "enderman"
-grep -q 'register_mob ("mcl_mobs_addon:blaze"' "$SRC/mobs_port.lua" && PASS "blaze" || BAD "blaze"
-grep -q 'register_mob ("mcl_mobs_addon:pufferfish"' "$SRC/mobs_port.lua" && PASS "pufferfish" || BAD "pufferfish"
-grep -q 'register_mob ("mcl_mobs_addon:ravager"' "$SRC/mobs_port.lua" && PASS "ravager" || BAD "ravager"
-grep -q 'register_mob ("mcl_mobs_addon:wandering_trader"' "$SRC/mobs_port.lua" && PASS "wandering trader" || BAD "trader"
-grep -q 'register_mob("mcl_mobs_addon:bee"' "$SRC/mobs_bee.lua" && PASS "bee" || BAD "bee"
-grep -q 'register_mob("mcl_mobs_addon:drowned"' "$SRC/mobs_121.lua" && PASS "drowned" || BAD "drowned"
-grep -q 'register_mob("mcl_mobs_addon:bogged"' "$SRC/mobs_121.lua" && PASS "bogged" || BAD "bogged"
-grep -q 'register_mob("mcl_mobs_addon:breeze"' "$SRC/mobs_121.lua" && PASS "breeze" || BAD "breeze"
-grep -q 'register_node("mcl_mobs_addon:trial_spawner"' "$SRC/mobs_trial.lua" && PASS "trial spawner" || BAD "trial spawner"
-grep -q 'register_node("mcl_mobs_addon:vault"' "$SRC/mobs_trial.lua" && PASS "vault" || BAD "vault"
-grep -q 'register_node("mcl_mobs_addon:suspicious_sand"' "$SRC/mobs_ruins.lua" && PASS "suspicious sand" || BAD "suspicious sand"
-grep -q 'register_node("mcl_mobs_addon:suspicious_gravel"' "$SRC/mobs_ruins.lua" && PASS "suspicious gravel" || BAD "suspicious gravel"
-grep -q 'register_tool("mcl_mobs_addon:brush"' "$SRC/mobs_ruins.lua" && PASS "brush" || BAD "brush"
+grep -q 'register_mob ("mc_parity:creeper"' "$SRC/mobs_port.lua" && PASS "creeper" || BAD "creeper"
+grep -q 'register_mob ("mc_parity:enderman"' "$SRC/mobs_port.lua" && PASS "enderman" || BAD "enderman"
+grep -q 'register_mob ("mc_parity:blaze"' "$SRC/mobs_port.lua" && PASS "blaze" || BAD "blaze"
+grep -q 'register_mob ("mc_parity:pufferfish"' "$SRC/mobs_port.lua" && PASS "pufferfish" || BAD "pufferfish"
+grep -q 'register_mob ("mc_parity:ravager"' "$SRC/mobs_port.lua" && PASS "ravager" || BAD "ravager"
+grep -q 'register_mob ("mc_parity:wandering_trader"' "$SRC/mobs_port.lua" && PASS "wandering trader" || BAD "trader"
+grep -q 'register_mob("mc_parity:bee"' "$SRC/mobs_bee.lua" && PASS "bee" || BAD "bee"
+grep -q 'register_mob("mc_parity:drowned"' "$SRC/mobs_121.lua" && PASS "drowned" || BAD "drowned"
+grep -q 'register_mob("mc_parity:bogged"' "$SRC/mobs_121.lua" && PASS "bogged" || BAD "bogged"
+grep -q 'register_mob("mc_parity:breeze"' "$SRC/mobs_121.lua" && PASS "breeze" || BAD "breeze"
+grep -q 'register_node("mc_parity:trial_spawner"' "$SRC/mobs_trial.lua" && PASS "trial spawner" || BAD "trial spawner"
+grep -q 'register_node("mc_parity:vault"' "$SRC/mobs_trial.lua" && PASS "vault" || BAD "vault"
+grep -q 'register_node("mc_parity:suspicious_sand"' "$SRC/mobs_ruins.lua" && PASS "suspicious sand" || BAD "suspicious sand"
+grep -q 'register_node("mc_parity:suspicious_gravel"' "$SRC/mobs_ruins.lua" && PASS "suspicious gravel" || BAD "suspicious gravel"
+grep -q 'register_tool("mc_parity:brush"' "$SRC/mobs_ruins.lua" && PASS "brush" || BAD "brush"
 grep -q 'register_record("Relic"' "$SRC/mobs_ruins.lua" && PASS "relic disc" || BAD "relic disc"
 grep -q 'build_woodland_mansion' "$SRC/legacy.lua" && PASS "mansion builder" || BAD "mansion"
 grep -q 'build_end_city_tower' "$SRC/legacy.lua" && PASS "end city builder" || BAD "end city"
@@ -75,8 +75,8 @@ else
 	fi
 
 	mkdir -p "$VL_WORLD/worldmods" "$MCLN_WORLD/worldmods"
-	cp -r "$SRC" "$VL_GAME/mods/mcl_mobs_addon"
-	cp -r "$SRC" "$MCLN_GAME/mods/mcl_mobs_addon"
+	cp -r "$SRC" "$VL_GAME/mods/mc_parity"
+	cp -r "$SRC" "$MCLN_GAME/mods/mc_parity"
 
 	# the in-engine probe (spawns every unique mob, checks meshes)
 	PROBE="$VL_WORLD/worldmods/mcl_addon_probe"
@@ -85,7 +85,7 @@ else
 name = mcl_addon_probe
 description = verify probe (tools/verify.sh)
 depends = mcl_core
-optional_depends = mcl_mobs_addon, mobs_mc
+optional_depends = mc_parity, mobs_mc
 EOF
 	cat > "$PROBE/init.lua" <<'EOF'
 minetest.register_on_mods_loaded(function()
@@ -96,10 +96,10 @@ minetest.register_on_mods_loaded(function()
 		end end end
 		local IS_MCLN = mcl_mobs and mcl_mobs.register_spawner ~= nil
 		local mobs = {
-			"mcl_mobs_addon:creeper", "mcl_mobs_addon:enderman",
-			"mcl_mobs_addon:blaze", "mcl_mobs_addon:pufferfish",
-			"mcl_mobs_addon:ravager", "mcl_mobs_addon:wandering_trader",
-			"mcl_mobs_addon:bee", "mcl_mobs_addon:drowned",
+			"mc_parity:creeper", "mc_parity:enderman",
+			"mc_parity:blaze", "mc_parity:pufferfish",
+			"mc_parity:ravager", "mc_parity:wandering_trader",
+			"mc_parity:bee", "mc_parity:drowned",
 		}
 		local objs = {}
 		for i, m in ipairs(mobs) do

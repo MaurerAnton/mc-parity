@@ -52,18 +52,18 @@ RIM = (90, 58, 34, 255)          # dark brown
 a = [[(0, 0, 0, 0)] * 64 for _ in range(64)]
 banded_shell(a, 64, 64, SHELL, BAND)
 rect(a, 4, 4, 60, 60, (0, 0, 0, 0))  # transparent margin (paint only the center)
-write_png("textures/mcl_mobs_addon_armadillo.png", 64, 64, a)
+write_png("textures/mc_parity_armadillo.png", 64, 64, a)
 
 # rolled ball (32x32)
 r = [[(0, 0, 0, 0)] * 32 for _ in range(32)]
 banded_shell(r, 32, 32, SHELL, BAND)
-write_png("textures/mcl_mobs_addon_armadillo_rolled.png", 32, 32, r)
+write_png("textures/mc_parity_armadillo_rolled.png", 32, 32, r)
 
 # armadillo scute (16x16): tan scale, darker rim
 s = [[(0, 0, 0, 0)] * 16 for _ in range(16)]
 rounded(s, 16, 16, SHELL, RIM)
 rect(s, 3, 5, 13, 6, RIM)  # a ridge line
-write_png("textures/mcl_mobs_addon_armadillo_scute.png", 16, 16, s)
+write_png("textures/mc_parity_armadillo_scute.png", 16, 16, s)
 
 # wolf armor (16x16): tan plate, darker border, rivets
 wa = [[(0, 0, 0, 0)] * 16 for _ in range(16)]
@@ -74,4 +74,4 @@ for rx, ry in [(3, 3), (12, 3), (3, 12), (12, 12), (7, 7)]:
             if 0 <= rx + dx < 16 and 0 <= ry + dy < 16:
                 wa[ry + dy][rx + dx] = RIM
     wa[ry][rx] = (220, 180, 110, 255)
-write_png("textures/mcl_mobs_addon_wolf_armor.png", 16, 16, wa)
+write_png("textures/mc_parity_wolf_armor.png", 16, 16, wa)

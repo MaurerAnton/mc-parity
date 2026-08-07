@@ -8,12 +8,12 @@
 -- sitting on netherrack) are converted to the fast variant by an ABM —
 -- overworld lava (on stone) is untouched.
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 local LAVA_TILE = "mcl_core_lava_source_animation.png"
 local LAVA_FLOW = "mcl_core_lava_flow_animation.png"
 
-minetest.register_node("mcl_mobs_addon:nether_lava_source", {
+minetest.register_node("mc_parity:nether_lava_source", {
 	description = S("Nether Lava Source"),
 	drawtype = "liquid",
 	tiles = {
@@ -37,8 +37,8 @@ minetest.register_node("mcl_mobs_addon:nether_lava_source", {
 	drop = "",
 	drowning = 4,
 	liquidtype = "source",
-	liquid_alternative_flowing = "mcl_mobs_addon:nether_lava_flowing",
-	liquid_alternative_source = "mcl_mobs_addon:nether_lava_source",
+	liquid_alternative_flowing = "mc_parity:nether_lava_flowing",
+	liquid_alternative_source = "mc_parity:nether_lava_source",
 	liquid_viscosity = 1,  -- water-like: fast (MC nether lava)
 	liquid_renewable = false,
 	liquid_range = 7,      -- spreads like water (MC nether lava)
@@ -51,7 +51,7 @@ minetest.register_node("mcl_mobs_addon:nether_lava_source", {
 	_mcl_hardness = -1,
 })
 
-minetest.register_node("mcl_mobs_addon:nether_lava_flowing", {
+minetest.register_node("mc_parity:nether_lava_flowing", {
 	description = S("Flowing Nether Lava"),
 	_doc_items_create_entry = false,
 	wield_image = LAVA_FLOW .. "^[verticalframe:64:0",
@@ -75,8 +75,8 @@ minetest.register_node("mcl_mobs_addon:nether_lava_flowing", {
 	drop = "",
 	drowning = 4,
 	liquidtype = "flowing",
-	liquid_alternative_flowing = "mcl_mobs_addon:nether_lava_flowing",
-	liquid_alternative_source = "mcl_mobs_addon:nether_lava_source",
+	liquid_alternative_flowing = "mc_parity:nether_lava_flowing",
+	liquid_alternative_source = "mc_parity:nether_lava_source",
 	liquid_viscosity = 1,
 	liquid_renewable = false,
 	liquid_range = 7,
@@ -92,12 +92,12 @@ minetest.register_node("mcl_mobs_addon:nether_lava_flowing", {
 -- Convert the nether's lava lakes to the fast variant: lava sitting on
 -- netherrack is nether lava (overworld lava sits on stone — untouched).
 -- Extracted so it can be called directly (ABMs don't run headless).
-function mcl_mobs_addon.convert_nether_lava(pos, node)
+function mc_parity.convert_nether_lava(pos, node)
 	local below = minetest.get_node(vector.offset(pos, 0, -1, 0)).name
 	if below == "mcl_nether:netherrack" then
-		local nn = "mcl_mobs_addon:nether_lava_source"
+		local nn = "mc_parity:nether_lava_source"
 		if node.name == "mcl_core:lava_flowing" then
-			nn = "mcl_mobs_addon:nether_lava_flowing"
+			nn = "mc_parity:nether_lava_flowing"
 		end
 		minetest.set_node(pos, { name = nn, param2 = node.param2 })
 		return true
@@ -110,7 +110,7 @@ minetest.register_abm({
 	nodenames = { "mcl_core:lava_source", "mcl_core:lava_flowing" },
 	interval = 8,
 	chance = 1,
-	action = mcl_mobs_addon.convert_nether_lava,
+	action = mc_parity.convert_nether_lava,
 })
 
-minetest.log("action", "[mcl_mobs_addon] nether lava registered (water-like flow, ABM conversion)")
+minetest.log("action", "[mc_parity] nether lava registered (water-like flow, ABM conversion)")

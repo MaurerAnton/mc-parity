@@ -6,9 +6,9 @@
 -- (registrations happen at load time).
 -- ---------------------------------------------------------------------------
 
-mcl_mobs_addon = mcl_mobs_addon or {}  -- loaded first, before init.lua creates it
+mc_parity = mc_parity or {}  -- loaded first, before init.lua creates it
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- feature registry: id -> { version group, human description }
 local FEATURES = {
@@ -90,13 +90,13 @@ local function save_config()
 end
 
 -- version group enabled?
-function mcl_mobs_addon.version_enabled(v)
+function mc_parity.version_enabled(v)
 	if config.versions[v] == false then return false end
 	return true
 end
 
 -- feature enabled? (version group AND not individually disabled)
-function mcl_mobs_addon.feature_enabled(id)
+function mc_parity.feature_enabled(id)
 	local f = FEATURES[id]
 	if not f then return true end  -- unknown features stay enabled
 	if config.disabled[id] == true then return false end
@@ -104,7 +104,7 @@ function mcl_mobs_addon.feature_enabled(id)
 	return true
 end
 
-function mcl_mobs_addon.feature_desc(id)
+function mc_parity.feature_desc(id)
 	return FEATURES[id] and FEATURES[id].desc or id
 end
 
@@ -121,7 +121,7 @@ local function open_menu(player)
 	end
 	local formspec = "size[9,10]"
 		.. "label[0.3,0.2;" .. minetest.formspec_escape(
-			S("mcl_mobs_addon feature selection")) .. "]"
+			S("mc_parity feature selection")) .. "]"
 		.. "label[0.3,0.7;" .. minetest.formspec_escape(
 			S("Choose which Minecraft-version features are active.")) .. "]"
 		.. "label[0.3,1.1;" .. minetest.formspec_escape(
@@ -151,11 +151,11 @@ local function open_menu(player)
 	formspec = formspec
 		.. string.format("button[1.0,%g;3,0.9;save;%s]", y, S("Save"))
 		.. string.format("button[5.0,%g;3,0.9;reset;%s]", y, S("Reset to all enabled"))
-	minetest.show_formspec(name, "mcl_mobs_addon:config", formspec)
+	minetest.show_formspec(name, "mc_parity:config", formspec)
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if formname ~= "mcl_mobs_addon:config" then return end
+	if formname ~= "mc_parity:config" then return end
 	if fields.reset then
 		config.versions = {}
 		config.disabled = {}
@@ -179,7 +179,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 minetest.register_chatcommand("mca-config", {
-	description = S("Open the mcl_mobs_addon feature selection menu"),
+	description = S("Open the mc_parity feature selection menu"),
 	privs = { server = true },
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
@@ -200,5 +200,5 @@ if storage:get_string("configured") ~= "true" then
 	end)
 end
 
-minetest.log("action", "[mcl_mobs_addon] feature config loaded ("
+minetest.log("action", "[mc_parity] feature config loaded ("
 	.. tostring(storage:get_string("configured") == "true") .. ")")

@@ -81,7 +81,7 @@ GOAT = [
 ]
 
 if __name__ == "__main__":
-    out = sys.argv[1] if len(sys.argv) > 1 else "mcl_mobs_addon_goat.b3d"
+    out = sys.argv[1] if len(sys.argv) > 1 else "mc_parity_goat.b3d"
     write_b3d(out, GOAT)
 
 # --- Armadillo (MC 1.21; low oval body, small head + tail, 4 legs) ---

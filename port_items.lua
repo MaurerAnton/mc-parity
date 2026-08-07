@@ -4,7 +4,7 @@
 -- Plus the chain (from VoxeLibre, for Mineclonia).
 -- ---------------------------------------------------------------------------
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- dual-game: Mineclonia calls its dye mod mcl_dyes, VoxeLibre mcl_dye
 local mcl_dyes = mcl_dyes or mcl_dye
@@ -86,7 +86,7 @@ local entity_pos_offset = vector.new(0, -1.25, 0)
 local function check_conduit(pos)
 	local water = core.find_nodes_in_area(vector.offset(pos, -1,-1,-1), vector.offset(pos, 1, 1, 1), {"group:water"})
 	local cname = core.get_node(pos).name
-	if #water < 26 or ( cname ~= "mcl_mobs_addon:conduit" and #water < 27 ) then return false end
+	if #water < 26 or ( cname ~= "mc_parity:conduit" and #water < 27 ) then return false end
 	local pn = 0
 	for _, v in pairs(frame_offsets) do
 		if table.indexof(conduit_nodes, core.get_node(vector.add(pos, v)).name) ~= -1 then
@@ -109,7 +109,7 @@ function mcl_conduits.conduit_damage(ent)
 	mcl_util.deal_damage(ent.object, 4, {type = "magic"})
 end
 
-core.register_entity("mcl_mobs_addon:conduit", {
+core.register_entity("mc_parity:conduit", {
 	initial_properties = {
 		physical = true,
 		visual = "mesh",
@@ -140,7 +140,7 @@ core.register_entity("mcl_mobs_addon:conduit", {
 		end
 		local lvl = check_conduit(self._pos)
 		if not lvl then
-			core.set_node(self._pos, {name = "mcl_mobs_addon:conduit"})
+			core.set_node(self._pos, {name = "mc_parity:conduit"})
 			self.object:remove()
 			return
 		end
@@ -157,7 +157,7 @@ core.register_entity("mcl_mobs_addon:conduit", {
 	end
 })
 local conduit_box = { -0.25, -0.25, -0.25, 0.25, 0.25, 0.25, }
-core.register_node("mcl_mobs_addon:conduit", {
+core.register_node("mc_parity:conduit", {
 	description = S("Conduit"),
 	_doc_longdesc = S("A conduit provides certain status effects to nearby players much like a beacon but under water"),
 	drawtype = "nodebox",
@@ -175,16 +175,16 @@ core.register_node("mcl_mobs_addon:conduit", {
 
 core.register_abm({
 	label = "Conduit Activation",
-	nodenames = { "mcl_mobs_addon:conduit" },
+	nodenames = { "mc_parity:conduit" },
 	interval = check_interval,
 	chance = 1,
 	action = function(pos, _)
 		for v in core.objects_inside_radius(vector.subtract(pos, entity_pos_offset), 0.5) do
-			if v.name == "mcl_mobs_addon:conduit" then return end
+			if v.name == "mc_parity:conduit" then return end
 		end
 		if check_conduit(pos) then
 			core.remove_node(pos)
-			local o = core.add_entity(vector.add(pos, entity_pos_offset) , "mcl_mobs_addon:conduit")
+			local o = core.add_entity(vector.add(pos, entity_pos_offset) , "mc_parity:conduit")
 			if o then
 				local l = o:get_luaentity()
 				l._pos = pos
@@ -194,7 +194,7 @@ core.register_abm({
 })
 
 core.register_craft({
-	output = "mcl_mobs_addon:conduit",
+	output = "mc_parity:conduit",
 	recipe = {
 		{"mcl_mobitems:nautilus_shell", "mcl_mobitems:nautilus_shell", "mcl_mobitems:nautilus_shell"},
 		{"mcl_mobitems:nautilus_shell", "mcl_mobitems:heart_of_the_sea", "mcl_mobitems:nautilus_shell"},
@@ -227,7 +227,7 @@ local function dripstone_hit_func(self, object)
 	mcl_util.deal_damage(object, math.min(40, self.timer * 1.125), {type = "falling_node"})
 end
 
-mcl_mobs.register_arrow("mcl_mobs_addon:vengeful_dripstone",
+mcl_mobs.register_arrow("mc_parity:vengeful_dripstone",
 {
 	visual = "upright_sprite",
 	textures = {"pointed_dripstone_tip.png"},
@@ -237,19 +237,19 @@ mcl_mobs.register_arrow("mcl_mobs_addon:vengeful_dripstone",
 	hit_mob = dripstone_hit_func,
 	hit_object = dripstone_hit_func,
 	hit_node = function(self, pos)
-		core.add_item(pos, ItemStack("mcl_mobs_addon:pointed_dripstone"))
+		core.add_item(pos, ItemStack("mc_parity:pointed_dripstone"))
 	end,
-	drop = "mcl_mobs_addon:pointed_dripstone",
+	drop = "mc_parity:pointed_dripstone",
 })
 
 local function spawn_dripstone_entity(pos)
-	local vengeful_dripstone = core.add_entity(pos, "mcl_mobs_addon:vengeful_dripstone")
+	local vengeful_dripstone = core.add_entity(pos, "mc_parity:vengeful_dripstone")
 	vengeful_dripstone:add_velocity(vector.new(0, -12, 0))
 	local ent = vengeful_dripstone:get_luaentity()
 	ent.switch = 1
 end
 
-core.register_node("mcl_mobs_addon:dripstone_block", {
+core.register_node("mc_parity:dripstone_block", {
 	description = S("Dripstone block"),
 	_doc_items_longdesc = S("Dripstone is type of stone that allows stalagmites and stalagtites to grow on it"),
 	_doc_items_hidden = false,
@@ -263,7 +263,7 @@ core.register_node("mcl_mobs_addon:dripstone_block", {
 
 -- returns the name of pointed dripstone node with that stage and direction
 local function get_dripstone_node(stage, direction)
-	return "mcl_mobs_addon:dripstone_" .. dripstone_directions[direction] .. "_" .. dripstone_stages[stage]
+	return "mc_parity:dripstone_" .. dripstone_directions[direction] .. "_" .. dripstone_stages[stage]
 end
 
 -- extracts the direction from dripstone's name
@@ -306,8 +306,8 @@ local function place_dripstone(pos, length, direction)
 	-- if a dripstone column should be created
 	-- ".[^l]" is in the pattern to prevent dripstone blocks from being matched
 	if string.find(core.get_node(vector.offset(pos, 0, length * -direction, 0)).name, "^mcl_dripstone:dripstone_.[^l]") then
-		core.swap_node(vector.offset(pos, 0, (length - 1) * -direction, 0), {name = "mcl_mobs_addon:dripstone_" .. dripstone_directions[direction] .. "_tip_merge"})
-		core.swap_node(vector.offset(pos, 0, length * -direction, 0), {name = "mcl_mobs_addon:dripstone_" .. dripstone_directions[-direction] .. "_tip_merge"})
+		core.swap_node(vector.offset(pos, 0, (length - 1) * -direction, 0), {name = "mc_parity:dripstone_" .. dripstone_directions[direction] .. "_tip_merge"})
+		core.swap_node(vector.offset(pos, 0, length * -direction, 0), {name = "mc_parity:dripstone_" .. dripstone_directions[-direction] .. "_tip_merge"})
 	else
 		core.swap_node(vector.offset(pos, 0, (length - 1) * -direction, 0), {name = get_dripstone_node(2, direction)})
 	end
@@ -325,7 +325,7 @@ local function break_dripstone(pos, direction)
 			break
 		else
 			if direction == -1 then
-				core.add_item(offset_pos, ItemStack("mcl_mobs_addon:pointed_dripstone"))
+				core.add_item(offset_pos, ItemStack("mc_parity:pointed_dripstone"))
 			else
 				spawn_dripstone_entity(offset_pos)
 			end
@@ -338,8 +338,8 @@ local function update_dripstone(pos, direction)
 	-- if a dripstone column should be created
 	-- ".[^l]" is in the pattern to prevent dripstone blocks from being matched
 	if string.find(core.get_node(vector.offset(pos, 0, -direction, 0)).name, "^mcl_dripstone:dripstone_.[^l]") then
-		core.swap_node(pos, {name = "mcl_mobs_addon:dripstone_" .. dripstone_directions[direction] .. "_tip_merge"})
-		core.swap_node(vector.offset(pos, 0, -direction, 0), {name = "mcl_mobs_addon:dripstone_" .. dripstone_directions[-direction] .. "_tip_merge"})
+		core.swap_node(pos, {name = "mc_parity:dripstone_" .. dripstone_directions[direction] .. "_tip_merge"})
+		core.swap_node(vector.offset(pos, 0, -direction, 0), {name = "mc_parity:dripstone_" .. dripstone_directions[-direction] .. "_tip_merge"})
 	end
 
 	local stage
@@ -352,7 +352,7 @@ local function update_dripstone(pos, direction)
 			break
 		elseif stage == 0 then
 			if previous_stage == 3 then
-				core.swap_node(vector.offset(pos, 0, -direction, 0), {name = "mcl_mobs_addon:dripstone_" .. dripstone_directions[direction] .. "_base"})
+				core.swap_node(vector.offset(pos, 0, -direction, 0), {name = "mc_parity:dripstone_" .. dripstone_directions[direction] .. "_base"})
 			end
 			break
 		end
@@ -411,14 +411,14 @@ local on_dripstone_destruct = function(pos)
 	end
 end
 
-core.register_craftitem("mcl_mobs_addon:pointed_dripstone", {
+core.register_craftitem("mc_parity:pointed_dripstone", {
 	description = S("Pointed dripstone"),
 	_doc_items_longdesc = S("Pointed dripstone is what stalagmites and stalagtites are made of"),
 	_doc_items_hidden = false,
 	inventory_image = "pointed_dripstone_tip.png",
 	on_place = on_dripstone_place,
 	on_secondary_use = on_dripstone_place,
-	_mcl_crafting_output = {square2 = {output = "mcl_mobs_addon:dripstone_block"}}
+	_mcl_crafting_output = {square2 = {output = "mc_parity:dripstone_block"}}
 })
 
 for i = 1, #dripstone_stages do
@@ -433,13 +433,13 @@ for i = 1, #dripstone_stages do
 		fixed = { math.max(-0.5, -3/16 - add), -0.5, math.max(-0.5, -3/16 - add), math.min(0.5, 3/16 + add), 0.5, math.min(0.5, 3/16 + add) },
 	}
 
-	core.register_node("mcl_mobs_addon:dripstone_top_" .. stage, {
+	core.register_node("mc_parity:dripstone_top_" .. stage, {
 		description = S("Pointed dripstone (@1/@2)", i, #dripstone_stages),
 		_doc_items_longdesc = S("Pointed dripstone is what stalagmites and stalagtites are made of"),
 		_doc_items_hidden = true,
 		drawtype = "plantlike",
 		tiles = {"pointed_dripstone_" .. stage .. ".png"},
-		drop = "mcl_mobs_addon:pointed_dripstone",
+		drop = "mc_parity:pointed_dripstone",
 		groups = {
 			pickaxey = 1,
 			not_in_creative_inventory = 1,
@@ -458,13 +458,13 @@ for i = 1, #dripstone_stages do
 		_mcl_hardness = 1.5,
 	})
 
-	core.register_node("mcl_mobs_addon:dripstone_bottom_" .. stage, {
+	core.register_node("mc_parity:dripstone_bottom_" .. stage, {
 		description = S("Pointed dripstone (@1/@2)", i, #dripstone_stages),
 		_doc_items_longdesc = S("Pointed dripstone is what stalagmites and stalagtites are made of"),
 		_doc_items_hidden = true,
 		drawtype = "plantlike",
 		tiles = {"pointed_dripstone_" .. stage .. ".png^[transform6"},
-		drop = "mcl_mobs_addon:pointed_dripstone",
+		drop = "mc_parity:pointed_dripstone",
 		groups = {
 			pickaxey = 1,
 			not_in_creative_inventory = 1,
@@ -499,13 +499,13 @@ end)
 
 core.register_abm({
 	label = "Dripstone growth",
-	nodenames = {"mcl_mobs_addon:dripstone_top_tip"},
+	nodenames = {"mc_parity:dripstone_top_tip"},
 	interval = 69,
 	chance = 88,
 	action = function(pos)
 		-- checking if can grow
 		local stalagtite_length = get_dripstone_length(pos, 1)
-		if core.get_node(vector.offset(pos, 0, stalagtite_length, 0)).name ~= "mcl_mobs_addon:dripstone_block"
+		if core.get_node(vector.offset(pos, 0, stalagtite_length, 0)).name ~= "mc_parity:dripstone_block"
 		or core.get_item_group(core.get_node(vector.offset(pos, 0, stalagtite_length + 1, 0)).name, "water") == 0 then
 			return
 		end
@@ -545,7 +545,7 @@ core.register_abm({
 
 core.register_abm({
 	label = "Dripstone filling water cauldrons, conversion from mud to clay",
-	nodenames = {"mcl_mobs_addon:dripstone_top_tip"},
+	nodenames = {"mc_parity:dripstone_top_tip"},
 	interval = 69,
 	chance = 5.5,
 	action = function(pos)
@@ -582,7 +582,7 @@ core.register_abm({
 
 core.register_abm({
 	label = "Dripstone filling lava cauldrons",
-	nodenames = {"mcl_mobs_addon:dripstone_top_tip"},
+	nodenames = {"mc_parity:dripstone_top_tip"},
 	interval = 69,
 	chance = 17,
 	action = function(pos)
@@ -606,7 +606,7 @@ core.register_abm({
 })
 
 mcl_structures.register_structure("dripstone_stalagmite", {
-	place_on = {"mcl_mobs_addon:dripstone_block"},
+	place_on = {"mc_parity:dripstone_block"},
 	spawn_by = "air",
 	check_offset = 1,
 	num_spawn_by = 5,
@@ -632,7 +632,7 @@ mcl_structures.register_structure("dripstone_stalagmite", {
 })
 
 mcl_structures.register_structure("dripstone_stalagtite", {
-	place_on = {"mcl_mobs_addon:dripstone_block"},
+	place_on = {"mc_parity:dripstone_block"},
 	spawn_by = "air",
 	check_offset = 1,
 	num_spawn_by = 5,
@@ -681,7 +681,7 @@ local function set_candle_properties(stack, color)
 	if type(color) ~= "string" and color == "" then return end
 
 	local color_defs = mcl_dyes.colors[color]
-	local image = "mcl_mobs_addon_item_".. color .. ".png"
+	local image = "mc_parity_item_".. color .. ".png"
 
 	if color_defs then
 		stack:get_meta():set_int("palette_index", color_defs.palette_index + 1)
@@ -698,9 +698,9 @@ local function drop_candles(pos, node, _, digger)
 
 	local group = core.get_item_group(node.name, "candles")
 
-	if node.name:find("mcl_mobs_addon:candle_cake") then group = 1 end
+	if node.name:find("mc_parity:candle_cake") then group = 1 end
 
-	local item = ItemStack("mcl_mobs_addon:candle_1 " .. group)
+	local item = ItemStack("mc_parity:candle_1 " .. group)
 	local color_index = node.param2 > 0 and node.param2
 	local color = color_index and mcl_dyes.palette_index_to_color(color_index - 1)
 
@@ -715,14 +715,14 @@ local function ignite_candle(pos)
 	local n = core.get_node(pos)
 	local g = core.get_item_group(n.name, "candles")
 	if g > 0 then
-		n.name = "mcl_mobs_addon:candle_lit_"..tostring(g)
+		n.name = "mc_parity:candle_lit_"..tostring(g)
 		core.swap_node(pos, n)
 		return true
 	end
 end
 
 local function get_candle_item(pos)
-	local stack = ItemStack("mcl_mobs_addon:candle_1")
+	local stack = ItemStack("mc_parity:candle_1")
 	local node = core.get_node(pos)
 	local color_index = node.param2 > 0 and node.param2
 	local color = color_index and mcl_dyes.palette_index_to_color(color_index - 1)
@@ -773,17 +773,17 @@ local tpl_candle = {
 		axey = 1, candles = 1, deco_block = 1, dig_by_piston = 1, handy = 1, not_solid = 1,
 		pickaxey = 1, shearsy = 1, shovely = 1, swordy = 1, unlit_candles = 1
 	},
-	inventory_image = "mcl_mobs_addon_item.png",
+	inventory_image = "mc_parity_item.png",
 	is_ground_content = false,
 	node_placement_prediction = "",
-	palette = "mcl_mobs_addon_palette.png",
+	palette = "mc_parity_palette.png",
 	paramtype = "light",
 	paramtype2 = "color",
 	sounds = mcl_sounds.node_sound_defaults(),
 	sunlight_propagates = true,
-	tiles = {"mcl_mobs_addon_candle.png", "blank.png"},
+	tiles = {"mc_parity_candle.png", "blank.png"},
 	use_texture_alpha = "clip",
-	wield_image = "mcl_mobs_addon_item.png"
+	wield_image = "mc_parity_item.png"
 }
 
 local tpl_lit_candle = {
@@ -795,7 +795,7 @@ local tpl_lit_candle = {
 		shovely = 1, swordy = 1
 	},
     tiles = {
-        "mcl_mobs_addon_candle.png",
+        "mc_parity_candle.png",
         {
             animation = {
                 aspect_h = 16,
@@ -804,7 +804,7 @@ local tpl_lit_candle = {
 				type = "vertical_frames"
             },
 			color = "white",
-			name = "mcl_mobs_addon_flames.png"
+			name = "mc_parity_flames.png"
         }
     }
 }
@@ -819,7 +819,7 @@ function tpl_candle.on_place(itemstack, placer, pointed_thing)
 	local param2 = tonumber(itemstack:get_meta():get("palette_index")) or 0
 
 	if unode.name == "mcl_cake:cake" then
-		core.swap_node(pointed_thing.under, {name = "mcl_mobs_addon:candle_cake", param2 = param2})
+		core.swap_node(pointed_thing.under, {name = "mc_parity:candle_cake", param2 = param2})
 
 		if not core.is_creative_enabled(placer:get_player_name()) then
 			itemstack:take_item()
@@ -834,7 +834,7 @@ function tpl_candle.on_place(itemstack, placer, pointed_thing)
 
 	if group > 0 then
 		if group < #candle_boxes then
-			unode.name = "mcl_mobs_addon:candle_" .. math.min(4, group + 1)
+			unode.name = "mc_parity:candle_" .. math.min(4, group + 1)
 			if param2 == unode.param2 then
 				core.swap_node(pointed_thing.under, unode)
 			end
@@ -861,7 +861,7 @@ local function extinguish(pos, node, clicker, _, _)
 
 	local group = core.get_item_group(node.name, "lit_candles")
 	if group > 0 then
-		node.name = "mcl_mobs_addon:candle_" .. group
+		node.name = "mc_parity:candle_" .. group
 		core.swap_node(pos, node)
 	end
 end
@@ -878,13 +878,13 @@ for i = 1, #candle_boxes do
 		creative_group = {not_in_creative_inventory = 1}
 	end
 
-	core.register_node("mcl_mobs_addon:candle_" .. i, table.merge(tpl_candle, candle_n, {
+	core.register_node("mc_parity:candle_" .. i, table.merge(tpl_candle, candle_n, {
 		_get_all_virtual_items = function ()
 			local output = {deco = {}}
 
 			if i == 1 then
 				for color, _ in pairs(mcl_dyes.colors) do
-					local stack = ItemStack("mcl_mobs_addon:candle_1")
+					local stack = ItemStack("mc_parity:candle_1")
 
 					set_candle_properties(stack, color)
 
@@ -897,30 +897,30 @@ for i = 1, #candle_boxes do
 			return output
 		end,
 		groups = table.merge(tpl_candle.groups, {candles = i, unlit_candles = i}, creative_group),
-		mesh = "mcl_mobs_addon_candle_" .. i .. ".obj",
+		mesh = "mc_parity_candle_" .. i .. ".obj",
 	}))
 	local lit_candle = table.merge(tpl_candle, tpl_lit_candle, candle_n, {
 		_on_wind_charge_hit = function (pos)
 			local node = core.get_node(pos)
 			local group = core.get_item_group(node.name, "lit_candles")
-			node.name = "mcl_mobs_addon:candle_" .. group
+			node.name = "mc_parity:candle_" .. group
 			core.swap_node(pos, node)
 		end,
 		groups = table.merge(tpl_lit_candle.groups, {candles = i, lit_candles = i}),
 		light_source = 3 * i,
-		mesh = "mcl_mobs_addon_candle_lit_" .. i .. ".obj",
+		mesh = "mc_parity_candle_lit_" .. i .. ".obj",
 		on_rightclick = extinguish
 	})
 	lit_candle._on_ignite = nil
 	lit_candle._on_arrow_hit = nil
-	core.register_node("mcl_mobs_addon:candle_lit_" .. i, lit_candle)
+	core.register_node("mc_parity:candle_lit_" .. i, lit_candle)
 
-	doc.add_entry_alias("nodes", "mcl_mobs_addon:candle_1", "nodes", "mcl_mobs_addon:candle_" .. i)
-	doc.add_entry_alias("nodes", "mcl_mobs_addon:candle_1", "nodes", "mcl_mobs_addon:candle_lit_" .. i)
+	doc.add_entry_alias("nodes", "mc_parity:candle_1", "nodes", "mc_parity:candle_" .. i)
+	doc.add_entry_alias("nodes", "mc_parity:candle_1", "nodes", "mc_parity:candle_lit_" .. i)
 end
 
 local function candle_craft(output, _, old_craft_grid, _)
-	if not (output and output:get_name() == "mcl_mobs_addon:candle_1") then return end
+	if not (output and output:get_name() == "mc_parity:candle_1") then return end
 
 	local i = 0
 	local dye, candle
@@ -954,7 +954,7 @@ core.register_craft_predict(candle_craft)
 core.register_on_craft(candle_craft)
 
 core.register_craft({
-	output = "mcl_mobs_addon:candle_1",
+	output = "mc_parity:candle_1",
 	recipe = {
 		{"mcl_mobitems:string"},
 		{"mcl_honey:honeycomb"}
@@ -963,7 +963,7 @@ core.register_craft({
 
 core.register_craft({
 	type = "shapeless",
-	output = "mcl_mobs_addon:candle_1",
+	output = "mc_parity:candle_1",
 	recipe = {
 		"group:candles",
 		"group:dye",
@@ -1028,7 +1028,7 @@ local tpl_cake = {
 			end
 		end
 	end,
-	palette = "mcl_mobs_addon_palette.png",
+	palette = "mc_parity_palette.png",
 	paramtype = "light",
 	paramtype2 = "color",
 	selection_box = cake_box,
@@ -1037,14 +1037,14 @@ local tpl_cake = {
 			color = "white",
 			name = "[combine:32x32:0,0=cake_top.png:16,0=cake_bottom.png:0,16=cake_side.png"
 		},
-		"mcl_mobs_addon_candle.png",
+		"mc_parity_candle.png",
 		"blank.png"
 	},
 	use_texture_alpha = "clip"
 }
 
-core.register_node("mcl_mobs_addon:candle_cake", table.merge(tpl_cake, {
-	mesh = "mcl_mobs_addon_cake.obj",
+core.register_node("mc_parity:candle_cake", table.merge(tpl_cake, {
+	mesh = "mc_parity_cake.obj",
 	tiles = {
 		{
 			color = "white",
@@ -1058,26 +1058,26 @@ core.register_node("mcl_mobs_addon:candle_cake", table.merge(tpl_cake, {
 			color = "white",
 			name = "cake_side.png"
 		},
-		"mcl_mobs_addon_candle.png"
+		"mc_parity_candle.png"
 	}
 }))
-core.register_node("mcl_mobs_addon:candle_cake_lit", table.merge(tpl_cake, {
+core.register_node("mc_parity:candle_cake_lit", table.merge(tpl_cake, {
 	_on_wind_charge_hit = function (pos)
 		local node = core.get_node(pos)
-		node.name = "mcl_mobs_addon:candle_cake"
+		node.name = "mc_parity:candle_cake"
 		core.swap_node(pos, node)
 	end,
 	_on_bottle_place = function(itemstack, placer, pointed_thing)
 		local def = itemstack:get_definition()
 		if def._mcl_cauldrons_liquid then
 			local node = core.get_node(pointed_thing.under)
-			mcl_potions.set_node_empty_bottle(itemstack, placer, pointed_thing, "mcl_mobs_addon:candle_cake", node.param2)
+			mcl_potions.set_node_empty_bottle(itemstack, placer, pointed_thing, "mc_parity:candle_cake", node.param2)
 			core.sound_play("fire_extinguish_flame", {gain = 0.1, max_hear_distance = 16, pos = pointed_thing.under}, true)
 		end
 	end,
 	light_source = 3,
 	groups = table.merge(tpl_cake.groups, {lit_cake = 1}),
-	mesh = "mcl_mobs_addon_cake_lit.obj",
+	mesh = "mc_parity_cake_lit.obj",
 	tiles = {
 		{
 			color = "white",
@@ -1091,7 +1091,7 @@ core.register_node("mcl_mobs_addon:candle_cake_lit", table.merge(tpl_cake, {
 			color = "white",
 			name = "cake_side.png"
 		},
-		"mcl_mobs_addon_candle.png",
+		"mc_parity_candle.png",
 		{
             animation = {
                 aspect_h = 16,
@@ -1100,7 +1100,7 @@ core.register_node("mcl_mobs_addon:candle_cake_lit", table.merge(tpl_cake, {
 				type = "vertical_frames"
             },
 			color = "white",
-			name = "mcl_mobs_addon_flames.png"
+			name = "mc_parity_flames.png"
         }
 	}
 }))
@@ -1109,7 +1109,7 @@ core.register_node("mcl_mobs_addon:candle_cake_lit", table.merge(tpl_cake, {
 -- ======================= POWDER SNOW (1.17) =======================
 local S = core.get_translator(core.get_current_modname())
 
-core.register_node("mcl_mobs_addon:powder_snow", {
+core.register_node("mc_parity:powder_snow", {
 	description = S("Powder Snow"),
 	_doc_items_longdesc = S("This is a block of snow thats extra fluffy, this means players can sink in it"),
 	_doc_items_hidden = false,
@@ -1127,13 +1127,13 @@ core.register_node("mcl_mobs_addon:powder_snow", {
 			core.set_node(pos, {name = "air"})
 			if not core.is_creative_enabled(clicker:get_player_name()) then
 				if itemstack:get_count() == 1 then
-					itemstack = ItemStack("mcl_mobs_addon:bucket_powder_snow")
+					itemstack = ItemStack("mc_parity:bucket_powder_snow")
 				else
 					local inv = clicker:get_inventory()
-					if inv:room_for_item("main", "mcl_mobs_addon:bucket_powder_snow") then
-						inv:add_item("main", "mcl_mobs_addon:bucket_powder_snow")
+					if inv:room_for_item("main", "mc_parity:bucket_powder_snow") then
+						inv:add_item("main", "mc_parity:bucket_powder_snow")
 					else
-						core.add_item(clicker:get_pos(), "mcl_mobs_addon:bucket_powder_snow")
+						core.add_item(clicker:get_pos(), "mc_parity:bucket_powder_snow")
 					end
 					itemstack:take_item()
 				end
@@ -1150,9 +1150,9 @@ core.register_node("mcl_mobs_addon:powder_snow", {
 
 mcl_buckets.register_liquid({
 	id = "powder_snow",
-	source_take = {"mcl_mobs_addon:powder_snow"},
-	source_place = "mcl_mobs_addon:powder_snow",
-	bucketname = "mcl_mobs_addon:bucket_powder_snow",
+	source_take = {"mc_parity:powder_snow"},
+	source_place = "mc_parity:powder_snow",
+	bucketname = "mc_parity:bucket_powder_snow",
 	inventory_image = "bucket_powder_snow.png",
 	name = S("Powder Snow Bucket"),
 	longdesc = S("This bucket is filled powder snow"),
@@ -1275,7 +1275,7 @@ _powder_gs(function(player, dtime)
 	local player_meta = player:get_meta()
 	local time_in_snow = tonumber(player_meta:get("time_in_snow"))
 
-	if core.get_node(player_pos).name == "mcl_mobs_addon:powder_snow" and not player_has_leather_armor(player) then
+	if core.get_node(player_pos).name == "mc_parity:powder_snow" and not player_has_leather_armor(player) then
 		if not time_in_snow then
 			time_in_snow = 0
 		end
@@ -1339,28 +1339,28 @@ end)
 
 
 -- ======================= ECHO SHARD (1.19) =======================
-minetest.register_craftitem("mcl_mobs_addon:echo_shard", {
+minetest.register_craftitem("mc_parity:echo_shard", {
 	description = S("Echo Shard"),
 	groups = {craftitem = 1, rarity = 1},
-	inventory_image = "mcl_mobs_addon_echo_shard.png",
-	wield_image = "mcl_mobs_addon_echo_shard.png"
+	inventory_image = "mc_parity_echo_shard.png",
+	wield_image = "mc_parity_echo_shard.png"
 })
 
 
 -- ======================= MACE (1.21) =======================
-local S = core.get_translator("mcl_mobs_addon")
-mcl_mobs_addon.mace_cooldown = {}
+local S = core.get_translator("mc_parity")
+mc_parity.mace_cooldown = {}
 
 --Mace Cooldown
 local cooldown_time = 1.6
 local heavy_core_longdesc = S("Solid Blocks of Steel. These are only forged if those that are brave enough can defeat the trials that await them.")
 local mace_longdesc = S("The mace is a slow melee weapon that deals incredible damage. “dig” key to use it. This weapon has a cooldown of 1.6 seconds, but if you fall the mace will deal more damage than if you are on the ground. The further you fall the more damage done. If you hit a mob or player then you will receive no fall damage, but beware. If you miss you will die. ")
 
-core.register_node("mcl_mobs_addon:heavy_core", {
+core.register_node("mc_parity:heavy_core", {
     description = S("Heavy Core"),
 	paramtype = "light",
     _doc_items_longdesc = heavy_core_longdesc,
-    tiles = {"mcl_mobs_addon_heavy_core_top.png", "mcl_mobs_addon_heavy_core_bottom.png", "mcl_mobs_addon_heavy_core_side.png"},
+    tiles = {"mc_parity_heavy_core_top.png", "mc_parity_heavy_core_bottom.png", "mc_parity_heavy_core_side.png"},
     is_ground_content = false,
     groups = {pickaxey = 1, deco_block = 1, rarity = 3},
     sounds = mcl_sounds.node_sound_stone_defaults(),
@@ -1380,10 +1380,10 @@ core.register_node("mcl_mobs_addon:heavy_core", {
 local WIND_BURST_BOUNCE_MULTIPLIER = 8
 
 --Mace
-core.register_tool("mcl_mobs_addon:mace", {
+core.register_tool("mc_parity:mace", {
 	description = S("Mace"),
 	_doc_items_longdesc = mace_longdesc,
-	inventory_image = "mcl_mobs_addon_mace.png",
+	inventory_image = "mc_parity_mace.png",
 	groups = { weapon=1, mace=1, dig_speed_class=1, enchantability=10, rarity = 3 },
 	wield_scale = mcl_vars.tool_wield_scale,
 	tool_capabilities = {
@@ -1399,12 +1399,12 @@ core.register_tool("mcl_mobs_addon:mace", {
 
 	on_use = function(itemstack, user, pointed_thing)
 		local user_velocity = user:get_velocity()
-		mcl_mobs_addon.mace_entity = pointed_thing.ref
+		mc_parity.mace_entity = pointed_thing.ref
 		if pointed_thing.type == "object" then
 			local current_time = core.get_gametime()
-			mcl_mobs_addon.mace_cooldown[user] = mcl_mobs_addon.mace_cooldown[user] or 0
-			if current_time - mcl_mobs_addon.mace_cooldown[user] >= cooldown_time then
-				mcl_mobs_addon.mace_cooldown[user] = current_time
+			mc_parity.mace_cooldown[user] = mc_parity.mace_cooldown[user] or 0
+			if current_time - mc_parity.mace_cooldown[user] >= cooldown_time then
+				mc_parity.mace_cooldown[user] = current_time
 				-- Define blocks based on laws of physics (an non-perfect solution for defining "blocks" based on velocity):
 				-- E(h) = mgh
 				-- E(k) = (mv^2)/2
@@ -1414,7 +1414,7 @@ core.register_tool("mcl_mobs_addon:mace", {
 				-- based on experiment g = 20
 				local blocks = -1*math.abs(user_velocity.y)*user_velocity.y/40
 				local enchantments = mcl_enchanting.get_enchantments(itemstack)
-				if mcl_mobs_addon.mace_entity:is_player() or mcl_mobs_addon.mace_entity:get_luaentity() then
+				if mc_parity.mace_entity:is_player() or mc_parity.mace_entity:get_luaentity() then
 					if blocks > 1 then
 						user:add_velocity(vector.new(0, -user_velocity.y, 0))
 						if enchantments.wind_burst then
@@ -1448,7 +1448,7 @@ core.register_tool("mcl_mobs_addon:mace", {
 						damage = 6
 					end
 
-					mcl_mobs_addon.mace_entity:punch(user, 1.6, {
+					mc_parity.mace_entity:punch(user, 1.6, {
 						full_punch_interval = 1.6,
 						damage_groups = {fleshy = damage},
 					}, nil)
@@ -1464,37 +1464,37 @@ core.register_tool("mcl_mobs_addon:mace", {
 })
 
 core.register_on_leaveplayer(function(player)
-	mcl_mobs_addon.mace_cooldown[player] = nil
+	mc_parity.mace_cooldown[player] = nil
 end)
 
 -- By Cora
 mcl_damage.register_modifier(function(obj, damage, reason)
-	if reason.type == "fall" and mcl_mobs_addon.mace_cooldown[obj] and core.get_gametime() - mcl_mobs_addon.mace_cooldown[obj] < 2 then
+	if reason.type == "fall" and mc_parity.mace_cooldown[obj] and core.get_gametime() - mc_parity.mace_cooldown[obj] < 2 then
 			return 0
 	end
 end)
 
 --Crafting recipe for mace
 core.register_craft({
-	output = "mcl_mobs_addon:mace",
+	output = "mc_parity:mace",
 	recipe = {
-		{ "", "mcl_mobs_addon:heavy_core" },
+		{ "", "mc_parity:heavy_core" },
 		{ "", "mcl_mobitems:breeze_rod" },
 	}
 })
 
 
 -- ======================= CHAIN (1.16, VL -> MCLN) =======================
-minetest.register_node("mcl_mobs_addon:chain", {
+minetest.register_node("mc_parity:chain", {
 	description = S("Chain"),
 	_doc_items_longdesc = S("Chains are metallic decoration blocks."),
-	inventory_image = "mcl_mobs_addon_chain_inv.png",
-	tiles = {"mcl_mobs_addon_chain.png"},
+	inventory_image = "mc_parity_chain_inv.png",
+	tiles = {"mc_parity_chain.png"},
 	drawtype = "mesh",
 	paramtype = "light",
 	paramtype2 = "facedir",
 	use_texture_alpha = "clip",
-	mesh = "mcl_mobs_addon_chain.obj",
+	mesh = "mc_parity_chain.obj",
 	is_ground_content = false,
 	sunlight_propagates = true,
 	collision_box = {

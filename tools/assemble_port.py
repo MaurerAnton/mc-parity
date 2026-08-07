@@ -5,7 +5,7 @@ de-Mineclonia-ing, wandering-trader extraction.
 """
 import re, subprocess
 
-OUT = "/home/llm/questions/mcl_mobs_addon/mobs_port.lua"
+OUT = "/home/llm/questions/mc_parity/mobs_port.lua"
 TMP = "/tmp/"
 
 HEADER = """-- MC mobs ported from Mineclonia (GPLv3 — same license as the addon):
@@ -13,13 +13,13 @@ HEADER = """-- MC mobs ported from Mineclonia (GPLv3 — same license as the add
 -- wandering trader. These close the LAST ecosystem gaps: VoxeLibre
 -- 0.92 lacks creeper/enderman/blaze/pufferfish/wandering_trader
 -- entirely; Mineclonia has them but NOT ravager-friendly targeting here.
--- Adapted: ids -> mcl_mobs_addon:*, Mineclonia-only spawn API ->
+-- Adapted: ids -> mc_parity:*, Mineclonia-only spawn API ->
 -- dual-game register_monster_spawn, raid/targeting-rule machinery ->
 -- standard framework aggro (the targeting-rule API is Mineclonia-only).
 -- Media (models/textures) keeps the mobs_mc_* names (the media namespace
 -- is global; on Mineclonia our identical copies simply shadow the game's).
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- Mineclonia's table.merge is missing in VoxeLibre — shim it
 if not table.merge then
@@ -73,7 +73,7 @@ local function register_monster_spawn(name, biomes, weight, pack_min, pack_max, 
 \tend
 \tend)
 \tif not ok then
-\t\tminetest.log("action", "[mcl_mobs_addon] spawn FAIL " .. tostring(name) .. ": " .. tostring(err))
+\t\tminetest.log("action", "[mc_parity] spawn FAIL " .. tostring(name) .. ": " .. tostring(err))
 \tend
 end
 
@@ -155,37 +155,37 @@ def de_mcln(src, add_aggro=True):
 
 # ---- creeper ----
 c = open(TMP + "port_creeper.lua").read()
-c = c.replace("mobs_mc:creeper_charged", "mcl_mobs_addon:creeper_charged")
+c = c.replace("mobs_mc:creeper_charged", "mc_parity:creeper_charged")
 c = c.replace('local mobs_griefing = mobs_mc.is_mob_griefing_enabled("creeper")',
               'local mobs_griefing = (mobs_mc and mobs_mc.is_mob_griefing_enabled)\n\tand mobs_mc.is_mob_griefing_enabled("creeper") or true')
 c = de_mcln(c)
 c = strip_spawn(c)
 creeper = c + """
-register_monster_spawn("mcl_mobs_addon:creeper", OW_MONSTERS, 100, 4, 4)
+register_monster_spawn("mc_parity:creeper", OW_MONSTERS, 100, 4, 4)
 """
 
 # ---- blaze ----
 b = open(TMP + "port_blaze.lua").read()
-b = b.replace("mobs_mc:blaze_fireball", "mcl_mobs_addon:blaze_fireball")
+b = b.replace("mobs_mc:blaze_fireball", "mc_parity:blaze_fireball")
 b = de_mcln(b)
 b = strip_spawn(b)
 blaze = b + """
-register_monster_spawn("mcl_mobs_addon:blaze", NETHER_BIOMES, 20, 1, 2, "nether")
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:blaze", 20, 20)
+register_monster_spawn("mc_parity:blaze", NETHER_BIOMES, 20, 1, 2, "nether")
+mc_parity.mcln_base_hp("mc_parity:blaze", 20, 20)
 """
 
 # ---- enderman ----
 e = open(TMP + "port_enderman.lua").read()
-e = e.replace("mobs_mc:ender_eyes", "mcl_mobs_addon:ender_eyes")
+e = e.replace("mobs_mc:ender_eyes", "mc_parity:ender_eyes")
 e = e.replace('local mobs_griefing = mobs_mc.is_mob_griefing_enabled("enderman")',
               'local mobs_griefing = (mobs_mc and mobs_mc.is_mob_griefing_enabled)\n\tand mobs_mc.is_mob_griefing_enabled("enderman") or true')
 e = de_mcln(e)
 e = strip_spawn(e)
 enderman = e + """
-register_monster_spawn("mcl_mobs_addon:enderman", OW_MONSTERS, 1, 1, 4)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:enderman", 40, 40)
-register_monster_spawn("mcl_mobs_addon:enderman", NETHER_BIOMES, 1, 1, 4, "nether")
-register_monster_spawn("mcl_mobs_addon:enderman", END_BIOMES, 10, 4, 4, "end")
+register_monster_spawn("mc_parity:enderman", OW_MONSTERS, 1, 1, 4)
+mc_parity.mcln_base_hp("mc_parity:enderman", 40, 40)
+register_monster_spawn("mc_parity:enderman", NETHER_BIOMES, 1, 1, 4, "nether")
+register_monster_spawn("mc_parity:enderman", END_BIOMES, 10, 4, 4, "end")
 """
 
 # ---- pufferfish ----
@@ -193,8 +193,8 @@ p = open(TMP + "port_pufferfish.lua").read()
 p = de_mcln(p, add_aggro=False)
 p = strip_spawn(p)
 pufferfish = p + """
-register_monster_spawn("mcl_mobs_addon:pufferfish", OCEAN_BIOMES, 10, 1, 3)
-mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:pufferfish", 6, 6)
+register_monster_spawn("mc_parity:pufferfish", OCEAN_BIOMES, 10, 1, 3)
+mc_parity.mcln_base_hp("mc_parity:pufferfish", 6, 6)
 """
 
 # ---- ravager: de-Mineclonia (raid template + targeting rules + gwp) ----
@@ -210,7 +210,7 @@ ravager = r + """
 # ---- wandering trader ----
 wt_src = subprocess.check_output(["git", "-C", "/tmp/mcln", "show",
     "HEAD:mods/ENTITIES/mobs_mc/wandering_trader.lua"]).decode()
-wt = wt_src.replace('"mobs_mc:wandering_trader"', '"mcl_mobs_addon:wandering_trader"').replace("mobs_mc:trader_llama", "mcl_mobs_addon:trader_llama")
+wt = wt_src.replace('"mobs_mc:wandering_trader"', '"mc_parity:wandering_trader"').replace("mobs_mc:trader_llama", "mc_parity:trader_llama")
 # villager_base is a LOCAL in the game's villager.lua (not exported) — the
 # trader's def is self-contained, so merge over an empty base
 wt = re.sub(r"local villager_base = mobs_mc\.villager_base", "local villager_base = {}", wt)
@@ -254,10 +254,10 @@ trader = wt + """
 -- Mineclonia branch FIRST (their spawn_setup is a broken compat shim).
 if mcl_mobs.register_spawner and mobs_mc and mobs_mc.animal_spawner then
 \tmcl_mobs.register_spawner(table.merge(mobs_mc.animal_spawner, {
-\t\tname = "mcl_mobs_addon:wandering_trader", biomes = OW_MONSTERS, weight = 5,
+\t\tname = "mc_parity:wandering_trader", biomes = OW_MONSTERS, weight = 5,
 \t}))
 elseif mcl_mobs.spawn_setup then
-\tmcl_mobs:spawn_setup({ name = "mcl_mobs_addon:wandering_trader", dimension = "overworld", biomes = OW_MONSTERS, weight = 5 })
+\tmcl_mobs:spawn_setup({ name = "mc_parity:wandering_trader", dimension = "overworld", biomes = OW_MONSTERS, weight = 5 })
 end
 """
 
@@ -275,5 +275,5 @@ with open(OUT, "w") as f:
     f.write(ravager + "\n")
     f.write("-- ---------------------------------------------------------------------------\n-- WANDERING TRADER\n-- ---------------------------------------------------------------------------\n")
     f.write(trader + "\n")
-    f.write('minetest.log("action", "[mcl_mobs_addon] ported mobs registered (creeper/enderman/blaze/pufferfish/ravager/trader)")\n')
+    f.write('minetest.log("action", "[mc_parity] ported mobs registered (creeper/enderman/blaze/pufferfish/ravager/trader)")\n')
 print("assembled:", OUT)

@@ -5,7 +5,7 @@
 -- signs (1.20), pitcher plant + torchflower (1.20).
 -- ---------------------------------------------------------------------------
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- ------------------------------------------------------------------ coral --
 local CORAL = {
@@ -15,21 +15,21 @@ local CORAL = {
 for _, c in ipairs(CORAL) do
 	local name, col = c[1], c[2]
 	-- coral block
-	minetest.register_node("mcl_mobs_addon:coral_block_" .. name, {
+	minetest.register_node("mc_parity:coral_block_" .. name, {
 		description = S("Coral Block"),
 		_doc_items_longdesc = S("A colorful coral block from the ocean floor."),
-		tiles = { "mcl_mobs_addon_coral_" .. name .. ".png" },
+		tiles = { "mc_parity_coral_" .. name .. ".png" },
 		is_ground_content = false,
 		groups = { pickaxe = 1, dig_by_pickaxe = 1, deco_block = 1 },
 		sounds = mcl_sounds.node_sound_stone_defaults(),
 	})
 	-- coral fan (placed on a wall/floor)
-	minetest.register_node("mcl_mobs_addon:coral_fan_" .. name, {
+	minetest.register_node("mc_parity:coral_fan_" .. name, {
 		description = S("Coral Fan"),
 		drawtype = "plantlike",
-		tiles = { "mcl_mobs_addon_coral_fan_" .. name .. ".png" },
-		inventory_image = "mcl_mobs_addon_coral_fan_" .. name .. ".png",
-		wield_image = "mcl_mobs_addon_coral_fan_" .. name .. ".png",
+		tiles = { "mc_parity_coral_fan_" .. name .. ".png" },
+		inventory_image = "mc_parity_coral_fan_" .. name .. ".png",
+		wield_image = "mc_parity_coral_fan_" .. name .. ".png",
 		paramtype = "light",
 		paramtype2 = "meshoptions",
 		mesh = "plantlike",
@@ -38,9 +38,9 @@ for _, c in ipairs(CORAL) do
 		sounds = mcl_sounds.node_sound_leaves_defaults(),
 	})
 	-- dead variants (gray)
-	minetest.register_node("mcl_mobs_addon:coral_block_dead_" .. name, {
+	minetest.register_node("mc_parity:coral_block_dead_" .. name, {
 		description = S("Dead Coral Block"),
-		tiles = { "mcl_mobs_addon_coral_dead.png" },
+		tiles = { "mc_parity_coral_dead.png" },
 		is_ground_content = false,
 		groups = { pickaxe = 1, dig_by_pickaxe = 1, deco_block = 1 },
 		sounds = mcl_sounds.node_sound_stone_defaults(),
@@ -48,35 +48,35 @@ for _, c in ipairs(CORAL) do
 end
 -- coral + coral fan craft (3 corals -> 3 blocks, 1 coral block -> 4 fans)
 minetest.register_craft({
-	output = "mcl_mobs_addon:coral_block_tube 3",
+	output = "mc_parity:coral_block_tube 3",
 	recipe = {
-		{ "mcl_mobs_addon:coral_block_tube", "mcl_mobs_addon:coral_block_tube" },
-		{ "mcl_mobs_addon:coral_block_tube", "mcl_mobs_addon:coral_block_tube" },
+		{ "mc_parity:coral_block_tube", "mc_parity:coral_block_tube" },
+		{ "mc_parity:coral_block_tube", "mc_parity:coral_block_tube" },
 	},
 })
 
 -- ------------------------------------------------------------ moss block --
-minetest.register_node("mcl_mobs_addon:moss_block", {
+minetest.register_node("mc_parity:moss_block", {
 	description = S("Moss Block"),
 	_doc_items_longdesc = S("A soft green block from the lush caves."),
-	tiles = { "mcl_mobs_addon_moss_block.png" },
+	tiles = { "mc_parity_moss_block.png" },
 	is_ground_content = false,
 	groups = { handy = 1, dig_by_hand = 1, deco_block = 1 },
 	sounds = mcl_sounds.node_sound_leaves_defaults(),
 })
-minetest.register_node("mcl_mobs_addon:moss_carpet", {
+minetest.register_node("mc_parity:moss_carpet", {
 	description = S("Moss Carpet"),
 	drawtype = "nodebox",
 	node_box = { type = "fixed", fixed = { -0.5, -0.5, -0.5, 0.5, -0.4, 0.5 } },
-	tiles = { "mcl_mobs_addon_moss_carpet.png" },
+	tiles = { "mc_parity_moss_carpet.png" },
 	is_ground_content = false,
 	groups = { handy = 1, dig_by_hand = 1, deco_block = 1 },
 	sounds = mcl_sounds.node_sound_leaves_defaults(),
 })
 minetest.register_craft({
-	output = "mcl_mobs_addon:moss_carpet 3",
+	output = "mc_parity:moss_carpet 3",
 	recipe = {
-		{ "mcl_mobs_addon:moss_block", "mcl_mobs_addon:moss_block" },
+		{ "mc_parity:moss_block", "mc_parity:moss_block" },
 	},
 })
 
@@ -87,16 +87,16 @@ local TUFF_VARIANTS = {
 	{ "chiseled_tuff", "Chiseled Tuff" },
 }
 for _, v in ipairs(TUFF_VARIANTS) do
-	minetest.register_node("mcl_mobs_addon:" .. v[1], {
+	minetest.register_node("mc_parity:" .. v[1], {
 		description = S(v[2]),
-		tiles = { "mcl_mobs_addon_" .. v[1] .. ".png" },
+		tiles = { "mc_parity_" .. v[1] .. ".png" },
 		is_ground_content = false,
 		groups = { pickaxe = 1, dig_by_pickaxe = 1, deco_block = 1 },
 		sounds = mcl_sounds.node_sound_stone_defaults(),
 	})
 end
 minetest.register_craft({
-	output = "mcl_mobs_addon:tuff_bricks 4",
+	output = "mc_parity:tuff_bricks 4",
 	recipe = {
 		{ "mcl_deepslate:tuff", "mcl_deepslate:tuff" },
 		{ "mcl_deepslate:tuff", "mcl_deepslate:tuff" },
@@ -104,15 +104,15 @@ minetest.register_craft({
 })
 
 -- --------------------------------------------------------- copper bulb ----
-local BULB = "mcl_mobs_addon:copper_bulb"
-local BULB_LIT = "mcl_mobs_addon:copper_bulb_lit"
+local BULB = "mc_parity:copper_bulb"
+local BULB_LIT = "mc_parity:copper_bulb_lit"
 for _, def in ipairs({
 	{ BULB, "Copper Bulb", 0 },
 	{ BULB_LIT, "Copper Bulb (lit)", 15 },
 }) do
 	minetest.register_node(def[1], {
 		description = S(def[2]),
-		tiles = { def[3] > 0 and "mcl_mobs_addon_copper_bulb_lit.png" or "mcl_mobs_addon_copper_bulb.png" },
+		tiles = { def[3] > 0 and "mc_parity_copper_bulb_lit.png" or "mc_parity_copper_bulb.png" },
 		is_ground_content = false,
 		light_source = def[3],
 		groups = { pickaxe = 1, dig_by_pickaxe = 1, deco_block = 1 },
@@ -122,10 +122,10 @@ end
 -- mesecons-driven twin swap (the sculk sensor pattern): a redstone signal
 -- lights the bulb; the globalstep keeps the state in sync
 minetest.register_globalstep(function(dtime)
-	if not mcl_mobs_addon._bulb_step then mcl_mobs_addon._bulb_step = 0 end
-	mcl_mobs_addon._bulb_step = mcl_mobs_addon._bulb_step + dtime
-	if mcl_mobs_addon._bulb_step < 0.5 then return end
-	mcl_mobs_addon._bulb_step = 0
+	if not mc_parity._bulb_step then mc_parity._bulb_step = 0 end
+	mc_parity._bulb_step = mc_parity._bulb_step + dtime
+	if mc_parity._bulb_step < 0.5 then return end
+	mc_parity._bulb_step = 0
 	for _, obj in pairs(minetest.luaentities) do
 		if obj._mca_bulb then
 			local pos = obj._mca_bulb
@@ -150,12 +150,12 @@ minetest.after(0, function()
 end)
 
 -- ------------------------------------------------------------ crafter -----
-local CRAFTER = "mcl_mobs_addon:crafter"
+local CRAFTER = "mc_parity:crafter"
 minetest.register_node(CRAFTER, {
 	description = S("Crafter"),
 	_doc_items_longdesc = S("Automated crafting: put a 3x3 recipe inside; "
 		.. "a redstone signal crafts the result."),
-	tiles = { "mcl_mobs_addon_crafter.png" },
+	tiles = { "mc_parity_crafter.png" },
 	is_ground_content = false,
 	groups = { pickaxe = 1, dig_by_pickaxe = 1, deco_block = 1 },
 	sounds = mcl_sounds.node_sound_stone_defaults(),
@@ -197,10 +197,10 @@ minetest.register_node(CRAFTER, {
 })
 
 -- -------------------------------------------------- recovery compass ------
-minetest.register_craftitem("mcl_mobs_addon:recovery_compass", {
+minetest.register_craftitem("mc_parity:recovery_compass", {
 	description = S("Recovery Compass"),
 	_doc_items_longdesc = S("Points toward your last death location."),
-	inventory_image = "mcl_mobs_addon_recovery_compass.png",
+	inventory_image = "mc_parity_recovery_compass.png",
 	groups = { craftitem = 1 },
 	on_use = function(itemstack, player)
 		local meta = player:get_meta()
@@ -224,16 +224,16 @@ if mcl_death_drop and mcl_death_drop.register_on_death then
 	end)
 end
 minetest.register_craft({
-	output = "mcl_mobs_addon:recovery_compass",
+	output = "mc_parity:recovery_compass",
 	recipe = {
-		{ "mcl_mobs_addon:echo_shard", "mcl_mobs_addon:echo_shard", "mcl_mobs_addon:echo_shard" },
-		{ "mcl_mobs_addon:echo_shard", "mcl_compass:compass", "mcl_mobs_addon:echo_shard" },
-		{ "mcl_mobs_addon:echo_shard", "mcl_mobs_addon:echo_shard", "mcl_mobs_addon:echo_shard" },
+		{ "mc_parity:echo_shard", "mc_parity:echo_shard", "mc_parity:echo_shard" },
+		{ "mc_parity:echo_shard", "mcl_compass:compass", "mc_parity:echo_shard" },
+		{ "mc_parity:echo_shard", "mc_parity:echo_shard", "mc_parity:echo_shard" },
 	},
 })
 
 -- --------------------------------------------------------- hanging sign ---
-minetest.register_node("mcl_mobs_addon:hanging_sign_oak", {
+minetest.register_node("mc_parity:hanging_sign_oak", {
 	description = S("Oak Hanging Sign"),
 	_doc_items_longdesc = S("A hanging sign you can write on."),
 	drawtype = "nodebox",
@@ -241,8 +241,8 @@ minetest.register_node("mcl_mobs_addon:hanging_sign_oak", {
 		type = "fixed",
 		fixed = { -0.4, -0.5, -0.4, 0.4, -0.15, 0.4 },
 	},
-	tiles = { "mcl_mobs_addon_hanging_sign.png" },
-	inventory_image = "mcl_mobs_addon_hanging_sign.png",
+	tiles = { "mc_parity_hanging_sign.png" },
+	inventory_image = "mc_parity_hanging_sign.png",
 	paramtype = "light",
 	paramtype2 = "facedir",
 	is_ground_content = false,
@@ -251,13 +251,13 @@ minetest.register_node("mcl_mobs_addon:hanging_sign_oak", {
 	on_rightclick = function(pos, node, player)
 		local meta = minetest.get_meta(pos)
 		minetest.show_formspec(player:get_player_name(),
-			"mcl_mobs_addon:sign_" .. pos.x .. "_" .. pos.y .. "_" .. pos.z,
+			"mc_parity:sign_" .. pos.x .. "_" .. pos.y .. "_" .. pos.z,
 			"size[6,2.5]field[0.3,0.8;5.4,1;text;;" .. minetest.formspec_escape(meta:get_string("text"))
 			.. "]button[4.5,1.6;1.5,0.8;save;Save]")
 	end,
 })
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	local px, py, pz = formname:match("^mcl_mobs_addon:sign_(%-?%d+)_(%-?%d+)_(%-?%d+)$")
+	local px, py, pz = formname:match("^mc_parity:sign_(%-?%d+)_(%-?%d+)_(%-?%d+)$")
 	if not px then return end
 	if fields.save then
 		local pos = { x = tonumber(px), y = tonumber(py), z = tonumber(pz) }
@@ -268,23 +268,23 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 -- --------------------------------------------------- pitcher + torchflower --
-minetest.register_node("mcl_mobs_addon:pitcher_plant", {
+minetest.register_node("mc_parity:pitcher_plant", {
 	description = S("Pitcher Plant"),
 	drawtype = "plantlike",
-	tiles = { "mcl_mobs_addon_pitcher_plant.png" },
-	inventory_image = "mcl_mobs_addon_pitcher_plant.png",
-	wield_image = "mcl_mobs_addon_pitcher_plant.png",
+	tiles = { "mc_parity_pitcher_plant.png" },
+	inventory_image = "mc_parity_pitcher_plant.png",
+	wield_image = "mc_parity_pitcher_plant.png",
 	paramtype = "light",
 	buildable_to = true,
 	groups = { snappy = 3, dig_by_hand = 1, deco_block = 1, plant = 1 },
 	sounds = mcl_sounds.node_sound_leaves_defaults(),
 })
-minetest.register_node("mcl_mobs_addon:torchflower", {
+minetest.register_node("mc_parity:torchflower", {
 	description = S("Torchflower"),
 	drawtype = "plantlike",
-	tiles = { "mcl_mobs_addon_torchflower.png" },
-	inventory_image = "mcl_mobs_addon_torchflower.png",
-	wield_image = "mcl_mobs_addon_torchflower.png",
+	tiles = { "mc_parity_torchflower.png" },
+	inventory_image = "mc_parity_torchflower.png",
+	wield_image = "mc_parity_torchflower.png",
 	paramtype = "light",
 	light_source = 5,
 	buildable_to = true,
@@ -318,8 +318,8 @@ local function liquid_tpl()
 	}
 end
 
-local BUBBLY = "mcl_mobs_addon:bubble_column_bubbly"
-local WHIRLY = "mcl_mobs_addon:bubble_column_whirly"
+local BUBBLY = "mc_parity:bubble_column_bubbly"
+local WHIRLY = "mc_parity:bubble_column_whirly"
 for _, def in ipairs({
 	{ BUBBLY .. "_flowing", "flowingliquid", "flowing", BUBBLY, BUBBLY .. "_flowing" },
 	{ BUBBLY, "liquid", "source", BUBBLY, BUBBLY .. "_flowing" },
@@ -331,16 +331,16 @@ for _, def in ipairs({
 	tpl.liquidtype = def[3]
 	tpl.liquid_alternative_source = def[4]
 	tpl.liquid_alternative_flowing = def[5]
-	tpl.tiles = { "mcl_mobs_addon_bubble_" .. (def[1]:find("bubbly") and "up" or "down") .. ".png" }
+	tpl.tiles = { "mc_parity_bubble_" .. (def[1]:find("bubbly") and "up" or "down") .. ".png" }
 	minetest.register_node(def[1], tpl)
 end
 
 -- push players inside the columns + generate them over soul sand / magma
 minetest.register_globalstep(function(dtime)
-	if not mcl_mobs_addon._bubble_step then mcl_mobs_addon._bubble_step = 0 end
-	mcl_mobs_addon._bubble_step = mcl_mobs_addon._bubble_step + dtime
-	if mcl_mobs_addon._bubble_step < 0.25 then return end
-	mcl_mobs_addon._bubble_step = 0
+	if not mc_parity._bubble_step then mc_parity._bubble_step = 0 end
+	mc_parity._bubble_step = mc_parity._bubble_step + dtime
+	if mc_parity._bubble_step < 0.25 then return end
+	mc_parity._bubble_step = 0
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pos = player:get_pos()
 		if pos then
@@ -354,4 +354,4 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-minetest.log("action", "[mcl_mobs_addon] final closers: coral, moss, tuff bricks, copper bulb, crafter, recovery compass, hanging sign, pitcher/torchflower, bubble columns")
+minetest.log("action", "[mc_parity] final closers: coral, moss, tuff bricks, copper bulb, crafter, recovery compass, hanging sign, pitcher/torchflower, bubble columns")

@@ -9,13 +9,13 @@
 --     4 corridors + 4 vault rooms + lava traps) placed deep underground.
 -- ---------------------------------------------------------------------------
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 local TRIAL_LOOT = { -- pool for both the wave reward and the vault
-	"mcl_mobs_addon:wind_charge 3",
-	"mcl_mobs_addon:wind_charge 2",
-	"mcl_mobs_addon:breeze_rod 1",
-	"mcl_mobs_addon:breeze_rod 2",
+	"mc_parity:wind_charge 3",
+	"mc_parity:wind_charge 2",
+	"mc_parity:breeze_rod 1",
+	"mc_parity:breeze_rod 2",
 	"mcl_core:emerald 2",
 	"mcl_core:emerald 4",
 	"mcl_core:diamond 1",
@@ -28,7 +28,7 @@ local WAVE_MOBS = { -- weighted per room discipline
 	{ "mobs_mc:stray", 3 },
 	{ "mobs_mc:husk", 3 },
 	{ "mobs_mc:slime", 2 },
-	{ "mcl_mobs_addon:breeze", 2 },  -- the breeze guards its chambers
+	{ "mc_parity:breeze", 2 },  -- the breeze guards its chambers
 }
 
 local function pick_weighted(list, pr)
@@ -43,11 +43,11 @@ local function pick_weighted(list, pr)
 end
 
 -- ---------------------------------------------------------------- spawner --
-minetest.register_node("mcl_mobs_addon:trial_spawner", {
+minetest.register_node("mc_parity:trial_spawner", {
 	description = S("Trial Spawner"),
 	_doc_items_longdesc = S("Spawns hostile mobs when players come close. "
 		.. "After the wave is cleared it drops loot, then cools down."),
-	tiles = { "mcl_mobs_addon_trial_spawner.png" },
+	tiles = { "mc_parity_trial_spawner.png" },
 	is_ground_content = false,
 	groups = { pickaxe = 2, dig_by_pickaxe = 1, deco_block = 1 },
 	sounds = mcl_sounds.node_sound_stone_defaults(),
@@ -84,7 +84,7 @@ minetest.register_node("mcl_mobs_addon:trial_spawner", {
 					end
 				end
 				meta:set_int("alive", spawned)
-				minetest.log("action", "[mcl_mobs_addon] trial spawner @ "
+				minetest.log("action", "[mc_parity] trial spawner @ "
 					.. minetest.pos_to_string(pos) .. " wave=" .. spawned .. " mob=" .. mob)
 				minetest.get_node_timer(pos):start(2)
 				return true
@@ -104,10 +104,10 @@ minetest.register_node("mcl_mobs_addon:trial_spawner", {
 					minetest.add_item(vector.offset(pos, 0, 1.2, 0), item)
 				end
 				minetest.add_item(vector.offset(pos, 0, 1.2, 0),
-					"mcl_mobs_addon:trial_key 1")
+					"mc_parity:trial_key 1")
 				meta:set_string("state", "cooldown")
 				minetest.get_node_timer(pos):start(1800)
-				minetest.log("action", "[mcl_mobs_addon] trial spawner @ "
+				minetest.log("action", "[mc_parity] trial spawner @ "
 					.. minetest.pos_to_string(pos) .. " cleared — reward dropped")
 				return true
 			end
@@ -125,10 +125,10 @@ minetest.register_node("mcl_mobs_addon:trial_spawner", {
 
 -- count the surviving trial mobs every 2s and update their spawners
 minetest.register_globalstep(function(dtime)
-	if not mcl_mobs_addon._trial_step then mcl_mobs_addon._trial_step = 0 end
-	mcl_mobs_addon._trial_step = mcl_mobs_addon._trial_step + dtime
-	if mcl_mobs_addon._trial_step < 2 then return end
-	mcl_mobs_addon._trial_step = 0
+	if not mc_parity._trial_step then mc_parity._trial_step = 0 end
+	mc_parity._trial_step = mc_parity._trial_step + dtime
+	if mc_parity._trial_step < 2 then return end
+	mc_parity._trial_step = 0
 	local counts = {}
 	for _, le in pairs(minetest.luaentities) do
 		if le._mca_trial then
@@ -147,11 +147,11 @@ minetest.register_globalstep(function(dtime)
 end)
 
 -- ------------------------------------------------------------------ vault --
-minetest.register_node("mcl_mobs_addon:vault", {
+minetest.register_node("mc_parity:vault", {
 	description = S("Vault"),
 	_doc_items_longdesc = S("A per-player loot container. Open it with a "
 		.. "trial key: each player gets the loot once."),
-	tiles = { "mcl_mobs_addon_vault.png" },
+	tiles = { "mc_parity_vault.png" },
 	is_ground_content = false,
 	groups = { pickaxe = 2, dig_by_pickaxe = 1, deco_block = 1 },
 	sounds = mcl_sounds.node_sound_stone_defaults(),
@@ -159,7 +159,7 @@ minetest.register_node("mcl_mobs_addon:vault", {
 	on_rightclick = function(pos, node, player, itemstack)
 		local name = player:get_player_name()
 		local meta = minetest.get_meta(pos)
-		if itemstack:get_name() ~= "mcl_mobs_addon:trial_key" then
+		if itemstack:get_name() ~= "mc_parity:trial_key" then
 			minetest.chat_send_player(name, S("The vault is sealed. It needs a trial key."))
 			return itemstack
 		end
@@ -189,14 +189,14 @@ minetest.register_node("mcl_mobs_addon:vault", {
 })
 
 -- ------------------------------------------------------------------ items --
-minetest.register_craftitem("mcl_mobs_addon:trial_key", {
+minetest.register_craftitem("mc_parity:trial_key", {
 	description = S("Trial Key"),
-	inventory_image = "mcl_mobs_addon_trial_key.png",
+	inventory_image = "mc_parity_trial_key.png",
 	groups = { craftitem = 1 },
 })
-minetest.register_craftitem("mcl_mobs_addon:wind_charge", {
+minetest.register_craftitem("mc_parity:wind_charge", {
 	description = S("Wind Charge"),
-	inventory_image = "mcl_mobs_addon_wind_charge.png",
+	inventory_image = "mc_parity_wind_charge.png",
 	groups = { craftitem = 1 },
 })
 
@@ -262,7 +262,7 @@ local function clear_room(area, a, b)
 	end
 end
 
-function mcl_mobs_addon.build_trial_chambers(pos, def, pr, blockseed)
+function mc_parity.build_trial_chambers(pos, def, pr, blockseed)
 	local area = make_area(vector.offset(pos, -10, 0, -10), { x = 21, y = 9, z = 21 })
 
 	local c = pos  -- chamber centre (the structure is placed centred)
@@ -279,7 +279,7 @@ function mcl_mobs_addon.build_trial_chambers(pos, def, pr, blockseed)
 		end
 	end
 	-- the trial spawner in the centre
-	area:set_node(c, { name = "mcl_mobs_addon:trial_spawner" })
+	area:set_node(c, { name = "mc_parity:trial_spawner" })
 	area:set_node(vector.offset(c, 0, 1, 0), { name = "air" })
 
 	-- 4 corridors (3 wide, 3 tall, 8 long, outward from the chamber's
@@ -327,7 +327,7 @@ function mcl_mobs_addon.build_trial_chambers(pos, def, pr, blockseed)
 		local rb = vector.offset(va, 2, 3, 2)
 		hollow_box(area, ra, rb, T, T)
 		clear_room(area, ra, rb)
-		area:set_node(va, { name = "mcl_mobs_addon:vault" })
+		area:set_node(va, { name = "mc_parity:vault" })
 		-- doorway between the corridor and the room
 		local door = vector.offset(va, -d[1] * 3, 0, -d[3] * 3)
 		area:set_node(door, { name = "air" })
@@ -335,11 +335,11 @@ function mcl_mobs_addon.build_trial_chambers(pos, def, pr, blockseed)
 	end
 
 	area:write_to_map()
-	minetest.log("action", "[mcl_mobs_addon] trial chambers built @ " .. minetest.pos_to_string(pos))
+	minetest.log("action", "[mc_parity] trial chambers built @ " .. minetest.pos_to_string(pos))
 end
 
 if mcl_structures and mcl_structures.register_structure then
-	mcl_structures.register_structure("mcl_mobs_addon:trial_chambers", {
+	mcl_structures.register_structure("mc_parity:trial_chambers", {
 		place_on = { "mcl_core:stone", "mcl_deepslate:deepslate", "mcl_deepslate:deepslate_with_tuff" },
 		biomes = {
 			"Plains", "Forest", "FlowerForest", "BirchForest", "RoofedForest",
@@ -348,9 +348,9 @@ if mcl_structures and mcl_structures.register_structure then
 		},
 		y_min = -45,
 		y_max = -15,
-		place_func = mcl_mobs_addon.build_trial_chambers,
+		place_func = mc_parity.build_trial_chambers,
 		flags = "place_center_x, place_center_z",
 	})
 end
 
-minetest.log("action", "[mcl_mobs_addon] trial chambers registered")
+minetest.log("action", "[mc_parity] trial chambers registered")

@@ -227,9 +227,9 @@ minetest.register_on_mods_loaded(function()
 	end
 	if ent.attach_to_face then
 		patch_mineclonia()
-		minetest.log("action", "[mcl_mobs_addon] shulker upgrade: Mineclonia (spin)")
+		minetest.log("action", "[mc_parity] shulker upgrade: Mineclonia (spin)")
 	else
 		patch_voxelibre()
-		minetest.log("action", "[mcl_mobs_addon] shulker upgrade: VoxeLibre (face+spin)")
+		minetest.log("action", "[mc_parity] shulker upgrade: VoxeLibre (face+spin)")
 	end
 end)

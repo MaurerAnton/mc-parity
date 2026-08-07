@@ -9,7 +9,7 @@
 -- No natural spawn (MC: pillager outposts/woodland mansions only — not
 -- expressible in either spawn system): creative egg only.
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- forward declarations (the def table's closures below reference them;
 -- they are NOT def fields — VoxeLibre's register_mob whitelist drops
@@ -29,8 +29,8 @@ local allay = {
 		collisionbox = { -0.2, -0.2, -0.2, 0.2, 0.6, 0.2 },
 	},
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_allay.b3d",
-	textures = { { "mcl_mobs_addon_allay.png" } },
+	mesh = "mc_parity_allay.b3d",
+	textures = { { "mc_parity_allay.png" } },
 	visual_size = { x = 1, y = 1 },
 	fly = true,
 	fall_damage = 0,
@@ -207,15 +207,15 @@ else
 	end
 end
 
-mcl_mobs.register_mob("mcl_mobs_addon:allay", allay)
-mcl_mobs_addon.register_egg("mcl_mobs_addon:allay", S("Allay"), "#8cbfe0", "#ffffff", 0)
+mcl_mobs.register_mob("mc_parity:allay", allay)
+mc_parity.register_egg("mc_parity:allay", S("Allay"), "#8cbfe0", "#ffffff", 0)
 
 if mcl_mobs.register_spawner then
-	local def = mcl_mobs.registered_mobs["mcl_mobs_addon:allay"]
+	local def = mcl_mobs.registered_mobs["mc_parity:allay"]
 	if def then
 		def.hp_min = 20
 		def.hp_max = 20
 	end
 end
 
-minetest.log("action", "[mcl_mobs_addon] allay registered (delivery AI, both games)")
+minetest.log("action", "[mc_parity] allay registered (delivery AI, both games)")

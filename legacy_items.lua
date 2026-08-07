@@ -4,19 +4,19 @@
 -- of these.
 -- ---------------------------------------------------------------------------
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- ------------------------------------------------------------------ lead --
-minetest.register_craftitem("mcl_mobs_addon:lead", {
+minetest.register_craftitem("mc_parity:lead", {
 	description = S("Lead"),
 	_doc_items_longdesc = S("Tie a mob to a fence post — or to yourself. "
 		.. "Right-click a mob to attach the lead, right-click a fence post "
 		.. "to tether it, right-click again to detach."),
-	inventory_image = "mcl_mobs_addon_lead.png",
+	inventory_image = "mc_parity_lead.png",
 	groups = { craftitem = 1 },
 })
 minetest.register_craft({
-	output = "mcl_mobs_addon:lead 2",
+	output = "mc_parity:lead 2",
 	recipe = {
 		{ "mcl_mobitems:string", "mcl_mobitems:string", "mcl_mobitems:string" },
 		{ "mcl_mobitems:string", "mcl_mobitems:slimeball", "mcl_mobitems:string" },
@@ -28,10 +28,10 @@ minetest.register_craft({
 local leashed = {}
 
 minetest.register_globalstep(function(dtime)
-	if not mcl_mobs_addon._lead_step then mcl_mobs_addon._lead_step = 0 end
-	mcl_mobs_addon._lead_step = mcl_mobs_addon._lead_step + dtime
-	if mcl_mobs_addon._lead_step < 0.5 then return end
-	mcl_mobs_addon._lead_step = 0
+	if not mc_parity._lead_step then mc_parity._lead_step = 0 end
+	mc_parity._lead_step = mc_parity._lead_step + dtime
+	if mc_parity._lead_step < 0.5 then return end
+	mc_parity._lead_step = 0
 	for id, data in pairs(leashed) do
 		local obj = minetest.get_entity_by_id(id)
 		if not obj or not obj:is_valid() then
@@ -96,7 +96,7 @@ local function leash_target(player, pointed_thing, anchor)
 end
 
 minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
-	if puncher and puncher:is_player() and puncher:get_wielded_item():get_name() == "mcl_mobs_addon:lead" then
+	if puncher and puncher:is_player() and puncher:get_wielded_item():get_name() == "mc_parity:lead" then
 		leash_target(puncher, { type = "node", under = pos }, pos)
 	end
 end)
@@ -114,7 +114,7 @@ minetest.register_chatcommand("lead-test", {
 -- ---------------------------------------------------------- dragon head ----
 -- (the mcl_heads.register_head API prefixes mcl_heads: and can't be called
 -- from another mod's load context — register our own node instead)
-minetest.register_node("mcl_mobs_addon:dragon_head", {
+minetest.register_node("mc_parity:dragon_head", {
 	description = S("Dragon Head"),
 	_doc_items_longdesc = S("The head of the Ender Dragon — a trophy "
 		.. "found on the bows of end ships."),
@@ -125,13 +125,13 @@ minetest.register_node("mcl_mobs_addon:dragon_head", {
 	},
 	paramtype = "light",
 	paramtype2 = "facedir",
-	tiles = { "mcl_mobs_addon_dragon_head.png" },
+	tiles = { "mc_parity_dragon_head.png" },
 	is_ground_content = false,
 	groups = { handy = 1, dig_by_hand = 1, deco_block = 1 },
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 })
 minetest.register_craft({
-	output = "mcl_mobs_addon:dragon_head",
+	output = "mc_parity:dragon_head",
 	recipe = {
 		{ "mcl_mobitems:dragon_breath", "mcl_mobitems:dragon_breath" },
 		{ "mcl_mobitems:dragon_breath", "mcl_mobitems:dragon_breath" },
@@ -153,7 +153,7 @@ local function shulker_box_node(name, color, glow)
 		description = S("Shulker Box"),
 		_doc_items_longdesc = S("A portable chest: it keeps its contents "
 			.. "when dug up and placed again."),
-		tiles = { "mcl_mobs_addon_shulker_" .. (color == "" and "default" or color) .. ".png" },
+		tiles = { "mc_parity_shulker_" .. (color == "" and "default" or color) .. ".png" },
 		is_ground_content = false,
 		groups = { pickaxe = 1, dig_by_pickaxe = 1, deco_block = 1 },
 		sounds = mcl_sounds.node_sound_stone_defaults(),
@@ -209,7 +209,7 @@ local function shulker_box_node(name, color, glow)
 	})
 end
 
-local SHULKER = "mcl_mobs_addon:shulker_box"
+local SHULKER = "mc_parity:shulker_box"
 for _, c in ipairs(SHULKER_COLORS) do
 	shulker_box_node(SHULKER .. (c[1] == "" and "" or "_" .. c[1]), c[1], c[1] == "purple" and 7 or 0)
 end
@@ -260,9 +260,9 @@ end
 
 if base_arrow then
 	for name, eff in pairs(TIPPED) do
-		minetest.register_craftitem("mcl_mobs_addon:arrow_" .. name, {
+		minetest.register_craftitem("mc_parity:arrow_" .. name, {
 			description = S("Arrow of " .. name),
-			inventory_image = "mcl_mobs_addon_arrow_" .. name .. ".png",
+			inventory_image = "mc_parity_arrow_" .. name .. ".png",
 			groups = { ammo_bow = 1, ammo_bow_regular = 1, craftitem = 1 },
 			_arrow_image = { "mcl_bows_arrow.png^[colorize:" .. eff.color .. ":220" },
 			stack_max = 64,
@@ -282,7 +282,7 @@ if base_arrow then
 				tipped_effect(self, obj)
 			end
 		end
-		minetest.register_entity("mcl_mobs_addon:arrow_" .. name .. "_entity", cls)
+		minetest.register_entity("mc_parity:arrow_" .. name .. "_entity", cls)
 	end
 	-- crafts: 8 arrows + 1 lingering potion -> 8 tipped arrows
 	local POTION = {
@@ -292,7 +292,7 @@ if base_arrow then
 	}
 	for name, potion in pairs(POTION) do
 		minetest.register_craft({
-			output = "mcl_mobs_addon:arrow_" .. name .. " 8",
+			output = "mc_parity:arrow_" .. name .. " 8",
 			recipe = {
 				{ "mcl_bows:arrow", "mcl_bows:arrow", "mcl_bows:arrow" },
 				{ "mcl_bows:arrow", "mcl_potions:" .. potion, "mcl_bows:arrow" },
@@ -302,7 +302,7 @@ if base_arrow then
 	end
 	-- spectral: 1 arrow + 4 glowstone -> 2 spectral arrows
 	minetest.register_craft({
-		output = "mcl_mobs_addon:arrow_spectral 2",
+		output = "mc_parity:arrow_spectral 2",
 		recipe = {
 			{ "mcl_core:glowstone_dust", "mcl_core:glowstone_dust" },
 			{ "mcl_core:glowstone_dust", "mcl_bows:arrow" },
@@ -310,4 +310,4 @@ if base_arrow then
 	})
 end
 
-minetest.log("action", "[mcl_mobs_addon] legacy items: lead + dragon head + shulker boxes + tipped arrows")
+minetest.log("action", "[mc_parity] legacy items: lead + dragon head + shulker boxes + tipped arrows")

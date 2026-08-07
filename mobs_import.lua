@@ -2,7 +2,7 @@
 -- free media — LEGAL.md verified): frog, turtle, phantom, sniffer.
 --
 -- Adaptations:
---   * mcl_mobs_addon: prefix + mcl_mobs_addon_ media prefix
+--   * mc_parity: prefix + mc_parity_ media prefix
 --   * hp in initial_properties (VoxeLibre) + base patch for Mineclonia
 --   * Mineclonia-only mob_class methods (feed_tame, go_home) feature-detected
 --   * natural spawns only where BOTH games' spawn systems can express the
@@ -12,11 +12,11 @@
 -- NOT imported yet: allay (uses Mineclonia-only motion_step/run_ai hooks —
 -- needs a VoxeLibre-compatible movement rewrite; TODO).
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- hatchling registry: egg_pos -> baby turtle (see the turtle egg on_timer)
-mcl_mobs_addon = rawget(_G, "mcl_mobs_addon") or {}
-mcl_mobs_addon.turtle_babies = mcl_mobs_addon.turtle_babies or {}
+mc_parity = rawget(_G, "mc_parity") or {}
+mc_parity.turtle_babies = mc_parity.turtle_babies or {}
 
 local function mcln_base_hp(name, hp_min, hp_max)
 	-- Mineclonia's mob activate reads hp from the def base (math.random(
@@ -31,7 +31,7 @@ local function mcln_base_hp(name, hp_min, hp_max)
 end
 
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("frog") then
+if mc_parity.feature_enabled("frog") then
 -- textures via the game's _mcl_biome_type field)
 -- ---------------------------------------------------------------------------
 local frog_textures = {
@@ -41,12 +41,12 @@ local frog_textures = {
 	hot = 3,
 }
 local frog_texture_list = {
-	{ "mcl_mobs_addon_frog.png" },
-	{ "mcl_mobs_addon_frog_temperate.png" },
-	{ "mcl_mobs_addon_frog_warm.png" },
+	{ "mc_parity_frog.png" },
+	{ "mc_parity_frog_temperate.png" },
+	{ "mc_parity_frog_warm.png" },
 }
 
-mcl_mobs.register_mob("mcl_mobs_addon:frog", {
+mcl_mobs.register_mob("mc_parity:frog", {
 	description = S("Frog"),
 	type = "animal",
 	spawn_class = "passive",
@@ -79,10 +79,10 @@ mcl_mobs.register_mob("mcl_mobs_addon:frog", {
 		"mobs_mc:magma_cube_tiny",
 	},
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_frog.b3d",
+	mesh = "mc_parity_frog.b3d",
 	visual_size = { x = 10, y = 10 },
 	texture_list = frog_texture_list,
-	textures = { "mcl_mobs_addon_frog_temperate.png" },
+	textures = { "mc_parity_frog_temperate.png" },
 	animation = {
 		speed_normal = 15,
 		stand_start = 1, stand_end = 80,
@@ -152,18 +152,18 @@ mcl_mobs.register_mob("mcl_mobs_addon:frog", {
 	end,
 })
 
-mcl_mobs_addon.register_egg("mcl_mobs_addon:frog", S("Frog"), "#00AA00", "#db635f", 0)
-mcl_mobs_addon.register_spawn("mcl_mobs_addon:frog",
+mc_parity.register_egg("mc_parity:frog", S("Frog"), "#00AA00", "#db635f", 0)
+mc_parity.register_spawn("mc_parity:frog",
 	{ "Swampland", "MangroveSwamp" },
 	{ "Swampland", "MangroveSwamp" }, 30)
-mcln_base_hp("mcl_mobs_addon:frog", 10, 10)
+mcln_base_hp("mc_parity:frog", 10, 10)
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("turtle") then
+if mc_parity.feature_enabled("turtle") then
 -- Bettercraft's go_home/_has_egg chain needs the nest block)
 -- ---------------------------------------------------------------------------
-mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
+mcl_mobs.register_mob("mc_parity:turtle", {
 	description = S("Turtle"),
 	type = "animal",
 	spawn_class = "passive",
@@ -185,10 +185,10 @@ mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
 	reach = 2,
 	armor = 5,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_turtle.b3d",
+	mesh = "mc_parity_turtle.b3d",
 	visual_size = { x = 1, y = 1 },
-	texture_list = { { "mcl_mobs_addon_turtle.png" } },
-	textures = { "mcl_mobs_addon_turtle.png" },
+	texture_list = { { "mc_parity_turtle.png" } },
+	textures = { "mc_parity_turtle.png" },
 	makes_footstep_sound = true,
 	view_range = 16,
 	stepheight = 1.1,
@@ -232,8 +232,8 @@ mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
 		-- so the baby flag must come through on_spawn)
 		local p = self.object:get_pos()
 		local key = p and minetest.pos_to_string(p)
-		if key and mcl_mobs_addon.turtle_babies[key] then
-			mcl_mobs_addon.turtle_babies[key] = nil
+		if key and mc_parity.turtle_babies[key] then
+			mc_parity.turtle_babies[key] = nil
 			self._mca_baby = true
 			self.object:set_properties({ visual_size = { x = 0.6, y = 0.6 } })
 		end
@@ -246,7 +246,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
 			if self._mca_grow <= 0 then
 				self._mca_baby = nil
 				self.object:set_properties({ visual_size = { x = 1, y = 1 } })
-				minetest.add_item(self.object:get_pos(), "mcl_mobs_addon:scute")
+				minetest.add_item(self.object:get_pos(), "mc_parity:scute")
 			end
 		end
 		-- breeding: go home, then lay the egg on a nearby sand block
@@ -268,7 +268,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
 				else
 					local egg_pos = vector.offset(p, 0, 1, 0)
 					if minetest.get_node(egg_pos).name == "air" then
-						minetest.set_node(egg_pos, { name = "mcl_mobs_addon:turtle_egg" })
+						minetest.set_node(egg_pos, { name = "mc_parity:turtle_egg" })
 						self._mca_has_egg = nil
 						self._mca_home = nil
 					end
@@ -279,15 +279,15 @@ mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
 	end,
 })
 
-mcl_mobs_addon.register_egg("mcl_mobs_addon:turtle", S("Turtle"), "#516720", "#ded88f", 0)
-mcl_mobs_addon.register_spawn("mcl_mobs_addon:turtle",
+mc_parity.register_egg("mc_parity:turtle", S("Turtle"), "#516720", "#ded88f", 0)
+mc_parity.register_spawn("mc_parity:turtle",
 	{ "StoneBeach" },
 	{ "StoneBeach" }, 40)
-mcln_base_hp("mcl_mobs_addon:turtle", 10, 10)
+mcln_base_hp("mc_parity:turtle", 10, 10)
 
 -- turtle egg block: laid on sand by breeding turtles, hatches after
 -- 2-5 minutes into a baby turtle (MC parity: nests on the home beach)
-minetest.register_node("mcl_mobs_addon:turtle_egg", {
+minetest.register_node("mc_parity:turtle_egg", {
 	description = S("Turtle Egg"),
 	drawtype = "nodebox",
 	node_box = {
@@ -298,7 +298,7 @@ minetest.register_node("mcl_mobs_addon:turtle_egg", {
 		type = "fixed",
 		fixed = { -0.22, -0.5, -0.22, 0.22, -0.32, 0.22 },
 	},
-	tiles = { "mcl_mobs_addon_turtle_egg.png" },
+	tiles = { "mc_parity_turtle_egg.png" },
 	paramtype = "light",
 	groups = { dig_immediate = 3, deco_block = 1, oddly_breakable_by_hand = 1 },
 	sounds = mcl_sounds.node_sound_defaults(),
@@ -314,16 +314,16 @@ minetest.register_node("mcl_mobs_addon:turtle_egg", {
 		local baby_pos = vector.offset(pos, 0, 1, 0)
 		-- mark the spawn pos as a hatchling (VoxeLibre never calls
 		-- def.on_activate for mobs — on_spawn reads this registry)
-		mcl_mobs_addon.turtle_babies[minetest.pos_to_string(baby_pos)] = true
-		minetest.add_entity(baby_pos, "mcl_mobs_addon:turtle")
+		mc_parity.turtle_babies[minetest.pos_to_string(baby_pos)] = true
+		minetest.add_entity(baby_pos, "mc_parity:turtle")
 		return false
 	end,
 })
 
 -- turtle scute (MC 1.13; neither game has it — turtles are ours)
-minetest.register_craftitem("mcl_mobs_addon:scute", {
+minetest.register_craftitem("mc_parity:scute", {
 	description = S("Scute"),
-	inventory_image = "mcl_mobs_addon_scute.png",
+	inventory_image = "mc_parity_scute.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
 })
@@ -339,18 +339,18 @@ if mcl_armor and mcl_armor.register_set then
 		toughness = 0,
 		durability = 275,
 		enchantability = 9,
-		textures = { head = "mcl_mobs_addon_turtle_helmet.png" },
+		textures = { head = "mc_parity_turtle_helmet.png" },
 		groups = { armor = 1, mcl_armor = 1, mcl_armor_turtle = 1 },
 	})
 	minetest.register_craft({
-		output = "mcl_mobs_addon:helmet_turtle",
+		output = "mc_parity:helmet_turtle",
 		recipe = {
-			{ "mcl_mobs_addon:scute", "mcl_mobs_addon:scute", "mcl_mobs_addon:scute" },
-			{ "mcl_mobs_addon:scute", "", "mcl_mobs_addon:scute" },
+			{ "mc_parity:scute", "mc_parity:scute", "mc_parity:scute" },
+			{ "mc_parity:scute", "", "mc_parity:scute" },
 		},
 	})
 	-- water breathing while the shell is worn and the head is underwater
-	local HELMET = "mcl_mobs_addon:helmet_turtle"
+	local HELMET = "mc_parity:helmet_turtle"
 	local head_index = mcl_armor.elements and mcl_armor.elements.head
 		and mcl_armor.elements.head.index or 2
 	minetest.register_globalstep(function(dtime)
@@ -373,26 +373,26 @@ if mcl_armor and mcl_armor.register_set then
 	end)
 else
 	-- no armor API (unlikely): plain wearable helmet without the effect
-	minetest.register_craftitem("mcl_mobs_addon:helmet_turtle", {
+	minetest.register_craftitem("mc_parity:helmet_turtle", {
 		description = S("Turtle Shell"),
-		inventory_image = "mcl_mobs_addon_turtle_helmet.png",
+		inventory_image = "mc_parity_turtle_helmet.png",
 		groups = { armor_head = 1, armor = 1 },
 	})
 	minetest.register_craft({
-		output = "mcl_mobs_addon:helmet_turtle",
+		output = "mc_parity:helmet_turtle",
 		recipe = {
-			{ "mcl_mobs_addon:scute", "mcl_mobs_addon:scute", "mcl_mobs_addon:scute" },
-			{ "mcl_mobs_addon:scute", "", "mcl_mobs_addon:scute" },
+			{ "mc_parity:scute", "mc_parity:scute", "mc_parity:scute" },
+			{ "mc_parity:scute", "", "mc_parity:scute" },
 		},
 	})
 end
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("phantom") then
+if mc_parity.feature_enabled("phantom") then
 -- retreats upward when damaged, burns in daylight — Bettercraft's full AI)
 -- ---------------------------------------------------------------------------
-mcl_mobs.register_mob("mcl_mobs_addon:phantom", {
+mcl_mobs.register_mob("mc_parity:phantom", {
 	description = S("Phantom"),
 	type = "monster",
 	spawn_class = "hostile",
@@ -407,8 +407,8 @@ mcl_mobs.register_mob("mcl_mobs_addon:phantom", {
 	damage_groups = { fleshy = 100 },
 	view_range = 64,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_phantom.b3d",
-	textures = { { "mcl_mobs_addon_phantom.png" } },
+	mesh = "mc_parity_phantom.b3d",
+	textures = { { "mc_parity_phantom.png" } },
 	visual_size = { x = 1, y = 1 },
 	glow = 6,
 	fly = true,
@@ -472,7 +472,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:phantom", {
 			local name = player:get_player_name()
 			local is_creative = minetest.settings:get_bool("creative_mode")
 				or minetest.check_player_privs(name, { creative = true })
-			local is_spec = mcl_mobs_addon.is_spectator and mcl_mobs_addon.is_spectator(player)
+			local is_spec = mc_parity.is_spectator and mc_parity.is_spectator(player)
 			if not is_creative and not is_spec then
 				local ppos = player:get_pos()
 				if ppos then
@@ -551,7 +551,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:phantom", {
 	end,
 })
 
-mcl_mobs_addon.register_egg("mcl_mobs_addon:phantom", S("Phantom"), "#162328", "#a078db", 0)
+mc_parity.register_egg("mc_parity:phantom", S("Phantom"), "#162328", "#a078db", 0)
 -- MC-parity night spawn: neither spawn system has a time-of-day filter, so
 -- a lightweight globalstep spawns phantoms at night near players who have
 -- NOT SLEPT for 3+ in-game days (MC parity). Sleep is tracked by patching
@@ -561,7 +561,7 @@ mcl_mobs_addon.register_egg("mcl_mobs_addon:phantom", S("Phantom"), "#162328", "
 local ph_timer = 0
 local function player_slept(player)
 	local meta = player:get_meta()
-	meta:set_string("mcl_mobs_addon:slept", "true")
+	meta:set_string("mc_parity:slept", "true")
 end
 -- patch the game's bed nodes so entering one marks the player
 minetest.register_on_mods_loaded(function()
@@ -591,11 +591,11 @@ minetest.register_globalstep(function(dtime)
 		-- new day (noon passed): update sleepless counters
 		for _, player in ipairs(minetest.get_connected_players()) do
 			local meta = player:get_meta()
-			local slept = meta:get_string("mcl_mobs_addon:slept") == "true"
-			local days = tonumber(meta:get_string("mcl_mobs_addon:sleepless")) or 0
+			local slept = meta:get_string("mc_parity:slept") == "true"
+			local days = tonumber(meta:get_string("mc_parity:sleepless")) or 0
 			days = slept and 0 or (days + 1)
-			meta:set_string("mcl_mobs_addon:sleepless", tostring(days))
-			meta:set_string("mcl_mobs_addon:slept", "")
+			meta:set_string("mc_parity:sleepless", tostring(days))
+			meta:set_string("mc_parity:slept", "")
 		end
 	end
 	prev_t = t
@@ -604,16 +604,16 @@ minetest.register_globalstep(function(dtime)
 		local name = player:get_player_name()
 		local is_creative = minetest.settings:get_bool("creative_mode")
 			or minetest.check_player_privs(name, { creative = true })
-		local is_spec = mcl_mobs_addon.is_spectator and mcl_mobs_addon.is_spectator(player)
+		local is_spec = mc_parity.is_spectator and mc_parity.is_spectator(player)
 		if not is_creative and not is_spec then
-			local days = tonumber(player:get_meta():get_string("mcl_mobs_addon:sleepless")) or 0
+			local days = tonumber(player:get_meta():get_string("mc_parity:sleepless")) or 0
 			if days >= 3 and math.random(60) == 1 then
 				local ppos = player:get_pos()
 				if ppos then
 					local exists = false
 					for _, o in ipairs(minetest.get_objects_inside_radius(ppos, 32)) do
 						local le = o:get_luaentity()
-						if le and le.name == "mcl_mobs_addon:phantom" then
+						if le and le.name == "mc_parity:phantom" then
 							exists = true
 							break
 						end
@@ -621,7 +621,7 @@ minetest.register_globalstep(function(dtime)
 					if not exists then
 						local sp = vector.offset(ppos, 0, 20 + math.random(0, 10), 0)
 						if minetest.get_node(sp).name == "air" then
-							minetest.add_entity(sp, "mcl_mobs_addon:phantom")
+							minetest.add_entity(sp, "mc_parity:phantom")
 						end
 					end
 				end
@@ -629,14 +629,14 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 end)
-mcln_base_hp("mcl_mobs_addon:phantom", 20, 20)
+mcln_base_hp("mc_parity:phantom", 20, 20)
 
 -- ---------------------------------------------------------------------------
 end
-if mcl_mobs_addon.feature_enabled("sniffer") then
+if mc_parity.feature_enabled("sniffer") then
 -- spawn condition is portable; drops TODO: sniffable seeds)
 -- ---------------------------------------------------------------------------
-mcl_mobs.register_mob("mcl_mobs_addon:sniffer", {
+mcl_mobs.register_mob("mc_parity:sniffer", {
 	description = S("Sniffer"),
 	type = "animal",
 	spawn_class = "passive",
@@ -653,9 +653,9 @@ mcl_mobs.register_mob("mcl_mobs_addon:sniffer", {
 	reach = 2,
 	armor = 5,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_sniffer.b3d",
+	mesh = "mc_parity_sniffer.b3d",
 	visual_size = { x = 1, y = 1 },
-	textures = { "mcl_mobs_addon_sniffer.png" },
+	textures = { "mc_parity_sniffer.png" },
 	makes_footstep_sound = true,
 	walk_velocity = 1,
 	pace_bonus = 0.3,
@@ -674,8 +674,8 @@ mcl_mobs.register_mob("mcl_mobs_addon:sniffer", {
 	},
 })
 
-mcl_mobs_addon.register_egg("mcl_mobs_addon:sniffer", S("Sniffer"), "#872618", "#254017", 0)
-mcln_base_hp("mcl_mobs_addon:sniffer", 14, 14)
+mc_parity.register_egg("mc_parity:sniffer", S("Sniffer"), "#872618", "#254017", 0)
+mcln_base_hp("mc_parity:sniffer", 14, 14)
 
-minetest.log("action", "[mcl_mobs_addon] imported Bettercraft mobs: frog, turtle, phantom, sniffer")
+minetest.log("action", "[mc_parity] imported Bettercraft mobs: frog, turtle, phantom, sniffer")
 end

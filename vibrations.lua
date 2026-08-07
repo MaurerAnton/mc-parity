@@ -11,10 +11,10 @@
 -- Frequencies (MC-ish): walking=1, jumping=4, digging=8, placing=8,
 -- punching=16. Sneaking suppresses walking vibrations (MC parity).
 
-mcl_mobs_addon = rawget(_G, "mcl_mobs_addon") or {}
-mcl_mobs_addon.vibrations = mcl_mobs_addon.vibrations or {}
-mcl_mobs_addon.shrieker_warnings = mcl_mobs_addon.shrieker_warnings or {}
-local vib = mcl_mobs_addon.vibrations
+mc_parity = rawget(_G, "mc_parity") or {}
+mc_parity.vibrations = mc_parity.vibrations or {}
+mc_parity.shrieker_warnings = mc_parity.shrieker_warnings or {}
+local vib = mc_parity.vibrations
 
 vib.listeners = {}
 
@@ -43,7 +43,7 @@ function vib.emit(pos, freq, player)
 	end
 
 	-- sensors react within 8 nodes
-	local sensor = minetest.find_node_near(pos, 8, { "mcl_mobs_addon:sculk_sensor" })
+	local sensor = minetest.find_node_near(pos, 8, { "mc_parity:sculk_sensor" })
 	if sensor then
 		minetest.sound_play("mcl_sculk", { pos = sensor, gain = 0.7, max_hear_distance = 12 }, true)
 		local n = minetest.get_node(sensor)
@@ -51,28 +51,28 @@ function vib.emit(pos, freq, player)
 		minetest.set_node(sensor, n)
 		minetest.after(1, function()
 			local nn = minetest.get_node(sensor)
-			if nn.name == "mcl_mobs_addon:sculk_sensor" and nn.param2 == 1 then
+			if nn.name == "mc_parity:sculk_sensor" and nn.param2 == 1 then
 				nn.param2 = 0
 				minetest.set_node(sensor, nn)
 			end
 		end)
 		-- mesecons output: swap to the powered twin for a ~0.8s pulse
 		-- (MC: sensors emit a redstone pulse on vibration; shriekers don't)
-		if rawget(_G, "mesecon") and minetest.registered_nodes["mcl_mobs_addon:sculk_sensor_active"] then
+		if rawget(_G, "mesecon") and minetest.registered_nodes["mc_parity:sculk_sensor_active"] then
 			local cn = minetest.get_node(sensor)
-			if cn.name == "mcl_mobs_addon:sculk_sensor" then
-				minetest.set_node(sensor, { name = "mcl_mobs_addon:sculk_sensor_active" })
+			if cn.name == "mc_parity:sculk_sensor" then
+				minetest.set_node(sensor, { name = "mc_parity:sculk_sensor_active" })
 				minetest.after(0.8, function()
 					local an = minetest.get_node(sensor)
-					if an.name == "mcl_mobs_addon:sculk_sensor_active" then
-						minetest.set_node(sensor, { name = "mcl_mobs_addon:sculk_sensor" })
+					if an.name == "mc_parity:sculk_sensor_active" then
+						minetest.set_node(sensor, { name = "mc_parity:sculk_sensor" })
 					end
 				end)
 			end
 		end
 	end
 	-- shriekers scream within 8 nodes
-	local shrieker = minetest.find_node_near(pos, 8, { "mcl_mobs_addon:sculk_shrieker" })
+	local shrieker = minetest.find_node_near(pos, 8, { "mc_parity:sculk_shrieker" })
 	if shrieker then
 		activate_shrieker(shrieker, player)
 	end
@@ -96,10 +96,10 @@ activate_shrieker = function(pos, player)
 	local key = minetest.pos_to_string(pos)
 	-- warning state in a GLOBAL table (node meta is lost when the mapblock
 	-- unloads — the param2 visual is unreliable for the same reason)
-	local st = mcl_mobs_addon.shrieker_warnings[key]
+	local st = mc_parity.shrieker_warnings[key]
 	if not st then
 		st = { last = 0, level = 0 }
-		mcl_mobs_addon.shrieker_warnings[key] = st
+		mc_parity.shrieker_warnings[key] = st
 	end
 
 	-- cooldown by time; last==0 = first scream ever: never blocked
@@ -119,20 +119,20 @@ activate_shrieker = function(pos, player)
 		minetest.set_node(pos, n)
 		minetest.after(SHRIEK_COOLDOWN, function()
 			local nn = minetest.get_node(pos)
-			if nn.name == "mcl_mobs_addon:sculk_shrieker" then
-				minetest.set_node(pos, { name = "mcl_mobs_addon:sculk_shrieker", param2 = 0 })
+			if nn.name == "mc_parity:sculk_shrieker" then
+				minetest.set_node(pos, { name = "mc_parity:sculk_shrieker", param2 = 0 })
 			end
 		end)
 	end
 
 	-- warning level: 2nd scream within WARNING_RESET summons the warden
-	if st.level >= 2 and minetest.registered_entities["mcl_mobs_addon:warden"] then
+	if st.level >= 2 and minetest.registered_entities["mc_parity:warden"] then
 		-- summon the warden (MC: warning level 4; 2 is friendlier for play)
 		local wardens = minetest.get_objects_inside_radius(pos, WARDEN_DIST)
 		local exists = false
 		for _, o in ipairs(wardens) do
 			local le = o:get_luaentity()
-			if le and le.name == "mcl_mobs_addon:warden" then
+			if le and le.name == "mc_parity:warden" then
 				exists = true
 				break
 			end
@@ -143,7 +143,7 @@ activate_shrieker = function(pos, player)
 				local p = vector.offset(pos, 0, dy, 0)
 				if minetest.get_node(p).name == "air"
 						and minetest.get_node(vector.offset(p, 0, 2, 0)).name == "air" then
-					minetest.add_entity(p, "mcl_mobs_addon:warden")
+					minetest.add_entity(p, "mc_parity:warden")
 					warn_player(player, "The darkness has awakened...")
 					break
 				end
@@ -162,7 +162,7 @@ local function hook_walkover(pos, node, player)
 	if not player then
 		return
 	end
-	if mcl_mobs_addon.is_spectator and mcl_mobs_addon.is_spectator(player) then
+	if mc_parity.is_spectator and mc_parity.is_spectator(player) then
 		return  -- spectators make no vibrations
 	end
 	local ctrl = player:get_player_control()
@@ -204,4 +204,4 @@ minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
 	end
 end)
 
-minetest.log("action", "[mcl_mobs_addon] vibration system ready")
+minetest.log("action", "[mc_parity] vibration system ready")

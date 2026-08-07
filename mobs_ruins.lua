@@ -4,7 +4,7 @@
 -- disc, and a small buried ruin structure.
 -- ---------------------------------------------------------------------------
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 -- pottery sherds (9 of the 20 MC designs)
 local SHERDS = {
@@ -14,25 +14,25 @@ local SHERDS = {
 }
 local SHERD_NAMES = {}
 for _, s in ipairs(SHERDS) do
-	SHERD_NAMES["mcl_mobs_addon:pottery_sherd_" .. s[1]] = true
-	minetest.register_craftitem("mcl_mobs_addon:pottery_sherd_" .. s[1], {
+	SHERD_NAMES["mc_parity:pottery_sherd_" .. s[1]] = true
+	minetest.register_craftitem("mc_parity:pottery_sherd_" .. s[1], {
 		description = S("Pottery Sherd"),
-		inventory_image = "mcl_mobs_addon_sherd_" .. s[1] .. ".png",
+		inventory_image = "mc_parity_sherd_" .. s[1] .. ".png",
 		groups = { craftitem = 1 },
 	})
 end
 
 -- decorated pot: 4 sherds in a square (any sherd combination)
-minetest.register_node("mcl_mobs_addon:decorated_pot", {
+minetest.register_node("mc_parity:decorated_pot", {
 	description = S("Decorated Pot"),
 	_doc_items_longdesc = S("A decorative pot made of four pottery sherds."),
-	tiles = { "mcl_mobs_addon_decorated_pot.png" },
+	tiles = { "mc_parity_decorated_pot.png" },
 	is_ground_content = false,
 	groups = { handy = 1, dig_by_hand = 1, deco_block = 1 },
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 })
 minetest.register_craft({
-	output = "mcl_mobs_addon:decorated_pot 1",
+	output = "mc_parity:decorated_pot 1",
 	recipe = {
 		{ "group:craftitem", "group:craftitem" },
 		{ "group:craftitem", "group:craftitem" },
@@ -40,9 +40,9 @@ minetest.register_craft({
 })
 
 -- ------------------------------------------------------------------ brush --
-minetest.register_tool("mcl_mobs_addon:brush", {
+minetest.register_tool("mc_parity:brush", {
 	description = S("Brush"),
-	inventory_image = "mcl_mobs_addon_brush.png",
+	inventory_image = "mc_parity_brush.png",
 	groups = { tool = 1 },
 	tool_capabilities = {
 		full_punch_interval = 0.9,
@@ -69,28 +69,28 @@ local function suspicious_blocks(pos, base, brush_use)
 		maxpos = vector.offset(pos, 0.3, 0.6, 0.3),
 		minvel = { x = -1, y = 2, z = -1 }, maxvel = { x = 1, y = 4, z = 1 },
 		minacc = { x = 0, y = -9, z = 0 }, maxacc = { x = 0, y = -9, z = 0 },
-		texture = "mcl_mobs_addon_brush_particle.png",
+		texture = "mc_parity_brush_particle.png",
 	})
 	if meta:get_int("progress") >= BRUSHING_TIME then
 		minetest.add_item(vector.offset(pos, 0, 0.8, 0), loot)
 		minetest.set_node(pos, { name = base })
 		meta:set_string("loot", "")
-		minetest.log("action", "[mcl_mobs_addon] brushed @ " .. minetest.pos_to_string(pos)
+		minetest.log("action", "[mc_parity] brushed @ " .. minetest.pos_to_string(pos)
 			.. " -> " .. loot)
 	end
 	if brush_use then brush_use() end
 end
 
-minetest.register_node("mcl_mobs_addon:suspicious_sand", {
+minetest.register_node("mc_parity:suspicious_sand", {
 	description = S("Suspicious Sand"),
 	_doc_items_longdesc = S("Sand with something hidden inside. Brush it to "
 		.. "carefully reveal the loot."),
-	tiles = { "mcl_mobs_addon_suspicious_sand.png" },
+	tiles = { "mc_parity_suspicious_sand.png" },
 	is_ground_content = true,
 	groups = { sand = 1, dig_by_hand = 1, falling_node = 1 },
 	sounds = mcl_sounds.node_sound_sand_defaults(),
 	on_rightclick = function(pos, node, player, itemstack)
-		if itemstack:get_name() ~= "mcl_mobs_addon:brush" then return itemstack end
+		if itemstack:get_name() ~= "mc_parity:brush" then return itemstack end
 		local name = player:get_player_name()
 		if not minetest.is_creative_enabled(name) then
 			itemstack:add_wear(65535 / 64)  -- 64 uses
@@ -100,16 +100,16 @@ minetest.register_node("mcl_mobs_addon:suspicious_sand", {
 	end,
 })
 
-minetest.register_node("mcl_mobs_addon:suspicious_gravel", {
+minetest.register_node("mc_parity:suspicious_gravel", {
 	description = S("Suspicious Gravel"),
 	_doc_items_longdesc = S("Gravel with something hidden inside. Brush it to "
 		.. "carefully reveal the loot."),
-	tiles = { "mcl_mobs_addon_suspicious_gravel.png" },
+	tiles = { "mc_parity_suspicious_gravel.png" },
 	is_ground_content = true,
 	groups = { dig_by_hand = 1, falling_node = 1 },
 	sounds = mcl_sounds.node_sound_gravel_defaults(),
 	on_rightclick = function(pos, node, player, itemstack)
-		if itemstack:get_name() ~= "mcl_mobs_addon:brush" then return itemstack end
+		if itemstack:get_name() ~= "mc_parity:brush" then return itemstack end
 		local name = player:get_player_name()
 		if not minetest.is_creative_enabled(name) then
 			itemstack:add_wear(65535 / 64)
@@ -122,20 +122,20 @@ minetest.register_node("mcl_mobs_addon:suspicious_gravel", {
 -- Relic music disc (plays a game track — CC BY-SA, compatible)
 if mcl_jukebox and mcl_jukebox.register_record then
 	mcl_jukebox.register_record("Relic", "Aaron Cherof", "relic",
-		"mcl_mobs_addon_disc_relic.png", "mcl_jukebox_track_1.ogg")
+		"mc_parity_disc_relic.png", "mcl_jukebox_track_1.ogg")
 end
 
 -- ------------------------------------------------------------ structure --
 local RUIN_LOOT = {
-	"mcl_mobs_addon:pottery_sherd_angler 1",
-	"mcl_mobs_addon:pottery_sherd_archer 1",
-	"mcl_mobs_addon:pottery_sherd_arms_up 1",
-	"mcl_mobs_addon:pottery_sherd_blade 1",
-	"mcl_mobs_addon:pottery_sherd_brewer 1",
-	"mcl_mobs_addon:pottery_sherd_burn 1",
-	"mcl_mobs_addon:pottery_sherd_danger 1",
-	"mcl_mobs_addon:pottery_sherd_friend 1",
-	"mcl_mobs_addon:pottery_sherd_heart 1",
+	"mc_parity:pottery_sherd_angler 1",
+	"mc_parity:pottery_sherd_archer 1",
+	"mc_parity:pottery_sherd_arms_up 1",
+	"mc_parity:pottery_sherd_blade 1",
+	"mc_parity:pottery_sherd_brewer 1",
+	"mc_parity:pottery_sherd_burn 1",
+	"mc_parity:pottery_sherd_danger 1",
+	"mc_parity:pottery_sherd_friend 1",
+	"mc_parity:pottery_sherd_heart 1",
 	"mcl_core:emerald 2",
 	"mcl_core:coal_lump 4",
 	"mcl_core:iron_ingot 2",
@@ -158,14 +158,14 @@ local function make_area_local(pos, size)
 	}
 end
 
-function mcl_mobs_addon.build_trail_ruins(pos, def, pr, blockseed)
+function mc_parity.build_trail_ruins(pos, def, pr, blockseed)
 	local area = make_area_local(pos, { x = 9, y = 4, z = 9 })
 
 	local MB = "mcl_mud:mud_bricks"
 	local PM = "mcl_mud:packed_mud"
 	local GR = "mcl_core:gravel"
-	local SG = "mcl_mobs_addon:suspicious_gravel"
-	local SS = "mcl_mobs_addon:suspicious_sand"
+	local SG = "mc_parity:suspicious_gravel"
+	local SS = "mc_parity:suspicious_sand"
 
 	local function set(p, name)
 		area:set_node(p, { name = name })
@@ -220,11 +220,11 @@ function mcl_mobs_addon.build_trail_ruins(pos, def, pr, blockseed)
 	end
 
 	area:write_to_map()
-	minetest.log("action", "[mcl_mobs_addon] trail ruins built @ " .. minetest.pos_to_string(pos))
+	minetest.log("action", "[mc_parity] trail ruins built @ " .. minetest.pos_to_string(pos))
 end
 
 if mcl_structures and mcl_structures.register_structure then
-	mcl_structures.register_structure("mcl_mobs_addon:trail_ruins", {
+	mcl_structures.register_structure("mc_parity:trail_ruins", {
 		place_on = { "mcl_core:grass_block", "mcl_core:podzol" },
 		biomes = {
 			"Taiga", "ColdTaiga", "MegaTaiga", "MegaSpruceTaiga",
@@ -232,9 +232,9 @@ if mcl_structures and mcl_structures.register_structure then
 		},
 		y_min = -2,
 		y_max = 8,
-		place_func = mcl_mobs_addon.build_trail_ruins,
+		place_func = mc_parity.build_trail_ruins,
 		flags = "place_center_x, place_center_z",
 	})
 end
 
-minetest.log("action", "[mcl_mobs_addon] trail ruins registered")
+minetest.log("action", "[mc_parity] trail ruins registered")

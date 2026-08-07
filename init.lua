@@ -1,5 +1,5 @@
 --[[
-mcl_mobs_addon — Extra Minecraft-style mobs for VoxeLibre / Mineclonia.
+mc_parity — Extra Minecraft-style mobs for VoxeLibre / Mineclonia.
 
 Implemented (retexture of existing game models, assets from
 Pixel-Perfection-Legacy, CC BY-SA 4.0):
@@ -13,7 +13,7 @@ WIP (need new .b3d models in Blender — no model exists anywhere in Luanti):
 
 API notes (verified 2026-08):
   - registration: mcl_mobs.register_mob("<mod>:<name>", def) — both games;
-    the id MUST use this mod's own prefix (mcl_mobs_addon:)
+    the id MUST use this mod's own prefix (mc_parity:)
   - spawn: VoxeLibre = mcl_mobs:spawn_setup{...}; Mineclonia =
     mcl_mobs.register_spawner(table.merge(mobs_mc.animal_spawner, {...}))
     with "#is_*" biome tags (no is_desert tag — use "Desert" name there)
@@ -23,7 +23,7 @@ API notes (verified 2026-08):
   - skeleton trap: lightning.register_on_strike(pos, pos2, objects) (VL only)
 ]]
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 local pr = PseudoRandom(os.time() * 2)
 
@@ -71,15 +71,15 @@ local function register_spawn(name, vl_biomes, mcln_biomes, weight)
 			max_height = mcl_vars.mg_overworld_max,
 		})
 	else
-		minetest.log("warning", "[mcl_mobs_addon] no spawn API available for " .. name)
+		minetest.log("warning", "[mc_parity] no spawn API available for " .. name)
 	end
 end
 
 -- Expose the helpers on the global table so dofile'd modules can use them
 -- (dofile chunks only see globals, never the caller's locals).
-mcl_mobs_addon = rawget(_G, "mcl_mobs_addon") or {}
-mcl_mobs_addon.register_egg = register_egg
-mcl_mobs_addon.register_spawn = register_spawn
+mc_parity = rawget(_G, "mc_parity") or {}
+mc_parity.register_egg = register_egg
+mc_parity.register_spawn = register_spawn
 
 -- Mineclonia's mob activate reads hp from the DEF BASE (math.random(
 -- self.hp_min, ...) at mcl_mobs/api.lua:429); VoxeLibre from
@@ -95,10 +95,10 @@ local function mcln_base_hp(name, hp_min, hp_max)
 		end
 	end
 end
-mcl_mobs_addon.mcln_base_hp = mcln_base_hp  -- for dofile'd modules
+mc_parity.mcln_base_hp = mcln_base_hp  -- for dofile'd modules
 
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("fox") then
+if mc_parity.feature_enabled("fox") then
 -- ---------------------------------------------------------------------------
 local fox = {
 	description = S("Fox"),
@@ -114,9 +114,9 @@ local fox = {
 	xp_max = 2,
 	passive = true,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_fox.b3d",
+	mesh = "mc_parity_fox.b3d",
 	textures = {
-		{"mcl_mobs_addon_fox.png"},
+		{"mc_parity_fox.png"},
 	},
 	visual_size = {x = 0.8, y = 0.8},
 	makes_footstep_sound = true,
@@ -152,16 +152,16 @@ local fox = {
 	},
 }
 
-mcl_mobs.register_mob("mcl_mobs_addon:fox", fox)
-mcln_base_hp("mcl_mobs_addon:fox", 10, 10)
-register_egg("mcl_mobs_addon:fox", S("Fox"), "#d98245", "#f2e9dc", 0)
-register_spawn("mcl_mobs_addon:fox",
+mcl_mobs.register_mob("mc_parity:fox", fox)
+mcln_base_hp("mc_parity:fox", 10, 10)
+register_egg("mc_parity:fox", S("Fox"), "#d98245", "#f2e9dc", 0)
+register_spawn("mc_parity:fox",
 	{"Taiga", "ColdTaiga", "MegaTaiga", "MegaSpruceTaiga"},
 	{"#is_taiga"}, 60)
 
 end
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("panda") then
+if mc_parity.feature_enabled("panda") then
 -- retexture; personality textures stay ours)
 -- ---------------------------------------------------------------------------
 local panda = {
@@ -178,9 +178,9 @@ local panda = {
 	xp_max = 3,
 	passive = true,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_panda.b3d",
+	mesh = "mc_parity_panda.b3d",
 	textures = {
-		{"mcl_mobs_addon_panda.png"},
+		{"mc_parity_panda.png"},
 	},
 	visual_size = {x = 1, y = 1},
 	animation = {
@@ -219,35 +219,35 @@ local panda = {
 		local r = pr:next(1, 100)
 		local tex
 		if r <= 40 then
-			tex = "mcl_mobs_addon_panda.png" -- normal
+			tex = "mc_parity_panda.png" -- normal
 		elseif r <= 55 then
-			tex = "mcl_mobs_addon_panda_playful.png"
+			tex = "mc_parity_panda_playful.png"
 		elseif r <= 65 then
-			tex = "mcl_mobs_addon_panda_lazy.png"
+			tex = "mc_parity_panda_lazy.png"
 		elseif r <= 75 then
-			tex = "mcl_mobs_addon_panda_worried.png"
+			tex = "mc_parity_panda_worried.png"
 		elseif r <= 85 then
-			tex = "mcl_mobs_addon_panda_weak.png"
+			tex = "mc_parity_panda_weak.png"
 		elseif r <= 95 then
-			tex = "mcl_mobs_addon_panda_aggressive.png"
+			tex = "mc_parity_panda_aggressive.png"
 		else
-			tex = "mcl_mobs_addon_panda_brown.png"
+			tex = "mc_parity_panda_brown.png"
 		end
 		self.base_texture[1] = tex
 		self.object:set_properties({ textures = self.base_texture })
 	end,
 }
 
-mcl_mobs.register_mob("mcl_mobs_addon:panda", panda)
-mcln_base_hp("mcl_mobs_addon:panda", 20, 20)
-register_egg("mcl_mobs_addon:panda", S("Panda"), "#f0f0f0", "#222222", 0)
-register_spawn("mcl_mobs_addon:panda",
+mcl_mobs.register_mob("mc_parity:panda", panda)
+mcln_base_hp("mc_parity:panda", 20, 20)
+register_egg("mc_parity:panda", S("Panda"), "#f0f0f0", "#222222", 0)
+register_spawn("mc_parity:panda",
 	{"BambooJungle", "BambooJungleM", "Jungle"},
 	{"#is_jungle"}, 30)
 
 end
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("camel") then
+if mc_parity.feature_enabled("camel") then
 -- retexture; our riding logic stays)
 -- ---------------------------------------------------------------------------
 local camel = {
@@ -264,9 +264,9 @@ local camel = {
 	xp_max = 3,
 	passive = true,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_camel.b3d",
+	mesh = "mc_parity_camel.b3d",
 	textures = {
-		{"mcl_mobs_addon_camel.png"},
+		{"mc_parity_camel.png"},
 	},
 	visual_size = {x = 1, y = 1},
 	animation = {
@@ -352,16 +352,16 @@ local camel = {
 	end,
 }
 
-mcl_mobs.register_mob("mcl_mobs_addon:camel", camel)
-mcln_base_hp("mcl_mobs_addon:camel", 32, 32)
-register_egg("mcl_mobs_addon:camel", S("Camel"), "#c89b5a", "#e8d5a8", 0)
-register_spawn("mcl_mobs_addon:camel",
+mcl_mobs.register_mob("mc_parity:camel", camel)
+mcln_base_hp("mc_parity:camel", 32, 32)
+register_egg("mc_parity:camel", S("Camel"), "#c89b5a", "#e8d5a8", 0)
+register_spawn("mc_parity:camel",
 	{"Desert"},
 	{"Desert"}, 20)
 
 end
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("goat") then
+if mc_parity.feature_enabled("goat") then
 -- no goat exists in VoxeLibre, Mineclonia, Bettercraft or ContentDB)
 -- ---------------------------------------------------------------------------
 local goat = {
@@ -378,9 +378,9 @@ local goat = {
 	xp_max = 3,
 	passive = true,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_goat.b3d",
+	mesh = "mc_parity_goat.b3d",
 	textures = {
-		{"mcl_mobs_addon_goat.png"},
+		{"mc_parity_goat.png"},
 	},
 	visual_size = {x = 1.0, y = 1.0},
 	makes_footstep_sound = true,
@@ -435,7 +435,7 @@ local goat = {
 						damage_groups = { fleshy = 2 },
 					})
 					for _ = 1, math.random(1, 2) do
-						minetest.add_item(pos, "mcl_mobs_addon:goat_horn")
+						minetest.add_item(pos, "mc_parity:goat_horn")
 					end
 					self._ramming = nil
 					self._ram_cooldown = 8
@@ -464,9 +464,9 @@ local goat = {
 }
 
 -- Goat horn (MC: dropped by charged rams; an instrument — plays notes)
-minetest.register_craftitem("mcl_mobs_addon:goat_horn", {
+minetest.register_craftitem("mc_parity:goat_horn", {
 	description = S("Goat Horn"),
-	inventory_image = "mcl_mobs_addon_goat_horn.png",
+	inventory_image = "mc_parity_goat_horn.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
 	on_use = function(itemstack, user, pointed_thing)
@@ -485,16 +485,16 @@ minetest.register_craftitem("mcl_mobs_addon:goat_horn", {
 	end,
 })
 
-mcl_mobs.register_mob("mcl_mobs_addon:goat", goat)
-mcln_base_hp("mcl_mobs_addon:goat", 10, 10)
-register_egg("mcl_mobs_addon:goat", S("Goat"), "#f2e2d0", "#9a8a7a", 0)
-register_spawn("mcl_mobs_addon:goat",
+mcl_mobs.register_mob("mc_parity:goat", goat)
+mcln_base_hp("mc_parity:goat", 10, 10)
+register_egg("mc_parity:goat", S("Goat"), "#f2e2d0", "#9a8a7a", 0)
+register_spawn("mc_parity:goat",
 	{"ExtremeHills", "ExtremeHillsM"},
 	{"#is_mountain"}, 30)
 
 end
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("skeleton_horse") then
+if mc_parity.feature_enabled("skeleton_horse") then
 -- ---------------------------------------------------------------------------
 local skeleton_horse = {
 	description = S("Skeleton Horse"),
@@ -510,9 +510,9 @@ local skeleton_horse = {
 	xp_max = 3,
 	passive = true,
 	visual = "mesh",
-	mesh = "mcl_mobs_addon_skeleton_horse.b3d",
+	mesh = "mc_parity_skeleton_horse.b3d",
 	textures = {
-		{"mcl_mobs_addon_skeleton_horse.png"},
+		{"mc_parity_skeleton_horse.png"},
 	},
 	visual_size = {x = 3.0, y = 3.0},
 	makes_footstep_sound = true,
@@ -543,9 +543,9 @@ local skeleton_horse = {
 	-- No natural spawn on purpose (MC: skeleton trap via lightning only)
 }
 
-mcl_mobs.register_mob("mcl_mobs_addon:skeleton_horse", skeleton_horse)
-mcln_base_hp("mcl_mobs_addon:skeleton_horse", 15, 15)
-register_egg("mcl_mobs_addon:skeleton_horse", S("Skeleton Horse"), "#8a8a8a", "#e8e8e8", 0)
+mcl_mobs.register_mob("mc_parity:skeleton_horse", skeleton_horse)
+mcln_base_hp("mc_parity:skeleton_horse", 15, 15)
+register_egg("mc_parity:skeleton_horse", S("Skeleton Horse"), "#8a8a8a", "#e8e8e8", 0)
 
 -- Skeleton trap (MC 1.11): lightning converts the horse and summons 4
 -- skeleton horses WITH skeleton riders (jockeys), which despawn after a
@@ -555,7 +555,7 @@ if minetest.get_modpath("lightning") and lightning and lightning.register_on_str
 	lightning.register_on_strike(function(pos, pos2, objects)
 		for _, obj in pairs(objects or {}) do
 			local ent = obj:get_luaentity()
-			if ent and ent.name == "mcl_mobs_addon:skeleton_horse" and not ent._trap then
+			if ent and ent.name == "mc_parity:skeleton_horse" and not ent._trap then
 				ent._trap = true
 				ent.damage = 2
 				local p = obj:get_pos()
@@ -571,7 +571,7 @@ if minetest.get_modpath("lightning") and lightning and lightning.register_on_str
 					local n2 = minetest.get_node(vector.offset(hp, 0, 1, 0))
 					if (n.name == "air" or n.name:find("grass"))
 							and n2.name == "air" then
-						local ho = minetest.add_entity(hp, "mcl_mobs_addon:skeleton_horse")
+						local ho = minetest.add_entity(hp, "mc_parity:skeleton_horse")
 						if ho then
 							local he = ho:get_luaentity()
 							if he then he._trap = true end
@@ -603,11 +603,11 @@ if minetest.get_modpath("lightning") and lightning and lightning.register_on_str
 	end)
 end
 
-minetest.log("action", "[mcl_mobs_addon] loaded: fox, panda, camel, skeleton_horse, goat registered")
+minetest.log("action", "[mc_parity] loaded: fox, panda, camel, skeleton_horse, goat registered")
 
 end
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("bundle") then
+if mc_parity.feature_enabled("bundle") then
 -- Bettercraft/ContentDB). Contents travel with the item (serialized in item
 -- metadata), so a dropped bundle keeps its items — the MC bundle property.
 -- v1: craft, view, take items out. TODO: shift-click insert (MC parity).
@@ -652,24 +652,24 @@ local function bundle_formspec(list)
 	return table.concat(parts)
 end
 
-minetest.register_craftitem("mcl_mobs_addon:bundle", {
+minetest.register_craftitem("mc_parity:bundle", {
 	description = S("Bundle"),
-	inventory_image = "mcl_mobs_addon_bundle.png",
+	inventory_image = "mc_parity_bundle.png",
 	stack_max = 1,
 	groups = { bundle = 1 },
 	on_use = function(itemstack, user)
-		minetest.show_formspec(user:get_player_name(), "mcl_mobs_addon:bundle",
+		minetest.show_formspec(user:get_player_name(), "mc_parity:bundle",
 			bundle_formspec(bundle_get_inv(itemstack)))
 		return itemstack
 	end,
 })
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if formname ~= "mcl_mobs_addon:bundle" then
+	if formname ~= "mc_parity:bundle" then
 		return
 	end
 	local itemstack = player:get_wielded_item()
-	if itemstack:get_name() ~= "mcl_mobs_addon:bundle" then
+	if itemstack:get_name() ~= "mc_parity:bundle" then
 		return
 	end
 	local list = bundle_get_inv(itemstack)
@@ -691,7 +691,7 @@ end)
 
 -- MC recipe: 6 rabbit hide + 2 string (VL: rabbit hide = leather_piece)
 minetest.register_craft({
-	output = "mcl_mobs_addon:bundle",
+	output = "mc_parity:bundle",
 	recipe = {
 		{"mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece"},
 		{"mcl_mobitems:leather_piece", "mcl_mobitems:string", "mcl_mobitems:leather_piece"},
@@ -707,7 +707,7 @@ minetest.register_craft({
 end
 -- See shulker_upgrade.lua.
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("shulker_upgrade") then
+if mc_parity.feature_enabled("shulker_upgrade") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/shulker_upgrade.lua")
 end
 
@@ -725,10 +725,10 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/deepdark.lua")
 -- Order matters: vibrations.lua (event bus) must load before warden.lua
 -- (registers a vibration listener). See vibrations.lua / warden.lua.
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("sculk") then
+if mc_parity.feature_enabled("sculk") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/vibrations.lua")
 end
-if mcl_mobs_addon.feature_enabled("warden") then
+if mc_parity.feature_enabled("warden") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/warden.lua")
 end
 
@@ -741,17 +741,17 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_import.lua
 -- ---------------------------------------------------------------------------
 -- ALLAY (Bettercraft import + movement rewrite for both games) — allay.lua
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("allay") then
+if mc_parity.feature_enabled("allay") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/allay.lua")
 end
 
 -- ---------------------------------------------------------------------------
 -- SPECTATOR MODE + NETHER LAVA (see spectator.lua / nether_lava.lua)
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("spectator") then
+if mc_parity.feature_enabled("spectator") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/spectator.lua")
 end
-if mcl_mobs_addon.feature_enabled("nether_lava") then
+if mc_parity.feature_enabled("nether_lava") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/nether_lava.lua")
 end
 
@@ -759,13 +759,13 @@ end
 -- MC 1.20.5/1.21: ARMADILLO + WOLF VARIANTS + WOLF ARMOR (see mobs_121.lua)
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_121.lua")
-if mcl_mobs_addon.feature_enabled("bee") then
+if mc_parity.feature_enabled("bee") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_bee.lua")
 end
-if mcl_mobs_addon.feature_enabled("trial_chambers") then
+if mc_parity.feature_enabled("trial_chambers") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_trial.lua")
 end
-if mcl_mobs_addon.feature_enabled("trail_ruins") then
+if mc_parity.feature_enabled("trail_ruins") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_ruins.lua")
 end
 
@@ -780,20 +780,20 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_port.lua")
 -- Luanti. Glass chest (27 slots, transparent) + semi-transparent glass
 -- ender chest (shared ender inventory). See glass_chests.lua.
 -- ---------------------------------------------------------------------------
-if mcl_mobs_addon.feature_enabled("glass_chests") then
+if mc_parity.feature_enabled("glass_chests") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/glass_chests.lua")
 end
 
 -- ---------------------------------------------------------------------------
 -- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already
 -- shipped in textures/:
---   allay     mcl_mobs_addon_allay.png
---   frog      mcl_mobs_addon_frog_{temperate,cold,warm}.png
---   warden    mcl_mobs_addon_warden.png (+ _glow, _ears)
---   phantom   mcl_mobs_addon_phantom.png (+ _eyes)
---   turtle    mcl_mobs_addon_turtle.png
---   sniffer   mcl_mobs_addon_sniffer.png
---   goat      mcl_mobs_addon_goat.png
+--   allay     mc_parity_allay.png
+--   frog      mc_parity_frog_{temperate,cold,warm}.png
+--   warden    mc_parity_warden.png (+ _glow, _ears)
+--   phantom   mc_parity_phantom.png (+ _eyes)
+--   turtle    mc_parity_turtle.png
+--   sniffer   mc_parity_sniffer.png
+--   goat      mc_parity_goat.png
 -- Model pipeline docs: https://docs.luanti.org/for-creators/models/
 --   Using Blender:      https://docs.luanti.org/for-creators/models/using-blender/
 --   Using Blockbench:   https://docs.luanti.org/for-creators/models/using-blockbench/
@@ -809,11 +809,11 @@ end
 --         collisionbox = {-0.6, -0.01, -0.6, 0.6, 2.9, 0.6},
 --     },
 --     visual = "mesh",
---     mesh = "mcl_mobs_addon_warden.b3d",
---     textures = {{"mcl_mobs_addon_warden.png"}},
+--     mesh = "mc_parity_warden.b3d",
+--     textures = {{"mc_parity_warden.png"}},
 --     visual_size = {x = 3.0, y = 3.0},
 --     -- TODO: vibration sensing via mcl_sculk sensor events
 -- }
--- mcl_mobs.register_mob("mcl_mobs_addon:warden", warden)
--- register_egg("mcl_mobs_addon:warden", S("Warden"), "#0a3b2e", "#7ef0c8", 0)
+-- mcl_mobs.register_mob("mc_parity:warden", warden)
+-- register_egg("mc_parity:warden", S("Warden"), "#0a3b2e", "#7ef0c8", 0)
 -- ---------------------------------------------------------------------------

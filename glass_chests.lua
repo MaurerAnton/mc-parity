@@ -13,7 +13,7 @@
 -- Textures are the game's own chest textures + alpha/colorize modifiers
 -- (no new media needed): mcl_chests_normal / mcl_chests_ender ^[opacity.
 
-local S = minetest.get_translator("mcl_mobs_addon")
+local S = minetest.get_translator("mc_parity")
 
 local function glassify(tex)
 	-- see-through with a subtle glass tint
@@ -31,8 +31,8 @@ local CHEST_BOX = { -0.4375, -0.5, -0.4375, 0.4375, 0.375, 0.4375 }
 -- v1: single chest only (double-chest linking needs the API internals).
 -- ---------------------------------------------------------------------------
 if mcl_chests and mcl_chests.create_entity and mcl_chests.tiles then
-	local NODE = "mcl_mobs_addon:glass_chest"
-	local NODE_SMALL = "mcl_mobs_addon:glass_chest_small"
+	local NODE = "mc_parity:glass_chest"
+	local NODE_SMALL = "mc_parity:glass_chest_small"
 	local GLASS_SMALL = glassify(mcl_chests.tiles.chest_normal_small[1])
 	local CHEST_SOUND = "default_chest"
 
@@ -119,7 +119,7 @@ if mcl_chests and mcl_chests.create_entity and mcl_chests.tiles then
 				return false
 			end
 			minetest.show_formspec(clicker:get_player_name(),
-				"mcl_mobs_addon:glass_chest_" .. pos.x .. "_" .. pos.y .. "_" .. pos.z,
+				"mc_parity:glass_chest_" .. pos.x .. "_" .. pos.y .. "_" .. pos.z,
 				glass_fs(pos, S("Glass Chest")))
 			mcl_chests.player_chest_open(clicker, pos, NODE_SMALL, { GLASS_SMALL },
 				node.param2, false, CHEST_SOUND, "mcl_chests_chest")
@@ -140,7 +140,7 @@ if mcl_chests and mcl_chests.create_entity and mcl_chests.tiles then
 	-- Glass ender chest — full pattern (with lid entity), ender.lua style
 	local GLASSY_ENDER = glassify("mcl_chests_ender")
 
-	minetest.register_node("mcl_mobs_addon:ender_chest_glass", {
+	minetest.register_node("mc_parity:ender_chest_glass", {
 		description = S("Glass Ender Chest"),
 		_tt_help = S("27 interdimensional inventory slots") .. "\n" ..
 			S("Put items inside, retrieve them from any ender chest"),
@@ -154,12 +154,12 @@ if mcl_chests and mcl_chests.create_entity and mcl_chests.tiles then
 		sounds = mcl_sounds.node_sound_stone_defaults(),
 		on_construct = function(pos)
 			local node = minetest.get_node(pos)
-			node.name = "mcl_mobs_addon:ender_chest_glass_small"
+			node.name = "mc_parity:ender_chest_glass_small"
 			minetest.set_node(pos, node)
 		end,
 	})
 
-	minetest.register_node("mcl_mobs_addon:ender_chest_glass_small", {
+	minetest.register_node("mc_parity:ender_chest_glass_small", {
 		description = S("Glass Ender Chest"),
 		_tt_help = S("27 interdimensional inventory slots") .. "\n" ..
 			S("Put items inside, retrieve them from any ender chest"),
@@ -182,7 +182,7 @@ if mcl_chests and mcl_chests.create_entity and mcl_chests.tiles then
 		sounds = mcl_sounds.node_sound_stone_defaults(),
 		drop = "mcl_core:glass 8",
 		on_construct = function(pos)
-			mcl_chests.create_entity(pos, "mcl_mobs_addon:ender_chest_glass_small",
+			mcl_chests.create_entity(pos, "mc_parity:ender_chest_glass_small",
 				{ GLASSY_ENDER }, minetest.get_node(pos).param2, false,
 				"mcl_chests_enderchest", "mcl_chests_chest", "chest")
 		end,
@@ -192,9 +192,9 @@ if mcl_chests and mcl_chests.create_entity and mcl_chests.tiles then
 				return false
 			end
 			minetest.show_formspec(clicker:get_player_name(),
-				"mcl_mobs_addon:ender_chest_glass_" .. clicker:get_player_name(),
+				"mc_parity:ender_chest_glass_" .. clicker:get_player_name(),
 				mcl_chests.formspec_ender_chest)
-			mcl_chests.player_chest_open(clicker, pos, "mcl_mobs_addon:ender_chest_glass_small",
+			mcl_chests.player_chest_open(clicker, pos, "mc_parity:ender_chest_glass_small",
 				{ GLASSY_ENDER }, node.param2, false, "mcl_chests_enderchest", "mcl_chests_chest")
 		end,
 		on_receive_fields = function(pos, formname, fields, sender)
@@ -204,12 +204,12 @@ if mcl_chests and mcl_chests.create_entity and mcl_chests.tiles then
 		end,
 		_mcl_blast_resistance = 600,
 		_mcl_hardness = 22.5,
-		_mcl_silk_touch_drop = { "mcl_mobs_addon:ender_chest_glass" },
+		_mcl_silk_touch_drop = { "mc_parity:ender_chest_glass" },
 		on_rotate = mcl_chests.simple_rotate,
 	})
 
 	minetest.register_craft({
-		output = "mcl_mobs_addon:ender_chest_glass",
+		output = "mc_parity:ender_chest_glass",
 		recipe = {
 			{ "mcl_core:glass", "mcl_core:glass", "mcl_core:glass" },
 			{ "mcl_core:glass", "mcl_end:ender_eye", "mcl_core:glass" },
@@ -217,7 +217,7 @@ if mcl_chests and mcl_chests.create_entity and mcl_chests.tiles then
 		},
 	})
 
-	minetest.log("action", "[mcl_mobs_addon] glass chests: VoxeLibre (full)")
+	minetest.log("action", "[mc_parity] glass chests: VoxeLibre (full)")
 
 -- ---------------------------------------------------------------------------
 -- Mineclonia branch: no register_chest API and its entity helpers are local —
@@ -251,7 +251,7 @@ elseif mcl_chests then
 		glassify("mcl_chests_normal.png"),
 	}
 
-	minetest.register_node("mcl_mobs_addon:glass_chest", {
+	minetest.register_node("mc_parity:glass_chest", {
 		description = S("Glass Chest"),
 		drawtype = "nodebox",
 		node_box = { type = "fixed", fixed = CHEST_BOX },
@@ -272,7 +272,7 @@ elseif mcl_chests then
 				return false
 			end
 			minetest.show_formspec(clicker:get_player_name(),
-				"mcl_mobs_addon:glass_chest_" .. minetest.pos_to_string(pos),
+				"mc_parity:glass_chest_" .. minetest.pos_to_string(pos),
 				chest_fs(pos, S("Glass Chest")))
 			minetest.sound_play("default_chest_open", { pos = pos, gain = 0.5 }, true)
 		end,
@@ -283,7 +283,7 @@ elseif mcl_chests then
 	})
 
 	minetest.register_craft({
-		output = "mcl_mobs_addon:glass_chest",
+		output = "mc_parity:glass_chest",
 		recipe = {
 			{ "mcl_core:glass", "mcl_core:glass", "mcl_core:glass" },
 			{ "mcl_core:glass", "mcl_chests:chest", "mcl_core:glass" },
@@ -311,7 +311,7 @@ elseif mcl_chests then
 		ENDER_TILES[i] = glassify("mcl_chests_ender.png")
 	end
 
-	minetest.register_node("mcl_mobs_addon:ender_chest_glass", {
+	minetest.register_node("mc_parity:ender_chest_glass", {
 		description = S("Glass Ender Chest"),
 		drawtype = "nodebox",
 		node_box = { type = "fixed", fixed = CHEST_BOX },
@@ -330,14 +330,14 @@ elseif mcl_chests then
 				return false
 			end
 			minetest.show_formspec(clicker:get_player_name(),
-				"mcl_mobs_addon:ender_chest_glass_" .. clicker:get_player_name(), ENDER_FS)
+				"mc_parity:ender_chest_glass_" .. clicker:get_player_name(), ENDER_FS)
 		end,
 		_mcl_blast_resistance = 600,
 		_mcl_hardness = 22.5,
 	})
 
 	minetest.register_craft({
-		output = "mcl_mobs_addon:ender_chest_glass",
+		output = "mc_parity:ender_chest_glass",
 		recipe = {
 			{ "mcl_core:glass", "mcl_core:glass", "mcl_core:glass" },
 			{ "mcl_core:glass", "mcl_end:ender_eye", "mcl_core:glass" },
@@ -345,5 +345,5 @@ elseif mcl_chests then
 		},
 	})
 
-	minetest.log("action", "[mcl_mobs_addon] glass chests: Mineclonia (static)")
+	minetest.log("action", "[mc_parity] glass chests: Mineclonia (static)")
 end
