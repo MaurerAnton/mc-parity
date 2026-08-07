@@ -413,6 +413,30 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           in mcl_trees (dual-game pick at load).
         - Verified headless BOTH games: mansion (wall + 6 chests),
           tower (purpur), 4 discs, 6 mobs spawned inside.
+29. [x] Last pre-1.13 items (legacy_items.lua — pre-1.13 now ~100%):
+        - LEAD (1.6): 3 string + slimeball; right-click a mob to attach,
+          a fence post to tether; globalstep pulls the mob back inside
+          the 10-block range (or follows the owner).
+        - DRAGON HEAD (1.9): a placeable nodebox trophy (mcl_heads'
+          API prepends its own prefix — can't be called from another
+          mod's load context — our own node instead).
+        - SHULKER BOXES (1.11): 17 colors; 27-slot inventory; digging
+          drops the box WITH its contents (serialized into the item
+          meta, restored on place). Craft: 2 shulker shells + 2 chests.
+        - TIPPED/SPECTRAL ARROWS (1.9): 6 effects + spectral; the games'
+          bows fire ANY item with the ammo_bow group — the items carry
+          _arrow_image + a per-effect entity copying the game's arrow
+          class with the effect injected on hit (VL: wrapped
+          on_collide_with_entity; Mineclonia: their _extra_hit_func).
+          Crafts: 8 arrows + lingering potion -> 8 tipped; 1 arrow +
+          glowstone dust -> 2 spectral.
+        - PITFALLS: the engine's after_dig_node passes oldmetadata =
+          meta:to_table() (NOT a MetadataRef) and .inventory.main holds
+          ItemStack userdata (empty slots are empty ItemStacks — use
+          :is_empty(), not ~= ""); the dropped item's contents travel
+          inside the item string, not the entity fields.
+        - Verified headless BOTH games: items/entities registered,
+          ammo_bow set, the box keeps its diamond through dig/place.
 
 ## Model pipeline (WIP mobs)
 
