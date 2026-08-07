@@ -528,6 +528,15 @@ minetest.register_craft({
 })
 
 -- ---------------------------------------------------------------------------
+-- SHULKER UPGRADE — MC-parity face attachment + the 900-degree spin quirk.
+-- Patches the game's own mobs_mc:shulker at runtime (works on both games):
+--   VoxeLibre: adds 6-face attachment + rotation + spin (was static)
+--   Mineclonia: adds the spin animation (was instant rotation)
+-- See shulker_upgrade.lua.
+-- ---------------------------------------------------------------------------
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/shulker_upgrade.lua")
+
+-- ---------------------------------------------------------------------------
 -- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already
 -- shipped in textures/:
 --   allay     mcl_mobs_addon_allay.png

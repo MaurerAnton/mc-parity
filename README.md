@@ -64,7 +64,12 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
 10. [ ] Warden AI: vibration sensing + anger + sonic boom (VL sculk sensor
         is a stub — the vibration system must be built; genuinely unique)
 11. [ ] Deep dark biome + ancient city (unique — nowhere)
-12. [ ] Mineclonia spawn API support (mcl_mobs.register_spawner) — DONE, was #9
+12. [x] Shulker upgrade (shulker_upgrade.lua) — MC-parity face attachment +
+        the "900-degree spin" quirk: VoxeLibre's static shulker now rotates
+        to all 6 faces with an animated spin on re-attach; Mineclonia's
+        instant rotation becomes an animated spin. Works on both games
+        (feature-detected), patches the game's own mobs_mc:shulker at
+        runtime. Verified headless on both.
 
 ## Model pipeline (WIP mobs)
 
