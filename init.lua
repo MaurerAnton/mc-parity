@@ -735,6 +735,7 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/nether_lava.lua
 -- MC 1.20.5/1.21: ARMADILLO + WOLF VARIANTS + WOLF ARMOR (see mobs_121.lua)
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_121.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_bee.lua")
 
 -- ---------------------------------------------------------------------------
 -- PORTED MC MOBS: creeper, enderman, blaze, pufferfish, ravager,

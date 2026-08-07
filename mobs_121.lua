@@ -469,3 +469,65 @@ mcl_mobs_addon.register_egg("mcl_mobs_addon:breeze", S("Breeze"), "#e8ecf5", "#8
 mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:breeze", 30, 30)
 
 minetest.log("action", "[mcl_mobs_addon] bogged + breeze registered (MC 1.21)")
+
+-- ---------------------------------------------------------------------------
+-- DROWNED (MC 1.13): a water zombie — spawns in oceans, swims (floats=1),
+-- drops fishing rods / nautilus shells / tridents. Textures: the game's
+-- zombie tinted teal-green (legal — game media, CC BY-SA).
+-- ---------------------------------------------------------------------------
+
+local drowned_tex = "mobs_mc_zombie.png^[colorize:#3f9e8e:140"
+local DROWNED = {
+	type = "monster",
+	spawn_class = "hostile",
+	attack_player = true,
+	hp_min = 20,
+	hp_max = 20,
+	initial_properties = {
+		hp_min = 20,
+		hp_max = 20,
+		breath_max = 30,
+	},
+	collisionbox = { -0.3, 0.0, -0.3, 0.3, 1.95, 0.3 },
+	visual = "mesh",
+	mesh = "mobs_mc_zombie.b3d",
+	textures = {
+		"mobs_mc_empty.png",
+		drowned_tex,
+		"mobs_mc_empty.png",
+	},
+	wears_armor = 1,
+	armor = { undead = 100, fleshy = 100 },
+	damage = 3,
+	floats = 1,  -- swims like a fish
+	walk_velocity = 1.2,
+	run_velocity = 1.8,
+	group_attack = { "mobs_mc:player", "mobs_mc:villager", "mobs_mc:iron_golem" },
+	drops = {
+		{ name = "mcl_fishing:rod", chance = 1, min = 1, max = 1 },
+		{ name = "mcl_mobitems:nautilus_shell", chance = 8, min = 1, max = 1 },
+		{ name = "vl_tridents:trident", chance = 25, min = 1, max = 1 },
+		{ name = "mcl_tridents:trident", chance = 25, min = 1, max = 1 },
+	},
+	animation = {
+		stand_start = 0, stand_end = 0,
+		walk_start = 0, walk_end = 40,
+	},
+	sounds = {},
+}
+
+mcl_mobs.register_mob("mcl_mobs_addon:drowned", DROWNED)
+mcl_mobs.register_egg("mcl_mobs_addon:drowned", S("Drowned"), "#3f9e8e", "#15433c", 0)
+-- the games' oceans are the "<Biome>_ocean" variants (no plain "Ocean")
+mcl_mobs_addon.register_spawn("mcl_mobs_addon:drowned",
+	{
+		"Jungle_ocean", "Savanna_ocean", "Desert_ocean", "Swampland_ocean",
+		"Plains_ocean", "Forest_ocean", "BirchForest_ocean", "FlowerForest_ocean",
+		"Taiga_ocean", "ColdTaiga_ocean",
+	},
+	{
+		"Jungle_ocean", "Savanna_ocean", "Desert_ocean", "Swampland_ocean",
+		"Plains_ocean", "Forest_ocean", "BirchForest_ocean", "FlowerForest_ocean",
+		"Taiga_ocean", "ColdTaiga_ocean",
+	}, 30)
+mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:drowned", 20, 20)
