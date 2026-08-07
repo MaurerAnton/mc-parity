@@ -28,6 +28,7 @@ local S = minetest.get_translator("mcl_mobs_addon")
 local pr = PseudoRandom(os.time() * 2)
 
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/config.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/legacy.lua")
 
 -- ---------------------------------------------------------------------------
 -- Helpers (dual-game)

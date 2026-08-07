@@ -55,6 +55,9 @@ grep -q 'register_node("mcl_mobs_addon:suspicious_sand"' "$SRC/mobs_ruins.lua" &
 grep -q 'register_node("mcl_mobs_addon:suspicious_gravel"' "$SRC/mobs_ruins.lua" && PASS "suspicious gravel" || BAD "suspicious gravel"
 grep -q 'register_tool("mcl_mobs_addon:brush"' "$SRC/mobs_ruins.lua" && PASS "brush" || BAD "brush"
 grep -q 'register_record("Relic"' "$SRC/mobs_ruins.lua" && PASS "relic disc" || BAD "relic disc"
+grep -q 'build_woodland_mansion' "$SRC/legacy.lua" && PASS "mansion builder" || BAD "mansion"
+grep -q 'build_end_city_tower' "$SRC/legacy.lua" && PASS "end city builder" || BAD "end city"
+grep -q 'register_record("Cat"' "$SRC/legacy.lua" && PASS "cat disc" || BAD "cat disc"
 
 # ---- 3. in-engine (needs luanti + the games; skipped when unavailable) ----
 echo "== [3/5] in-engine checks =="
