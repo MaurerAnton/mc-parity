@@ -303,6 +303,28 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           arrows via def.arrow automatically (the shulker pattern — no
           custom shoot_arrow needed); mob AI overrides set_velocity
           knockback on its next step (players keep the launch).
+23. [x] Ported mobs from Mineclonia (GPLv3 — mobs_port.lua):
+        - CREEPER (+charged), ENDERMAN, BLAZE, PUFFERFISH, RAVAGER,
+          WANDERING TRADER (+ trader llama): closes the LAST ecosystem
+          gaps — VoxeLibre lacked creeper/enderman/blaze/pufferfish/
+          trader entirely; both lacked ravager.
+        - Pipeline: tools/port_mcln.py (extract + id remap) +
+          tools/assemble_port.py (de-Mineclonia) + tools/add_footer.py.
+        - Adaptations: register_spawner -> dual-game
+          register_monster_spawn (nether/end via biome lists); the
+          MCLN-only targeting-rule API -> attack_player aggro; the
+          raid/gwp/fish-movement machinery stripped; villager_base
+          (a nil LOCAL) -> {}; the MCLN villager trade API guarded (the
+          trader wanders with llamas; the trade UI is MCLN-only for
+          now); spawn_class added (VL asserts); table.merge shim;
+          mcln_base_hp for all 8 entities; biome lists verified against
+          BOTH games (RoofedForest, Nether, *_ocean variants).
+        - PITFALLS: mob_class.X(self, ...) must call
+          mcl_mobs.mob_class.X(self, ...) — self:X(...) recurses when
+          the def overrides X (stack overflow); the Mineclonia spawner
+          blocks appear BEFORE register_egg (strip from the last
+          register_mob, not the egg); is_canonical trader/llama
+          spawners call register_spawner (nil on VL) — strip them.
 
 ## Model pipeline (WIP mobs)
 
