@@ -176,11 +176,22 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         - TURTLE EGGS (MC parity): breeding turtles walk back to their
           home beach and lay eggs on sand (mcl_mobs_addon:turtle_egg, PP
           texture); eggs hatch after 2-5 minutes into baby turtles
-          (visual_size 0.6) that grow to full size after ~5 minutes.
+          (visual_size 0.6) that grow to full size after ~5 minutes
+          (dropping a scute — MC parity).
           PITFALL: VoxeLibre NEVER calls def.on_activate for mobs (the
           final_def wraps it into mob_activate; def.on_activate is only
           used for projectiles) — hatchling state travels via an on_spawn
           registry instead of staticdata.
+        - SCUTE + TURTLE SHELL (MC 1.13; missed in the original port):
+          mcl_mobs_addon:scute item (PP texture) + the turtle shell helmet
+          via mcl_armor.register_set — mcl_mobs_addon:helmet_turtle
+          (2 armor points, durability 275, craft = 5 scute — MC recipe);
+          wearing it grants water breathing while the head is underwater.
+          PITFALLS: register_set names items element.name..'_'..def.name
+          ('helmet_turtle', the helmet_iron convention — NOT turtle_helmet);
+          the armor head slot is index 2 (mcl_armor.elements.head.index),
+          not 1. Elytra: BOTH games already have them (mcl_armor) — not
+          missed.
         - PHANTOM 3-NIGHTS: bed nodes are runtime-patched (wrap the
           original on_rightclick; the player is marked when is_in_bed());
           a noon tracker resets/increments each player's sleepless count;
