@@ -172,6 +172,49 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         non-creative players (no 3-sleepless-nights tracking yet — TODO).
         Camel: second seat (MC parity) — passenger attaches behind the
         driver, both dismount together.
+18. [x] TODO-tail + far items:
+        - TURTLE EGGS (MC parity): breeding turtles walk back to their
+          home beach and lay eggs on sand (mcl_mobs_addon:turtle_egg, PP
+          texture); eggs hatch after 2-5 minutes into baby turtles
+          (visual_size 0.6) that grow to full size after ~5 minutes.
+          PITFALL: VoxeLibre NEVER calls def.on_activate for mobs (the
+          final_def wraps it into mob_activate; def.on_activate is only
+          used for projectiles) — hatchling state travels via an on_spawn
+          registry instead of staticdata.
+        - PHANTOM 3-NIGHTS: bed nodes are runtime-patched (wrap the
+          original on_rightclick; the player is marked when is_in_bed());
+          a noon tracker resets/increments each player's sleepless count;
+          phantoms spawn only at night for players with 3+ sleepless days
+          (MC parity). The patch covers any mcl_beds:* node.
+        - GOAT HORN INSTRUMENT: the horn plays a random note from the
+          game's own mesecons_noteblock sounds (CC BY-SA game media).
+        - CC0 goat sounds: searched OpenGameArt — only a CC-BY variant
+          with a broken attachment; the goat keeps the game's llama/cow
+          sounds (legal). Real CC0 samples: TODO.
+        - CAMEL SEATS: tuned to the REAL camel model geometry (parsed the
+          b3d vertex bounds: camel = 24.7 model units tall vs llama 21.7)
+          — driver on the hump (y=22), passenger behind (y=19, z=6);
+          in-game visual tuning still recommended.
+        - SPECTATOR MODE (/spec, privilege "spectator"): noclip + fly +
+          invisible (visual_size ~0), no interact privilege (can't
+          dig/place/punch), no damage (on_player_hpchange), mobs ignore
+          spectators (vibrations not emitted, phantoms don't target or
+          spawn for them); state persists in player meta, re-applied on
+          join.
+        - NETHER LAVA (MC parity, unique): a new liquid pair
+          (mcl_mobs_addon:nether_lava_source/_flowing) with liquid_viscosity
+          = 1 and liquid_range = 7 — nether lava flows like water (MC).
+          The nether's existing lava lakes are converted by an ABM: lava
+          sitting on netherrack (overworld lava sits on stone — untouched).
+          The conversion logic is extracted to
+          mcl_mobs_addon.convert_nether_lava for testability (ABMs don't
+          run headless — no active blocks without players).
+        - MC-ACCURATE FLUID SOLVER: NOT feasible as an addon — Luanti's
+          liquid simulation runs natively in the engine
+          (src/servermap.cpp transformLiquids); an addon cannot intercept
+          or replace it. The only paths are an engine patch or a custom
+          game that does not use the engine's liquid system. Documented
+          here as the end of this roadmap item.
 
 ## Model pipeline (WIP mobs)
 

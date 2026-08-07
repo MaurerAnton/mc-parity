@@ -148,6 +148,9 @@ local function hook_walkover(pos, node, player)
 	if not player then
 		return
 	end
+	if mcl_mobs_addon.is_spectator and mcl_mobs_addon.is_spectator(player) then
+		return  -- spectators make no vibrations
+	end
 	local ctrl = player:get_player_control()
 	if ctrl and ctrl.sneak then
 		return  -- sneaking makes no vibrations (MC parity)

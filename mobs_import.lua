@@ -14,6 +14,10 @@
 
 local S = minetest.get_translator("mcl_mobs_addon")
 
+-- hatchling registry: egg_pos -> baby turtle (see the turtle egg on_timer)
+mcl_mobs_addon = rawget(_G, "mcl_mobs_addon") or {}
+mcl_mobs_addon.turtle_babies = mcl_mobs_addon.turtle_babies or {}
+
 local function mcln_base_hp(name, hp_min, hp_max)
 	-- Mineclonia's mob activate reads hp from the def base (math.random(
 	-- self.hp_min, ...)); VoxeLibre from initial_properties. See warden.lua.
@@ -215,11 +219,60 @@ mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
 		end
 	end,
 	on_breed = function(self, _)
-		if self.go_home then
-			self._has_egg = true
-			self:go_home()
-		end
+		-- pregnant: walk back to the home beach, then lay eggs on sand
+		-- (handled in do_custom — both games)
+		self._mca_has_egg = true
+		self._mca_home = self.object:get_pos()
 		return false
+	end,
+	on_spawn = function(self)
+		-- hatched from an egg? (the egg's on_timer marks the spawn pos in
+		-- the registry — VoxeLibre does NOT call def.on_activate for mobs,
+		-- so the baby flag must come through on_spawn)
+		local p = self.object:get_pos()
+		local key = p and minetest.pos_to_string(p)
+		if key and mcl_mobs_addon.turtle_babies[key] then
+			mcl_mobs_addon.turtle_babies[key] = nil
+			self._mca_baby = true
+			self.object:set_properties({ visual_size = { x = 0.6, y = 0.6 } })
+		end
+	end,
+	do_custom = function(self, dtime)
+		-- baby turtles grow to full size after ~5 minutes
+		if self._mca_baby then
+			self._mca_grow = (self._mca_grow or 300) - dtime
+			if self._mca_grow <= 0 then
+				self._mca_baby = nil
+				self.object:set_properties({ visual_size = { x = 1, y = 1 } })
+			end
+		end
+		-- breeding: go home, then lay the egg on a nearby sand block
+		if self._mca_has_egg then
+			local pos = self.object:get_pos()
+			if not pos then return true end
+			if vector.distance(pos, self._mca_home) > 4 then
+				self:gopath(self._mca_home, 0.5)
+				return true
+			end
+			local sand = minetest.find_nodes_in_area_under_air(
+				vector.offset(self._mca_home, -32, -5, -32),
+				vector.offset(self._mca_home, 32, 5, 32),
+				{ "mcl_core:sand", "mcl_core:red_sand" })
+			if sand and #sand > 0 then
+				local p = sand[math.random(#sand)]
+				if vector.distance(pos, p) > 1.5 then
+					self:gopath(p, 0.5)
+				else
+					local egg_pos = vector.offset(p, 0, 1, 0)
+					if minetest.get_node(egg_pos).name == "air" then
+						minetest.set_node(egg_pos, { name = "mcl_mobs_addon:turtle_egg" })
+						self._mca_has_egg = nil
+						self._mca_home = nil
+					end
+				end
+			end
+		end
+		return true
 	end,
 })
 
@@ -228,6 +281,41 @@ mcl_mobs_addon.register_spawn("mcl_mobs_addon:turtle",
 	{ "StoneBeach" },
 	{ "StoneBeach" }, 40)
 mcln_base_hp("mcl_mobs_addon:turtle", 10, 10)
+
+-- turtle egg block: laid on sand by breeding turtles, hatches after
+-- 2-5 minutes into a baby turtle (MC parity: nests on the home beach)
+minetest.register_node("mcl_mobs_addon:turtle_egg", {
+	description = S("Turtle Egg"),
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = { -0.22, -0.5, -0.22, 0.22, -0.32, 0.22 },
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = { -0.22, -0.5, -0.22, 0.22, -0.32, 0.22 },
+	},
+	tiles = { "mcl_mobs_addon_turtle_egg.png" },
+	paramtype = "light",
+	groups = { dig_immediate = 3, deco_block = 1, oddly_breakable_by_hand = 1 },
+	sounds = mcl_sounds.node_sound_defaults(),
+	_tt_help = S("Hatches into a baby turtle"),
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(120 + math.random(0, 180))
+	end,
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		minetest.get_node_timer(pos):start(120 + math.random(0, 180))
+	end,
+	on_timer = function(pos)
+		minetest.set_node(pos, { name = "air" })
+		local baby_pos = vector.offset(pos, 0, 1, 0)
+		-- mark the spawn pos as a hatchling (VoxeLibre never calls
+		-- def.on_activate for mobs — on_spawn reads this registry)
+		mcl_mobs_addon.turtle_babies[minetest.pos_to_string(baby_pos)] = true
+		minetest.add_entity(baby_pos, "mcl_mobs_addon:turtle")
+		return false
+	end,
+})
 
 -- ---------------------------------------------------------------------------
 -- PHANTOM  (MC 1.13; circles high above, dives on non-creative players,
@@ -306,14 +394,15 @@ mcl_mobs.register_mob("mcl_mobs_addon:phantom", {
 			end
 		end
 
-		-- nearest non-creative player within 64
+		-- nearest non-creative, non-spectator player within 64
 		local target = nil
 		local min_dist = 64
 		for _, player in ipairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
 			local is_creative = minetest.settings:get_bool("creative_mode")
 				or minetest.check_player_privs(name, { creative = true })
-			if not is_creative then
+			local is_spec = mcl_mobs_addon.is_spectator and mcl_mobs_addon.is_spectator(player)
+			if not is_creative and not is_spec then
 				local ppos = player:get_pos()
 				if ppos then
 					local dist = vector.distance(pos, ppos)
@@ -393,33 +482,76 @@ mcl_mobs.register_mob("mcl_mobs_addon:phantom", {
 
 mcl_mobs_addon.register_egg("mcl_mobs_addon:phantom", S("Phantom"), "#162328", "#a078db", 0)
 -- MC-parity night spawn: neither spawn system has a time-of-day filter, so
--- a lightweight globalstep spawns phantoms at night near non-creative
--- players (no sleep-tracking yet — MC requires 3 sleepless nights; TODO).
+-- a lightweight globalstep spawns phantoms at night near players who have
+-- NOT SLEPT for 3+ in-game days (MC parity). Sleep is tracked by patching
+-- the game's bed nodes at runtime: entering a bed marks the player; at
+-- every noon, players who slept since the previous noon reset to 0 days,
+-- others increment.
 local ph_timer = 0
+local function player_slept(player)
+	local meta = player:get_meta()
+	meta:set_string("mcl_mobs_addon:slept", "true")
+end
+-- patch the game's bed nodes so entering one marks the player
+minetest.register_on_mods_loaded(function()
+	for name, def in pairs(minetest.registered_nodes) do
+		if name:find("^mcl_beds:") and def.on_rightclick then
+			local orig = def.on_rightclick
+			def.on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+				local r = orig(pos, node, clicker, itemstack, pointed_thing)
+				if clicker and clicker:is_player() and clicker:is_in_bed() then
+					player_slept(clicker)
+				end
+				return r
+			end
+		end
+	end
+end)
+-- noon tracker: day boundary -> sleepless counters
+local prev_t = nil  -- lazily set (get_timeofday can be nil during startup)
 minetest.register_globalstep(function(dtime)
 	ph_timer = ph_timer + dtime
 	if ph_timer < 2 then return end
 	ph_timer = 0
 	if not minetest.get_connected_players() then return end
 	local t = minetest.get_timeofday()
+	if not t then return end
+	if prev_t and prev_t <= 0.5 and t > 0.5 then
+		-- new day (noon passed): update sleepless counters
+		for _, player in ipairs(minetest.get_connected_players()) do
+			local meta = player:get_meta()
+			local slept = meta:get_string("mcl_mobs_addon:slept") == "true"
+			local days = tonumber(meta:get_string("mcl_mobs_addon:sleepless")) or 0
+			days = slept and 0 or (days + 1)
+			meta:set_string("mcl_mobs_addon:sleepless", tostring(days))
+			meta:set_string("mcl_mobs_addon:slept", "")
+		end
+	end
+	prev_t = t
 	if t > 0.25 and t < 0.75 then return end  -- daytime: no phantoms
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
-		if not minetest.check_player_privs(name, { creative = true }) then
-			local ppos = player:get_pos()
-			if ppos and math.random(60) == 1 then
-				local exists = false
-				for _, o in ipairs(minetest.get_objects_inside_radius(ppos, 32)) do
-					local le = o:get_luaentity()
-					if le and le.name == "mcl_mobs_addon:phantom" then
-						exists = true
-						break
+		local is_creative = minetest.settings:get_bool("creative_mode")
+			or minetest.check_player_privs(name, { creative = true })
+		local is_spec = mcl_mobs_addon.is_spectator and mcl_mobs_addon.is_spectator(player)
+		if not is_creative and not is_spec then
+			local days = tonumber(player:get_meta():get_string("mcl_mobs_addon:sleepless")) or 0
+			if days >= 3 and math.random(60) == 1 then
+				local ppos = player:get_pos()
+				if ppos then
+					local exists = false
+					for _, o in ipairs(minetest.get_objects_inside_radius(ppos, 32)) do
+						local le = o:get_luaentity()
+						if le and le.name == "mcl_mobs_addon:phantom" then
+							exists = true
+							break
+						end
 					end
-				end
-				if not exists then
-					local sp = vector.offset(ppos, 0, 20 + math.random(0, 10), 0)
-					if minetest.get_node(sp).name == "air" then
-						minetest.add_entity(sp, "mcl_mobs_addon:phantom")
+					if not exists then
+						local sp = vector.offset(ppos, 0, 20 + math.random(0, 10), 0)
+						if minetest.get_node(sp).name == "air" then
+							minetest.add_entity(sp, "mcl_mobs_addon:phantom")
+						end
 					end
 				end
 			end

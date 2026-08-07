@@ -293,7 +293,7 @@ local camel = {
 			self.max_speed_forward = 3.5
 			self.max_speed_reverse = 1.5
 			self.accel = 3
-			self.driver_attach_at = {x = 0, y = 12.7, z = -5}
+			self.driver_attach_at = {x = 0, y = 22, z = 0}  -- camel hump top is 24.7 model units
 			self.driver_eye_offset = {x = 0, y = 6, z = 0}
 			self.driver_scale = {
 				x = 1 / self.initial_properties.visual_size.x,
@@ -333,7 +333,7 @@ local camel = {
 			-- Second seat (MC: camels seat 2)
 			if not self.passenger or not self.passenger:is_valid() then
 				self.passenger = clicker
-				clicker:set_attach(self.object, "", {x = 0, y = 12.7, z = 5}, {x = 0, y = 0, z = 0})
+				clicker:set_attach(self.object, "", {x = 0, y = 19, z = 6}, {x = 0, y = 0, z = 0})  -- behind the hump
 			end
 		elseif not self.driver then
 			-- Mount
@@ -453,12 +453,26 @@ local goat = {
 	end,
 }
 
--- Goat horn (MC: dropped by charged rams; playable instrument TODO)
+-- Goat horn (MC: dropped by charged rams; an instrument — plays notes)
 minetest.register_craftitem("mcl_mobs_addon:goat_horn", {
 	description = S("Goat Horn"),
 	inventory_image = "mcl_mobs_addon_goat_horn.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
+	on_use = function(itemstack, user, pointed_thing)
+		local notes = {
+			"mesecons_noteblock_a", "mesecons_noteblock_b", "mesecons_noteblock_c",
+			"mesecons_noteblock_d", "mesecons_noteblock_e", "mesecons_noteblock_f",
+			"mesecons_noteblock_g", "mesecons_noteblock_asharp",
+			"mesecons_noteblock_csharp", "mesecons_noteblock_fsharp",
+		}
+		local pos = user and user:get_pos()
+		if pos then
+			minetest.sound_play(notes[math.random(#notes)],
+				{ pos = pos, gain = 1.0, max_hear_distance = 24 }, true)
+		end
+		return itemstack
+	end,
 })
 
 mcl_mobs.register_mob("mcl_mobs_addon:goat", goat)
@@ -681,6 +695,12 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_import.lua
 -- ALLAY (Bettercraft import + movement rewrite for both games) — allay.lua
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/allay.lua")
+
+-- ---------------------------------------------------------------------------
+-- SPECTATOR MODE + NETHER LAVA (see spectator.lua / nether_lava.lua)
+-- ---------------------------------------------------------------------------
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/spectator.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/nether_lava.lua")
 
 -- ---------------------------------------------------------------------------
 -- GLASS CHESTS — MC mod parity (Iron Chests "Crystal Chest"); unique for
