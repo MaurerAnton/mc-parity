@@ -253,4 +253,219 @@ minetest.register_on_mods_loaded(function()
 	minetest.log("action", "[mcl_mobs_addon] wolf patched: biome variants + armor")
 end)
 
-minetest.log("action", "[mcl_mobs_addon] armadillo + wolf variants + wolf armor registered")
+-- ---------------------------------------------------------------------------
+-- BOGGED (MC 1.21): a moss-covered skeleton — does NOT burn in daylight,
+-- shoots poison arrows, drops slimeballs. Textures from Bettercraft (GPLv3)
+-- on the game's skeleton model (no new model needed).
+-- ---------------------------------------------------------------------------
+minetest.register_craftitem("mcl_mobs_addon:breeze_rod", {
+	description = S("Breeze Rod"),
+	inventory_image = "mcl_mobs_addon_breeze_rod.png",
+	groups = { craftitem = 1 },
+	stack_max = 64,
+})
+
+-- poison arrow (the framework's "shoot" attack fires registered arrows)
+mcl_mobs.register_arrow("mcl_mobs_addon:poison_arrow", {
+	visual = "sprite",
+	visual_size = { x = 0.4, y = 0.4 },
+	textures = { "mcl_bows_arrow.png^[colorize:#4a9e4a:180" },
+	velocity = 18,
+	expire = 2,
+	hit_player = function(self, player)
+		if mcl_mobs.get_arrow_damage_func then
+			mcl_mobs.get_arrow_damage_func(4)(self, player)
+		end
+		if mcl_potions and mcl_potions.give_effect_by_level then
+			pcall(mcl_potions.give_effect_by_level, "poison", player, 1, 8)
+		end
+	end,
+	hit_mob = mcl_mobs.get_arrow_damage_func and mcl_mobs.get_arrow_damage_func(4),
+	hit_node = function() end,
+})
+
+local bogged = {
+	description = S("Bogged"),
+	type = "monster",
+	spawn_class = "hostile",
+	passive = false,
+	initial_properties = {
+		hp_min = 20,
+		hp_max = 20,
+		breath_max = -1,
+		collisionbox = { -0.3, -0.01, -0.3, 0.3, 1.98, 0.3 },
+	},
+	xp_min = 6,
+	xp_max = 6,
+	armor = { undead = 100, fleshy = 100 },
+	pathfinding = 1,
+	group_attack = true,
+	head_swivel = "Head_Control",
+	head_eye_height = 1.6,
+	head_bone_position = vector.new(0, 2.38, 0),
+	curiosity = 6,
+	visual = "mesh",
+	mesh = "mobs_mc_skeleton.b3d",  -- the game's skeleton model (media namespace)
+	shooter_avoid_enemy = true,
+	strafes = true,
+	textures = {
+		{
+			"mobs_mc_empty.png",  -- armor
+			"mcl_mobs_addon_bogged.png^mcl_mobs_addon_bogged_overlay.png",  -- mossy body
+			"mcl_bows_bow_0.png",  -- wielded bow
+		},
+	},
+	sounds = {
+		random = "mobs_mc_skeleton_random",
+		death = "mobs_mc_skeleton_death",
+		damage = "mobs_mc_skeleton_hurt",
+		distance = 16,
+	},
+	walk_velocity = 1.2,
+	run_velocity = 2.0,
+	-- NO ignited_by_sunlight: bogged do not burn in daylight (MC parity)
+	floats = 0,
+	view_range = 16,
+	fear_height = 4,
+	attack_type = "shoot",
+	arrow = "mcl_mobs_addon:poison_arrow",
+	shoot_interval = 2,
+	shoot_offset = 1.5,
+	dogshoot_switch = 1,
+	dogshoot_count_max = 1.8,
+	harmed_by_heal = true,
+	animation = {
+		stand_start = 0, stand_end = 40, stand_speed = 10,
+		walk_start = 40, walk_end = 75, speed_normal = 15,
+		run_start = 40, run_end = 75, speed_run = 20,
+		punch_start = 75, punch_end = 90, punch_speed = 15,
+		shoot_start = 75, shoot_end = 90,
+		die_start = 160, die_end = 170, die_speed = 15, die_loop = false,
+	},
+	drops = {
+		{ name = "mcl_mobitems:slimeball", chance = 1, min = 0, max = 1 },
+		{ name = "mcl_mobitems:bone", chance = 2, min = 0, max = 2 },
+	},
+}
+
+mcl_mobs.register_mob("mcl_mobs_addon:bogged", bogged)
+mcl_mobs_addon.register_egg("mcl_mobs_addon:bogged", S("Bogged"), "#4a9e4a", "#7a5c3a", 0)
+mcl_mobs_addon.register_spawn("mcl_mobs_addon:bogged",
+	{ "Swampland", "MangroveSwamp", "Swampland_shore" },
+	{ "Swampland", "MangroveSwamp", "Swampland_shore" }, 40)
+mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:bogged", 20, 20)
+
+-- ---------------------------------------------------------------------------
+-- BREEZE (MC 1.21 trial chambers): a wind golem — hops around, fires wind
+-- charges (a 3-ray fan that knocks targets back hard). Cuboid model via
+-- tools/gen_b3d.py + painted texture. MC spawns it only in trial chambers
+-- (no such structure here yet) — spawn egg only for now.
+-- ---------------------------------------------------------------------------
+mcl_mobs.register_mob("mcl_mobs_addon:breeze", {
+	description = S("Breeze"),
+	type = "monster",
+	spawn_class = "hostile",
+	passive = false,
+	initial_properties = {
+		hp_min = 30,
+		hp_max = 30,
+		breath_max = -1,
+		collisionbox = { -0.6, 0, -0.6, 0.6, 1.4, 0.6 },
+	},
+	xp_min = 10,
+	xp_max = 10,
+	armor = 20,
+	pathfinding = 1,
+	visual = "mesh",
+	mesh = "mcl_mobs_addon_breeze.b3d",
+	textures = { "mcl_mobs_addon_breeze.png" },
+	visual_size = { x = 1.1, y = 1.1 },
+	glow = 5,
+	makes_footstep_sound = false,  -- it floats
+	walk_velocity = 2,
+	run_velocity = 3,
+	view_range = 16,
+	stepheight = 1.2,
+	jump = true,
+	fall_damage = 0,
+	fire_resistant = true,
+	drops = {
+		{ name = "mcl_mobs_addon:breeze_rod", chance = 1, min = 1, max = 1 },
+	},
+	animation = {
+		stand_start = 0, stand_end = 40, stand_speed = 15,
+		walk_start = 40, walk_end = 75, speed_normal = 20,
+		run_start = 40, run_end = 75, speed_run = 25,
+		punch_start = 75, punch_end = 90, punch_speed = 20,
+		die_start = 160, die_end = 170, die_speed = 15, die_loop = false,
+	},
+	do_custom = function(self, dtime)
+		-- hop around randomly (the breeze is a jumper; MC: it bounces)
+		self._mca_hop_t = (self._mca_hop_t or 1.5) - dtime
+		if self._mca_hop_t <= 0 and not self.attack then
+			self._mca_hop_t = 1.5 + math.random() * 2
+			local v = self.object:get_velocity()
+			self.object:set_velocity({
+				x = (math.random() - 0.5) * 6,
+				y = 4.5,
+				z = (math.random() - 0.5) * 6,
+			})
+		end
+		-- wind charge volley: a fan of 3 rays (MC: 3-5 charges); strong
+		-- knockback, small damage; passes through blocks like the warden's
+		-- boom (and like MC wind charges bounce around)
+		local target = self.attack
+		if target and target:is_valid() then
+			local sp = self.object:get_pos()
+			local tp = target:get_pos()
+			if sp and tp then
+				local dist = vector.distance(sp, tp)
+				self._mca_volley_t = (self._mca_volley_t or 1.5) - dtime
+				if self._mca_volley_t <= 0 and dist < 20 then
+					self._mca_volley_t = 2.5
+					local dir = vector.normalize(vector.subtract(tp, sp))
+					dir.y = 0
+					minetest.sound_play("mcl_mobs_addon_warden_boom",
+						{ pos = sp, gain = 0.4, max_hear_distance = 20 }, true)
+					for _, ang in ipairs({ -0.45, 0, 0.45 }) do
+						local c = math.cos(ang)
+						local s = math.sin(ang)
+						local rd = { x = dir.x * c - dir.z * s, z = dir.x * s + dir.z * c }
+						for _, obj in ipairs(minetest.get_objects_inside_radius(sp, 16)) do
+							local op = obj:get_pos()
+							if op then
+								local rel = vector.subtract(op, sp)
+								local d = vector.length(rel)
+								if d > 1.5 and d <= 16 then
+									local nd = vector.normalize(rel)
+									if nd.x * rd.x + nd.z * rd.z > 0.85 then
+										if obj ~= self.object then
+											if mcl_util and mcl_util.deal_damage then
+												mcl_util.deal_damage(obj, 1, { type = "wind_charge" })
+											end
+											-- hard knockback (the MC wind charge)
+											obj:set_velocity({
+												x = rd.x * 10,
+												y = 5,
+												z = rd.z * 10,
+											})
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+				if dist > 8 then
+					self:gopath(tp, 0.9)  -- close the distance
+				end
+			end
+		end
+		return true
+	end,
+})
+
+mcl_mobs_addon.register_egg("mcl_mobs_addon:breeze", S("Breeze"), "#e8ecf5", "#8cb8e8", 0)
+mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:breeze", 30, 30)
+
+minetest.log("action", "[mcl_mobs_addon] bogged + breeze registered (MC 1.21)")

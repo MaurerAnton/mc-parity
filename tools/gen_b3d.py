@@ -101,3 +101,14 @@ ARMADILLO_ROLLED = [
     ((-0.8, 0.0, -0.8), (0.8, 1.6, 0.8)),
 ]
 
+# --- Breeze (MC 1.21 trial chambers; white/blue wind golem with 4 FLOATING
+# limb pieces — the gaps are the breeze's signature) ---
+BREEZE = [
+    ((-0.55, 1.1, -0.55), (0.55, 2.0, 0.55)),     # torso
+    ((-0.4, 2.0, -0.4), (0.4, 2.6, 0.4)),         # head
+    ((-1.15, 0.6, -0.3), (-0.65, 1.0, 0.3)),      # limb FL (floating)
+    ((0.65, 0.6, -0.3), (1.15, 1.0, 0.3)),        # limb FR
+    ((-1.15, 2.2, -0.3), (-0.65, 2.6, 0.3)),      # limb BL
+    ((0.65, 2.2, -0.3), (1.15, 2.6, 0.3)),        # limb BR
+]
+
