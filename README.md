@@ -499,6 +499,6 @@ animation frames (see the existing models/ for frame conventions).
 
 ## License
 
-- Code: GPL-3.0-or-later (mod.conf)
+- Code: GPL-3.0-only (mod.conf)
 - Media: CC BY-SA 4.0 (Pixel Perfection textures) / game models per
   VoxeLibre licensing
