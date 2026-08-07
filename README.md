@@ -63,7 +63,21 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         daylight detector + trial spawners/mace + froglight
 10. [ ] Warden AI: vibration sensing + anger + sonic boom (VL sculk sensor
         is a stub — the vibration system must be built; genuinely unique)
-11. [ ] Deep dark biome + ancient city (unique — nowhere)
+11. [x] Deep Dark + Ancient City (deepdark.lua) — the FULL MC 1.19 package:
+        - sculk sensor + shrieker NODES registered (absent in BOTH games —
+          commented out in both mcl_sculk mods) with the game textures
+        - DeepDark biome + sculk patch generation PORTED to VoxeLibre
+          (Mineclonia already has biome+patches; ours is checked in
+          on_mods_loaded so it never duplicates)
+        - sensor/shrieker scatter ores in the deep dark (both games)
+        - FULL Ancient City structure (Lua place_func builder, no .mts):
+          central hall, 4 pillars + central monument, soul lanterns on
+          chains, sculk floor, corridors to 4 side rooms with loot chests,
+          sensors + shriekers — Mineclonia has only the mini "hermitage"
+        - functional shriekers: walking near one screams + warns (both
+          games' shrieker logic is inert)
+        - place_func signature pitfall documented in-code: mcl_structures
+          calls it as (pos, def, pr, blockseed)
 12. [x] Shulker upgrade (shulker_upgrade.lua) — MC-parity face attachment +
         the "900-degree spin" quirk: VoxeLibre's static shulker now rotates
         to all 6 faces with an animated spin on re-attach; Mineclonia's
