@@ -1,0 +1,22 @@
+name: verify
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install luanti + luac
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luanti-server luanti git
+
+      - name: Run tools/verify.sh
+        run: |
+          chmod +x tools/verify.sh
+          ./tools/verify.sh

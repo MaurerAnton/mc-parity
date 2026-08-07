@@ -325,6 +325,22 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           blocks appear BEFORE register_egg (strip from the last
           register_mob, not the egg); is_canonical trader/llama
           spawners call register_spawner (nil on VL) — strip them.
+24. [x] Bee + Drowned (the last two vanilla mobs — mobs 100%):
+        - BEE: the games ship the full honey machinery (mcl_beehives +
+          mcl_honey: nest/beehive with 5 honey levels, bottle/shears
+          harvest, honey bottle/honeycomb/honey+comb blocks) but NO
+          bee entity. Our bee: flies (fly=true), picks up pollen near
+          the 16 flowers, grows crops (wheat/carrot/potato/beetroot
+          stage advance), fills nests one level per visit
+          (bee_nest -> bee_nest_5), stings when provoked (poison + the
+          bee dies). Model: gen_b3d cuboid (body+head+2 wings),
+          textures painted (stripes + translucent wings).
+        - DROWNED: the game's zombie tinted teal (^[colorize),
+          floats=1 (swims), spawns in the *_ocean biomes (neither game
+          has a plain Ocean), drops fishing rods / nautilus shells /
+          tridents (vl_tridents and mcl_tridents both guarded).
+        - Verified headless BOTH games: bee flies, nest reaches _5,
+          crops grow, both mobs have meshes.
 
 ## Model pipeline (WIP mobs)
 
