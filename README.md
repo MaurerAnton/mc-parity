@@ -341,6 +341,38 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           tridents (vl_tridents and mcl_tridents both guarded).
         - Verified headless BOTH games: bee flies, nest reaches _5,
           crops grow, both mobs have meshes.
+25. [x] Trial Chambers (MC 1.21 structure — mobs_trial.lua):
+        - TRIAL SPAWNER: node-timer block (the game's spawner pattern);
+          spawns a wave scaled to the nearby player count (2 + 1/player,
+          cap 8) from a weighted pool (zombie/skeleton/spider/stray/
+          husk/slime + the breeze); the wave is tracked via the
+          _mca_trial marker (globalstep counts survivors); cleared ->
+          loot (wind charges, breeze rods, emeralds, diamonds + trial
+          key) -> 30 min cooldown.
+        - VAULT: per-player loot container opened with the trial key.
+        - trial key + wind charge items (painted textures).
+        - build_trial_chambers: tuff/copper labyrinth — central chamber
+          with copper pillars + spawner, 4 corridors with lava traps,
+          4 vault rooms; generated deep underground (y -45..-15) in all
+          overworld biomes via mcl_structures.
+        - PITFALLS: get_mapgen_object is mapgen-thread-only — the
+          builders pcall-fallback to direct set_node (works everywhere);
+          pos_to_string must be minetest.pos_to_string (not a global on
+          5.16); corridor directions read d[3] for the z axis — a
+          {0,0,1} vector's z lives at index 3 (d[2] = y = 0 makes every
+          corridor hit the centre).
+26. [x] Trail Ruins (MC 1.20 structure — mobs_ruins.lua):
+        - SUSPICIOUS SAND/GRAVEL: hidden loot in the meta, brushed out
+          (8 strokes + particles) -> the block becomes plain
+          sand/gravel.
+        - BRUSH tool (64 uses); 9 pottery sherds + decorated pot
+          (craft: 4 sherds); RELIC music disc via
+          mcl_jukebox.register_record (plays a game track, CC BY-SA).
+        - build_trail_ruins: small buried mud-brick ruin with gravel,
+          packed-mud columns and 4 pre-filled suspicious blocks;
+          generated in taiga/snowy biomes.
+        - Verified headless BOTH games: registrations, both structures
+          build, brushing drops the loot.
 
 ## Model pipeline (WIP mobs)
 
