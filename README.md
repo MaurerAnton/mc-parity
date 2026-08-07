@@ -226,6 +226,27 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           or replace it. The only paths are an engine patch or a custom
           game that does not use the engine's liquid system. Documented
           here as the end of this roadmap item.
+19. [x] MC 1.20.5/1.21 branch (mobs_121.lua) — unique (verified nowhere):
+        - ARMADILLO: cuboid model (tools/gen_b3d.py) + painted textures
+          (tools/paint_121.py — pure-Python PNG writer, no PIL); rolls
+          into a ball when a player/hostile mob comes within 3 nodes
+          (armor 100, can't move; unrolls after ~4s without threat);
+          drops armadillo scute every 5-10 min; savanna spawn.
+        - WOLF VARIANTS (1.20.5): the game's wolf gets a biome-based
+          texture at spawn — Bettercraft's textures (GPLv3) with their
+          biome map REMAPPED (their Grove/SnowyTaiga/OldGrowthPineTaiga
+          don't exist here: both games use ColdTaiga/MegaTaiga/
+          MegaSpruceTaiga; Mineclonia additionally has Grove). Verified:
+          VL spawn biome -> pale wolf, Mineclonia -> spotted wolf.
+        - WOLF ARMOR (1.21): 6 armadillo scute -> armor; right-click a
+          tamed wolf to equip (overlay + ~60% damage reduction; drops on
+          death). Tame/angry textures for variants: the game's own (TODO).
+        - PITFALL: runtime entity patches must target
+          minetest.registered_entities[name] (the whitelisted final_def
+          class) — mutating mcl_mobs.registered_mobs (the original def)
+          never reaches live entities. mcln_base_hp is exposed on the
+          global table for dofile'd modules (armadillo would crash on
+          Mineclonia otherwise: math.random(nil)).
 
 ## Model pipeline (WIP mobs)
 
