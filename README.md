@@ -373,6 +373,27 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           generated in taiga/snowy biomes.
         - Verified headless BOTH games: registrations, both structures
           build, brushing drops the loot.
+27. [x] Feature selection menu (config.lua):
+        - On the FIRST JOIN a formspec menu appears (and /mca-config
+          reopens it): the user picks which MC-version feature sets are
+          active — version groups (1.21 / 1.20 / 1.19 / 1.17 / 1.15 /
+          1.14 / 1.13 / classic pre-1.13 VL ports / addon extras) plus
+          per-feature overrides ("features from 1.20, not from 1.19,
+          only part of 1.13").
+        - Stored per world (mod storage); changes apply after a server
+          restart (registrations happen at load).
+        - Gating: every registration wrapped in
+          mcl_mobs_addon.feature_enabled(id) — version group AND not
+          individually disabled; ~35 features tagged in the FEATURES
+          table (tools/wrap_gates.py wrapped the module sections).
+        - PITFALLS: config.lua loads FIRST (dofile before the helpers)
+          so it creates the mcl_mobs_addon global itself; the port
+          footer's mcln_base_hp stays OUTSIDE the trader wrap (it
+          patches all 8 entities — safe no-op for unregistered names);
+          the mod storage file is a JSON object of strings.
+        - Verified headless: default = everything; a seeded storage
+          disabling 1.19+1.15+bogged removes warden/allay/frog/bee/
+          bogged while fox/camel/breeze/trial/turtle/phantom stay.
 
 ## Model pipeline (WIP mobs)
 
