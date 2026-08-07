@@ -437,6 +437,29 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           inside the item string, not the entity fields.
         - Verified headless BOTH games: items/entities registered,
           ammo_bow set, the box keeps its diamond through dig/place.
+30. [x] 100% closure (port_items.lua + mobs_final.lua — the full 1.0-1.21
+        audit's last 15 gaps):
+        - PORTED (GPLv3 from Mineclonia, for VL — tools/port_items.py):
+          conduit, dripstone (blocks + pointed growth; the MCLN-levelgen
+          worldgen is not portable), candles (5 colors + cake), powder
+          snow (freezing), echo shard, mace (+ heavy core). Chain
+          ported the OTHER way (VL -> Mineclonia).
+        - FINAL CLOSERS (mobs_final.lua): 5 coral blocks + fans + dead,
+          moss block + carpet, tuff bricks/polished/chiseled, copper
+          bulb (mesecons twin-swap light), crafter (3x3 + timer craft),
+          recovery compass (death location hook + echo-shard craft),
+          oak hanging sign (formspec text), pitcher plant + torchflower,
+          bubble columns (bubbly/whirly liquids + player push).
+        - PITFALLS: no node_sound_copper_defaults (use stone);
+          register_globalstep_slow is MCLN-only — its fallback must
+          emulate the per-player loop (the standard globalstep passes
+          no player — dtime as the player crashes); mcl_dyes (MCLN) vs
+          mcl_dye (VL); palette_index_to_color MCLN-only; Lua 5.1
+          rejects a parenthesized call at statement start; the mcl_tools
+          global is MCLN-only (store the mace state on our table).
+        - Verified headless BOTH games: all 15 features registered, the
+          crafter crafts (2 wood -> pressure plate), coral + bubble
+          nodes place.
 
 ## Model pipeline (WIP mobs)
 
