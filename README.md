@@ -84,6 +84,22 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         instant rotation becomes an animated spin. Works on both games
         (feature-detected), patches the game's own mobs_mc:shulker at
         runtime. Verified headless on both.
+13. [x] Glass chests (glass_chests.lua) — MC mod parity (cpw/ironchest
+        "Crystal Chest" is the canonical glass chest; MC vanilla has none;
+        NOTHING exists for Luanti — checked ContentDB + both trees +
+        Bettercraft + GitHub code search):
+        - glass chest: transparent (see-through), 27 slots. VL: full variant
+          with lid entity (manual registration — see pitfall below);
+          Mineclonia: static nodebox variant (their entity helpers are
+          local). Craft: 8 glass + chest.
+        - glass ender chest: semi-transparent, shares the player's ender
+          inventory. VL: with lid entity; Mineclonia: static. Craft:
+          8 glass + eye of ender.
+        - PITFALL: Luanti 5.16 blocks registering mcl_chests:* node ids from
+          other mods ("Name does not follow naming conventions") — the
+          game's own mcl_chests.register_chest API is unusable from addons;
+          register manually under your own prefix and use the PUBLIC
+          mcl_chests.create_entity / player_chest_open helpers.
 
 ## Model pipeline (WIP mobs)
 

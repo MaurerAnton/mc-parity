@@ -545,6 +545,13 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/shulker_upgrade
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/deepdark.lua")
 
 -- ---------------------------------------------------------------------------
+-- GLASS CHESTS — MC mod parity (Iron Chests "Crystal Chest"); unique for
+-- Luanti. Glass chest (27 slots, transparent) + semi-transparent glass
+-- ender chest (shared ender inventory). See glass_chests.lua.
+-- ---------------------------------------------------------------------------
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/glass_chests.lua")
+
+-- ---------------------------------------------------------------------------
 -- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already
 -- shipped in textures/:
 --   allay     mcl_mobs_addon_allay.png
