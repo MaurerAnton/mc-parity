@@ -49,6 +49,12 @@ grep -q 'register_mob("mcl_mobs_addon:bee"' "$SRC/mobs_bee.lua" && PASS "bee" ||
 grep -q 'register_mob("mcl_mobs_addon:drowned"' "$SRC/mobs_121.lua" && PASS "drowned" || BAD "drowned"
 grep -q 'register_mob("mcl_mobs_addon:bogged"' "$SRC/mobs_121.lua" && PASS "bogged" || BAD "bogged"
 grep -q 'register_mob("mcl_mobs_addon:breeze"' "$SRC/mobs_121.lua" && PASS "breeze" || BAD "breeze"
+grep -q 'register_node("mcl_mobs_addon:trial_spawner"' "$SRC/mobs_trial.lua" && PASS "trial spawner" || BAD "trial spawner"
+grep -q 'register_node("mcl_mobs_addon:vault"' "$SRC/mobs_trial.lua" && PASS "vault" || BAD "vault"
+grep -q 'register_node("mcl_mobs_addon:suspicious_sand"' "$SRC/mobs_ruins.lua" && PASS "suspicious sand" || BAD "suspicious sand"
+grep -q 'register_node("mcl_mobs_addon:suspicious_gravel"' "$SRC/mobs_ruins.lua" && PASS "suspicious gravel" || BAD "suspicious gravel"
+grep -q 'register_tool("mcl_mobs_addon:brush"' "$SRC/mobs_ruins.lua" && PASS "brush" || BAD "brush"
+grep -q 'register_record("Relic"' "$SRC/mobs_ruins.lua" && PASS "relic disc" || BAD "relic disc"
 
 # ---- 3. in-engine (needs luanti + the games; skipped when unavailable) ----
 echo "== [3/5] in-engine checks =="

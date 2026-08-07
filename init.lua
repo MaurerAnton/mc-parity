@@ -736,6 +736,8 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/nether_lava.lua
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_121.lua")
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_bee.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_trial.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_ruins.lua")
 
 -- ---------------------------------------------------------------------------
 -- PORTED MC MOBS: creeper, enderman, blaze, pufferfish, ravager,
