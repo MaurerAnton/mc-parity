@@ -262,6 +262,29 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         - TAMED WOLF VARIANTS: tamed variant wolves keep their fur +
           collar (wolf_<v>_tame.png); the dye handler still wins. Angry
           textures: the game never swaps to angry (VL dead asset) — TODO.
+21. [x] Warden 2.0 + sculk sensor redstone (MC parity):
+        - SONIC BOOM: ray-based shockwave that PASSES THROUGH WALLS
+          (no line-of-sight check), aimed at the target (not the yaw —
+          a fresh warden's yaw is arbitrary); replaces the vl_projectile
+          variant (stopped at walls); identical on both games; damage
+          via mcl_util.deal_damage (no knockback). PITFALL: the
+          framework's deal_damage/damage_mob reduces luaentity.health
+          but does NOT sync ObjectRef hp — verify with le.health.
+        - DARKNESS: the addon registers the mcl_potions 'darkness'
+          effect (icon painted); an angry warden re-applies it to its
+          player target every 3s (5s). VL's skycolor darkens the sky;
+          Mineclonia applies the effect (HUD) without the sky change.
+        - HEARTBEAT: synthesized CC0 sounds (tools/gen_sounds.py:
+          Python WAV + ffmpeg -> OGG) — heartbeat lub-dub + boom
+          whoosh; played while agitated. No external media.
+        - SCULK SENSOR -> REDSTONE: with mesecons installed the sensor
+          swaps to an '_active' twin (receptor ON, all-dirs) for a
+          ~0.8s pulse per vibration; shriekers stay redstone-free (MC).
+          PITFALL: register_node in on_mods_loaded fails the engine's
+          naming check (no mod context) — register the twin at load
+          time (mesecons is an optional_depends, already loaded).
+          Verified with a fake-mesecons worldmod stub.
+        - mod.conf: optional_depends += mcl_potions, mesecons.
 
 ## Model pipeline (WIP mobs)
 
