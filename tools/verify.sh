@@ -49,8 +49,9 @@ grep -q 'register_mob("mcl_mobs_addon:breeze"' "$SRC/mobs_121.lua" && PASS "bree
 
 # ---- 3. in-engine (needs luanti + the games; skipped when unavailable) ----
 echo "== [3/5] in-engine checks =="
-if ! command -v luanti >/dev/null 2>&1; then
-	echo "SKIP: luanti not installed (luac checks only)"
+ENGINE_BIN="$(command -v luanti || command -v minetest || true)"
+if [ -z "$ENGINE_BIN" ]; then
+	echo "SKIP: luanti/minetest not installed (luac checks only)"
 else
 	if [ ! -d "$VL_GAME" ]; then
 		echo "cloning VoxeLibre ($VL_TAG)…"
@@ -112,7 +113,7 @@ EOF
 
 	echo "-- VoxeLibre --"
 	cp -r "$VL_WORLD" "$VL_WORLD.bak" 2>/dev/null; rm -rf "$VL_WORLD.bak"
-	timeout 60 luanti --server --world "$VL_WORLD" --gameid mineclone2 \
+	timeout 60 "$ENGINE_BIN" --server --world "$VL_WORLD" --gameid mineclone2 \
 		--logfile "$WORK/vl.log" >/dev/null 2>&1
 	if grep -q "loaded=8" "$WORK/vl.log"; then PASS "8 mobs spawn (VL)"; else BAD "VL spawn: $(grep -o 'loaded=.*' "$WORK/vl.log" | head -1)"; fi
 	if grep -q "ModError\|ERROR\[Main\]" "$WORK/vl.log"; then BAD "VL errors"; else PASS "VL clean"; fi
@@ -120,7 +121,7 @@ EOF
 	echo "-- Mineclonia --"
 	cp -r "$VL_WORLD" "$MCLN_WORLD" && rm -rf "$MCLN_WORLD/worldmods" && mkdir -p "$MCLN_WORLD/worldmods"
 	cp -r "$PROBE" "$MCLN_WORLD/worldmods/mcl_addon_probe"
-	timeout 60 luanti --server --world "$MCLN_WORLD" --gameid mineclonia \
+	timeout 60 "$ENGINE_BIN" --server --world "$MCLN_WORLD" --gameid mineclonia \
 		--logfile "$WORK/mcln.log" >/dev/null 2>&1
 	if grep -q "loaded=8" "$WORK/mcln.log"; then PASS "8 mobs spawn (Mineclonia)"; else BAD "MCLN spawn: $(grep -o 'loaded=.*' "$WORK/mcln.log" | head -1)"; fi
 	if grep -q "ModError\|ERROR\[Main\]" "$WORK/mcln.log"; then BAD "MCLN errors"; else PASS "MCLN clean"; fi
