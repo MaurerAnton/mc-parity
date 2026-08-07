@@ -30,9 +30,12 @@ BAD() { echo "FAIL: $1"; FAIL=1; }
 
 # ---- 1. luac ----
 echo "== [1/5] luac syntax =="
+LUAC_BIN="$(command -v luac || command -v luac5.1 || command -v luac5.4 || true)"
+if [ -z "$LUAC_BIN" ]; then echo "SKIP: luac not found"; else
 LUA_FILES=""
 for f in "$SRC"/*.lua; do LUA_FILES="$LUA_FILES $f"; done
-if luac -p $LUA_FILES; then PASS "all modules"; else BAD "syntax"; fi
+if "$LUAC_BIN" -p $LUA_FILES; then PASS "all modules"; else BAD "syntax"; fi
+fi
 
 # ---- 2. code markers ----
 echo "== [2/5] code markers =="
