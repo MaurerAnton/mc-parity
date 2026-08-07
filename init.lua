@@ -545,6 +545,15 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/shulker_upgrade
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/deepdark.lua")
 
 -- ---------------------------------------------------------------------------
+-- VIBRATION SYSTEM + WARDEN — MC 1.19 sculk mechanics + the warden (imported
+-- from Bettercraft, with unique AI: hearing, shrieker-summon, sonic boom).
+-- Order matters: vibrations.lua (event bus) must load before warden.lua
+-- (registers a vibration listener). See vibrations.lua / warden.lua.
+-- ---------------------------------------------------------------------------
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/vibrations.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/warden.lua")
+
+-- ---------------------------------------------------------------------------
 -- GLASS CHESTS — MC mod parity (Iron Chests "Crystal Chest"); unique for
 -- Luanti. Glass chest (27 slots, transparent) + semi-transparent glass
 -- ender chest (shared ender inventory). See glass_chests.lua.

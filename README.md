@@ -100,6 +100,27 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           game's own mcl_chests.register_chest API is unusable from addons;
           register manually under your own prefix and use the PUBLIC
           mcl_chests.create_entity / player_chest_open helpers.
+14. [x] Warden + vibration system (vibrations.lua, warden.lua) — MC 1.19:
+        - warden mob imported from Bettercraft (GPLv3; there it is plain
+          melee with a DEAD sonic-boom arrow) — our prefix, model+texture,
+          emerge animation, drops sculk catalyst
+        - vibration system (unique — both games' sculk logic is commented
+          out): emit(pos, freq, player) event bus + player-action hooks
+          (walking/jumping via walkover, digging, placing, punching;
+          sneaking is silent), sensors react within 8 nodes (sound+pulse),
+          shriekers scream within 8 nodes
+        - shrieker -> warden: warning level in a GLOBAL table (node meta is
+          lost on block unload); 2nd scream within 60s summons the warden
+          (MC parity: no natural spawn — shrieker-only + creative egg)
+        - warden HEARING: the blind warden reacts to vibrations within 24
+          nodes (targets the player or investigates the source; 60s decay)
+        - SONIC BOOM: ranged attack at 4-15 blocks (vl_projectile on VL;
+          Bettercraft's arrow was dead code — wired up; Mineclonia melee v1)
+        - PITFALL: Mineclonia's mob activate reads hp_min/hp_max from the
+          DEF BASE (math.random(self.hp_min,...)) while VoxeLibre wants them
+          in initial_properties — register with initial_properties, then add
+          def.hp_min/hp_max post-registration on Mineclonia
+          (mcl_mobs.register_spawner is the Mineclonia marker)
 
 ## Model pipeline (WIP mobs)
 
