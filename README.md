@@ -394,6 +394,25 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
         - Verified headless: default = everything; a seeded storage
           disabling 1.19+1.15+bogged removes warden/allay/frog/bee/
           bogged while fox/camel/breeze/trial/turtle/phantom stay.
+28. [x] Pre-1.13 closers (legacy.lua):
+        - WOODLAND MANSION (MC 1.11): a 27x27 two-storey dark-oak
+          mansion — log pillars, central hall + stairs, library
+          (bookshelves), dining (red carpet), wheat farm, lava room,
+          the 1.19 ALLAY CAGE (trapped allay), bedroom, obsidian room,
+          the arena (vindicators + evoker), 6 loot chests; RoofedForest.
+        - END CITY TOWERS (MC 1.9) for VoxeLibre (it only had the
+          ships; Mineclonia has small_end_city): 9x9 purpur tower —
+          3 floors, corner pillars, spire, 3 chests, 2 shulkers; End
+          biomes.
+        - DISCS: cat, stal, ward, 11 — the 4 pre-1.13 discs absent
+          from both games' jukebox (tracks reuse the games' CC BY-SA
+          recordings; labels painted).
+        - PITFALLS: the VL fence node is mcl_fences:dark_oak_fence
+          (the register helper appends the _fence suffix — the woods
+          table id is NOT the node name); Mineclonia's dark oak lives
+          in mcl_trees (dual-game pick at load).
+        - Verified headless BOTH games: mansion (wall + 6 chests),
+          tower (purpur), 4 discs, 6 mobs spawned inside.
 
 ## Model pipeline (WIP mobs)
 
