@@ -89,6 +89,7 @@ local function mcln_base_hp(name, hp_min, hp_max)
 		end
 	end
 end
+mcl_mobs_addon.mcln_base_hp = mcln_base_hp  -- for dofile'd modules
 
 -- ---------------------------------------------------------------------------
 -- FOX  (base model: wolf)
@@ -701,6 +702,11 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/allay.lua")
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/spectator.lua")
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/nether_lava.lua")
+
+-- ---------------------------------------------------------------------------
+-- MC 1.20.5/1.21: ARMADILLO + WOLF VARIANTS + WOLF ARMOR (see mobs_121.lua)
+-- ---------------------------------------------------------------------------
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_121.lua")
 
 -- ---------------------------------------------------------------------------
 -- GLASS CHESTS — MC mod parity (Iron Chests "Crystal Chest"); unique for

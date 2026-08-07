@@ -83,3 +83,21 @@ GOAT = [
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else "mcl_mobs_addon_goat.b3d"
     write_b3d(out, GOAT)
+
+# --- Armadillo (MC 1.21; low oval body, small head + tail, 4 legs) ---
+# Model ~3.0 units tall; the mob def uses visual_size 0.75 -> ~0.55 node
+ARMADILLO = [
+    ((-1.0, 0.9, -0.8), (1.0, 1.9, 0.8)),       # body (wide, low)
+    ((-0.35, 1.0, 0.8), (0.35, 1.7, 1.6)),      # head (front = +z)
+    ((-0.2, 1.0, -1.3), (0.2, 1.4, -0.8)),      # tail (back = -z)
+    ((-0.9, 0.0, -0.6), (-0.5, 0.9, -0.2)),     # leg FL
+    ((0.5, 0.0, -0.6), (0.9, 0.9, -0.2)),       # leg FR
+    ((-0.9, 0.0, 0.2), (-0.5, 0.9, 0.6)),       # leg BL
+    ((0.5, 0.0, 0.2), (0.9, 0.9, 0.6)),         # leg BR
+]
+
+# Rolled state: a tight ball (MC: the armadillo curls up)
+ARMADILLO_ROLLED = [
+    ((-0.8, 0.0, -0.8), (0.8, 1.6, 0.8)),
+]
+
