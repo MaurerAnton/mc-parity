@@ -285,6 +285,24 @@ Place `mcl_mobs_addon/` into the game's `mods/` directory (VoxeLibre:
           time (mesecons is an optional_depends, already loaded).
           Verified with a fake-mesecons worldmod stub.
         - mod.conf: optional_depends += mcl_potions, mesecons.
+22. [x] Bogged + Breeze (MC 1.21 — last unique mobs):
+        - BOGGED: moss-covered skeleton on the game's skeleton model +
+          Bettercraft textures (GPLv3); does NOT burn in daylight (the
+          skeleton's ignited_by_sunlight flag is omitted); shoots POISON
+          arrows (mcl_mobs_addon:poison_arrow — damage 4 + poison 8s,
+          green [colorize on the game's arrow texture); drops slimeball
+          + bones; swamps (Swampland/Swampland_shore/MangroveSwamp —
+          verified in both games).
+        - BREEZE: wind golem — cuboid model (gen_b3d.py: torso + head +
+          4 FLOATING limbs) + painted white/blue texture; hops around;
+          WIND CHARGE VOLLEY: a 3-ray fan (MC: 3-5 charges) with 1
+          damage + HARD KNOCKBACK, through blocks; drops a breeze rod.
+          MC: trial-chamber-only — spawn egg only (no structure here
+          yet; trial chambers TODO).
+        - PITFALL: the framework's "shoot" attack fires registered
+          arrows via def.arrow automatically (the shulker pattern — no
+          custom shoot_arrow needed); mob AI overrides set_velocity
+          knockback on its next step (players keep the launch).
 
 ## Model pipeline (WIP mobs)
 
