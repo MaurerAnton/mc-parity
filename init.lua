@@ -737,6 +737,12 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/nether_lava.lua
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_121.lua")
 
 -- ---------------------------------------------------------------------------
+-- PORTED MC MOBS: creeper, enderman, blaze, pufferfish, ravager,
+-- wandering trader (from Mineclonia, GPLv3 — see mobs_port.lua)
+-- ---------------------------------------------------------------------------
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_port.lua")
+
+-- ---------------------------------------------------------------------------
 -- GLASS CHESTS — MC mod parity (Iron Chests "Crystal Chest"); unique for
 -- Luanti. Glass chest (27 slots, transparent) + semi-transparent glass
 -- ender chest (shared ender inventory). See glass_chests.lua.
