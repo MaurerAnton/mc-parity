@@ -396,9 +396,8 @@ local goat = {
 		death = { name = "mobs_mc_cow_hurt", gain = 0.6 },
 		distance = 16,
 	},
-	drops = {
-		{ name = "mcl_mobs_addon:goat_horn", chance = 2, min = 1, max = 2 },
-	},
+	-- MC parity: horns come ONLY from charged rams (1-2), never on death
+	drops = {},
 	-- MC goat ramming: provoked goats wind up ~0.7s then charge, knocking
 	-- back and damaging; charged rams drop horns
 	on_attack = function(self, hitter)
@@ -420,12 +419,13 @@ local goat = {
 				local dist = vector.distance(pos, tpos)
 				self.object:set_velocity(vector.multiply(self._ram_dir, 6))
 				if dist < 1.8 then
-					-- impact: damage + knockback + maybe a horn
+					-- impact: damage + knockback + 1-2 horns (MC: charged
+					-- rams ALWAYS drop 1-2 horns)
 					self.attack:punch(self.object, 1.0, {
 						full_punch_interval = 1.0,
 						damage_groups = { fleshy = 2 },
 					})
-					if math.random(2) == 1 then
+					for _ = 1, math.random(1, 2) do
 						minetest.add_item(pos, "mcl_mobs_addon:goat_horn")
 					end
 					self._ramming = nil
@@ -538,9 +538,9 @@ mcln_base_hp("mcl_mobs_addon:skeleton_horse", 15, 15)
 register_egg("mcl_mobs_addon:skeleton_horse", S("Skeleton Horse"), "#8a8a8a", "#e8e8e8", 0)
 
 -- Skeleton trap (MC 1.11): lightning converts the horse and summons 4
--- skeletons. Approximation: horse turns hostile, skeletons spawn around it.
--- Works on BOTH games: Mineclonia ships a COMPAT "lightning" shim whose
--- metatable resolves lightning.* to mcl_lightning (same API as VL).
+-- skeleton horses WITH skeleton riders (jockeys), which despawn after a
+-- while. Works on BOTH games: Mineclonia ships a COMPAT "lightning" shim
+-- whose metatable resolves lightning.* to mcl_lightning (same API as VL).
 if minetest.get_modpath("lightning") and lightning and lightning.register_on_strike then
 	lightning.register_on_strike(function(pos, pos2, objects)
 		for _, obj in pairs(objects or {}) do
@@ -549,14 +549,42 @@ if minetest.get_modpath("lightning") and lightning and lightning.register_on_str
 				ent._trap = true
 				ent.damage = 2
 				local p = obj:get_pos()
-				for i = 1, 4 do
-					local sp = {
-						x = p.x + math.random(-2, 2),
-						y = p.y + 1,
-						z = p.z + math.random(-2, 2),
+				-- the struck horse + 3 more around (MC parity)
+				local horses = { obj }
+				for i = 1, 3 do
+					local hp = {
+						x = p.x + math.random(-3, 3),
+						y = p.y,
+						z = p.z + math.random(-3, 3),
 					}
-					if minetest.get_node(sp).name == "air" then
-						minetest.add_entity(sp, "mobs_mc:skeleton")
+					local n = minetest.get_node(hp)
+					local n2 = minetest.get_node(vector.offset(hp, 0, 1, 0))
+					if (n.name == "air" or n.name:find("grass"))
+							and n2.name == "air" then
+						local ho = minetest.add_entity(hp, "mcl_mobs_addon:skeleton_horse")
+						if ho then
+							local he = ho:get_luaentity()
+							if he then he._trap = true end
+							table.insert(horses, ho)
+						end
+					end
+				end
+				-- riders (jockey): VL = horse:jock_to(name, rel);
+				-- Mineclonia = rider:jock_to_existing(horse, bone, rel)
+				for _, ho in ipairs(horses) do
+					local he = ho:get_luaentity()
+					if he then
+						if he.jock_to then
+							he:jock_to("mobs_mc:skeleton", { x = 0, y = 1.6, z = 0 })
+						elseif he.jock_to_existing then
+							local sk = minetest.add_entity(p, "mobs_mc:skeleton")
+							if sk then
+								local sle = sk:get_luaentity()
+								if sle then
+									sle:jock_to_existing(ho, "", { x = 0, y = 1.6, z = 0 }, vector.zero())
+								end
+							end
+						end
 					end
 				end
 				break

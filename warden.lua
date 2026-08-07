@@ -20,7 +20,7 @@ mcl_mobs.register_mob("mcl_mobs_addon:warden", {
 		hp_max = 500,
 		collisionbox = { -0.6, 0, -0.6, 0.6, 2, 0.6 },
 	},
-	damage = 45,
+	damage = 30,  -- MC parity (was 45 from Bettercraft)
 	armor = 10,
 	reach = 3,
 	attack_player = true,
@@ -142,8 +142,8 @@ mcl_mobs.register_arrow("mcl_mobs_addon:sonic_boom", {
 	expire = 1,
 	collisionbox = { -0.5, -0.5, -0.5, 0.5, 0.5, 0.5 },
 	redirectable = true,
-	hit_player = mcl_mobs.get_arrow_damage_func(25),
-	hit_mob = mcl_mobs.get_arrow_damage_func(25),
+	hit_player = mcl_mobs.get_arrow_damage_func(10),  -- MC parity (was 25)
+	hit_mob = mcl_mobs.get_arrow_damage_func(10),
 	hit_node = function() end,
 })
 

@@ -218,6 +218,15 @@ minetest.register_on_mods_loaded(function()
 		if orig_rightclick then
 			orig_rightclick(self, clicker, itemstack, pointed_thing)
 		end
+		-- MC 1.20.5: a tamed variant wolf keeps its fur + collar
+		-- (the game's tame handler resets to the default wolf_tame)
+		if self.tamed and self._mca_variant and self.base_texture
+				and self.base_texture[1] and not self._mca_tamed
+				and self.base_texture[1]:find("mobs_mc_wolf_tame%.png") then
+			self._mca_tamed = true
+			self.base_texture[1] = self._mca_variant:gsub("%.png$", "_tame.png")
+			self.object:set_properties({ textures = self.base_texture })
+		end
 	end
 
 	-- damage reduction while armored (~60%)
