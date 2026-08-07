@@ -27,6 +27,8 @@ local S = minetest.get_translator("mcl_mobs_addon")
 
 local pr = PseudoRandom(os.time() * 2)
 
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/config.lua")
+
 -- ---------------------------------------------------------------------------
 -- Helpers (dual-game)
 -- ---------------------------------------------------------------------------
@@ -92,7 +94,7 @@ end
 mcl_mobs_addon.mcln_base_hp = mcln_base_hp  -- for dofile'd modules
 
 -- ---------------------------------------------------------------------------
--- FOX  (base model: wolf)
+if mcl_mobs_addon.feature_enabled("fox") then
 -- ---------------------------------------------------------------------------
 local fox = {
 	description = S("Fox"),
@@ -153,8 +155,9 @@ register_spawn("mcl_mobs_addon:fox",
 	{"Taiga", "ColdTaiga", "MegaTaiga", "MegaSpruceTaiga"},
 	{"#is_taiga"}, 60)
 
+end
 -- ---------------------------------------------------------------------------
--- PANDA  (real model imported from Bettercraft — replaces the polar-bear
+if mcl_mobs_addon.feature_enabled("panda") then
 -- retexture; personality textures stay ours)
 -- ---------------------------------------------------------------------------
 local panda = {
@@ -238,8 +241,9 @@ register_spawn("mcl_mobs_addon:panda",
 	{"BambooJungle", "BambooJungleM", "Jungle"},
 	{"#is_jungle"}, 30)
 
+end
 -- ---------------------------------------------------------------------------
--- CAMEL  (real model imported from Bettercraft — replaces the llama
+if mcl_mobs_addon.feature_enabled("camel") then
 -- retexture; our riding logic stays)
 -- ---------------------------------------------------------------------------
 local camel = {
@@ -351,8 +355,9 @@ register_spawn("mcl_mobs_addon:camel",
 	{"Desert"},
 	{"Desert"}, 20)
 
+end
 -- ---------------------------------------------------------------------------
--- GOAT  (model: procedurally generated b3d — tools/gen_b3d.py, unique:
+if mcl_mobs_addon.feature_enabled("goat") then
 -- no goat exists in VoxeLibre, Mineclonia, Bettercraft or ContentDB)
 -- ---------------------------------------------------------------------------
 local goat = {
@@ -483,8 +488,9 @@ register_spawn("mcl_mobs_addon:goat",
 	{"ExtremeHills", "ExtremeHillsM"},
 	{"#is_mountain"}, 30)
 
+end
 -- ---------------------------------------------------------------------------
--- SKELETON HORSE  (base model: horse)
+if mcl_mobs_addon.feature_enabled("skeleton_horse") then
 -- ---------------------------------------------------------------------------
 local skeleton_horse = {
 	description = S("Skeleton Horse"),
@@ -595,8 +601,9 @@ end
 
 minetest.log("action", "[mcl_mobs_addon] loaded: fox, panda, camel, skeleton_horse, goat registered")
 
+end
 -- ---------------------------------------------------------------------------
--- BUNDLE  (MC 1.17 item — no implementation exists in VoxeLibre/Mineclonia/
+if mcl_mobs_addon.feature_enabled("bundle") then
 -- Bettercraft/ContentDB). Contents travel with the item (serialized in item
 -- metadata), so a dropped bundle keeps its items — the MC bundle property.
 -- v1: craft, view, take items out. TODO: shift-click insert (MC parity).
@@ -693,9 +700,12 @@ minetest.register_craft({
 -- Patches the game's own mobs_mc:shulker at runtime (works on both games):
 --   VoxeLibre: adds 6-face attachment + rotation + spin (was static)
 --   Mineclonia: adds the spin animation (was instant rotation)
+end
 -- See shulker_upgrade.lua.
 -- ---------------------------------------------------------------------------
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/shulker_upgrade.lua")
+if mcl_mobs_addon.feature_enabled("shulker_upgrade") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/shulker_upgrade.lua")
+end
 
 -- ---------------------------------------------------------------------------
 -- DEEP DARK + ANCIENT CITY — MC 1.19. Ports the DeepDark biome + sculk
@@ -711,8 +721,12 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/deepdark.lua")
 -- Order matters: vibrations.lua (event bus) must load before warden.lua
 -- (registers a vibration listener). See vibrations.lua / warden.lua.
 -- ---------------------------------------------------------------------------
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/vibrations.lua")
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/warden.lua")
+if mcl_mobs_addon.feature_enabled("sculk") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/vibrations.lua")
+end
+if mcl_mobs_addon.feature_enabled("warden") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/warden.lua")
+end
 
 -- ---------------------------------------------------------------------------
 -- IMPORTED MOBS (Bettercraft, GPLv3): frog, turtle, phantom, sniffer —
@@ -723,21 +737,33 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_import.lua
 -- ---------------------------------------------------------------------------
 -- ALLAY (Bettercraft import + movement rewrite for both games) — allay.lua
 -- ---------------------------------------------------------------------------
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/allay.lua")
+if mcl_mobs_addon.feature_enabled("allay") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/allay.lua")
+end
 
 -- ---------------------------------------------------------------------------
 -- SPECTATOR MODE + NETHER LAVA (see spectator.lua / nether_lava.lua)
 -- ---------------------------------------------------------------------------
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/spectator.lua")
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/nether_lava.lua")
+if mcl_mobs_addon.feature_enabled("spectator") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/spectator.lua")
+end
+if mcl_mobs_addon.feature_enabled("nether_lava") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/nether_lava.lua")
+end
 
 -- ---------------------------------------------------------------------------
 -- MC 1.20.5/1.21: ARMADILLO + WOLF VARIANTS + WOLF ARMOR (see mobs_121.lua)
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_121.lua")
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_bee.lua")
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_trial.lua")
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_ruins.lua")
+if mcl_mobs_addon.feature_enabled("bee") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_bee.lua")
+end
+if mcl_mobs_addon.feature_enabled("trial_chambers") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_trial.lua")
+end
+if mcl_mobs_addon.feature_enabled("trail_ruins") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_ruins.lua")
+end
 
 -- ---------------------------------------------------------------------------
 -- PORTED MC MOBS: creeper, enderman, blaze, pufferfish, ravager,
@@ -750,7 +776,9 @@ dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_port.lua")
 -- Luanti. Glass chest (27 slots, transparent) + semi-transparent glass
 -- ender chest (shared ender inventory). See glass_chests.lua.
 -- ---------------------------------------------------------------------------
-dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/glass_chests.lua")
+if mcl_mobs_addon.feature_enabled("glass_chests") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/glass_chests.lua")
+end
 
 -- ---------------------------------------------------------------------------
 -- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already

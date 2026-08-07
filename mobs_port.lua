@@ -68,7 +68,7 @@ local function register_monster_spawn(name, biomes, weight, pack_min, pack_max, 
 end
 
 -- ---------------------------------------------------------------------------
--- CREEPER (+charged)
+if mcl_mobs_addon.feature_enabled("creeper") then
 -- ---------------------------------------------------------------------------
 --License for code WTFPL and otherwise stated in readmes
 
@@ -341,7 +341,8 @@ mcl_mobs.register_egg("mcl_mobs_addon:creeper", S("Creeper"), "#0da70a", "#00000
 register_monster_spawn("mcl_mobs_addon:creeper", OW_MONSTERS, 100, 4, 4)
 
 -- ---------------------------------------------------------------------------
--- BLAZE
+end
+if mcl_mobs_addon.feature_enabled("blaze") then
 -- ---------------------------------------------------------------------------
 -- daufinsyd
 -- My work is under the LGPL terms
@@ -635,7 +636,8 @@ register_monster_spawn("mcl_mobs_addon:blaze", NETHER_BIOMES, 20, 1, 2, "nether"
 mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:blaze", 20, 20)
 
 -- ---------------------------------------------------------------------------
--- ENDERMAN
+end
+if mcl_mobs_addon.feature_enabled("enderman") then
 -- ---------------------------------------------------------------------------
 --MCmobs v0.4
 --maikerumine
@@ -1391,7 +1393,8 @@ register_monster_spawn("mcl_mobs_addon:enderman", NETHER_BIOMES, 1, 1, 4, "nethe
 register_monster_spawn("mcl_mobs_addon:enderman", END_BIOMES, 10, 4, 4, "end")
 
 -- ---------------------------------------------------------------------------
--- PUFFERFISH
+end
+if mcl_mobs_addon.feature_enabled("pufferfish") then
 -- ---------------------------------------------------------------------------
 local S = core.get_translator ("mobs_mc")
 
@@ -1648,7 +1651,8 @@ register_monster_spawn("mcl_mobs_addon:pufferfish", OCEAN_BIOMES, 10, 1, 3)
 mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:pufferfish", 6, 6)
 
 -- ---------------------------------------------------------------------------
--- RAVAGER
+end
+if mcl_mobs_addon.feature_enabled("ravager") then
 -- ---------------------------------------------------------------------------
 local S = core.get_translator ("mobs_mc")
 local raid_mob = {}  -- raid system not ported (Mineclonia-only)
@@ -2149,7 +2153,8 @@ mcl_mobs.register_egg ("mcl_mobs_addon:ravager", S ("Ravager"), "#757470", "#5b5
 -- no natural spawn (MC: raid-only); egg only
 
 -- ---------------------------------------------------------------------------
--- WANDERING TRADER
+end
+if mcl_mobs_addon.feature_enabled("wandering_trader") then
 -- ---------------------------------------------------------------------------
 local modname = core.get_current_modname ()
 local S = core.get_translator (modname)
@@ -2826,6 +2831,7 @@ elseif mcl_mobs.spawn_setup then
 end
 
 minetest.log("action", "[mcl_mobs_addon] ported mobs registered (creeper/enderman/blaze/pufferfish/ravager/trader)")
+end
 
 -- Mineclonia reads hp from the def base (math.random at activate) — the
 -- same latent crash as the other addon mobs; patch after registration.

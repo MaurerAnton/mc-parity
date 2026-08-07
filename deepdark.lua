@@ -50,7 +50,7 @@ local CHAIN = "mcl_lanterns:chain"
 local CHEST = "mcl_chests:chest_small"
 
 -- ---------------------------------------------------------------------------
--- 0) Sculk sensor + shrieker nodes (absent in BOTH games — unique work)
+if mcl_mobs_addon.feature_enabled("sculk") then
 -- ---------------------------------------------------------------------------
 if not node_exists(SENSOR) then
 	minetest.register_node(SENSOR, {
@@ -108,7 +108,8 @@ if not node_exists(SHRIEKER) then
 end
 
 -- ---------------------------------------------------------------------------
--- 1) DeepDark biome + sculk generation (VoxeLibre only — Mineclonia has it).
+end
+if mcl_mobs_addon.feature_enabled("deep_dark") then
 -- Checked in on_mods_loaded: our mod loads BEFORE Mineclonia's mcl_biomes,
 -- so the biome may not exist yet at load time.
 -- ---------------------------------------------------------------------------
@@ -336,4 +337,5 @@ if mcl_structures and mcl_structures.register_structure then
 		},
 	})
 	minetest.log("action", "[mcl_mobs_addon] Ancient City structure registered")
+end
 end

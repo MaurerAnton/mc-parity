@@ -31,7 +31,7 @@ local function mcln_base_hp(name, hp_min, hp_max)
 end
 
 -- ---------------------------------------------------------------------------
--- FROG  (MC 1.19; eats slimes, drops froglight from magma cubes, biome
+if mcl_mobs_addon.feature_enabled("frog") then
 -- textures via the game's _mcl_biome_type field)
 -- ---------------------------------------------------------------------------
 local frog_textures = {
@@ -159,7 +159,8 @@ mcl_mobs_addon.register_spawn("mcl_mobs_addon:frog",
 mcln_base_hp("mcl_mobs_addon:frog", 10, 10)
 
 -- ---------------------------------------------------------------------------
--- TURTLE  (MC 1.13; beach walker, seagrass-breedable — egg-laying TODO:
+end
+if mcl_mobs_addon.feature_enabled("turtle") then
 -- Bettercraft's go_home/_has_egg chain needs the nest block)
 -- ---------------------------------------------------------------------------
 mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
@@ -387,7 +388,8 @@ else
 end
 
 -- ---------------------------------------------------------------------------
--- PHANTOM  (MC 1.13; circles high above, dives on non-creative players,
+end
+if mcl_mobs_addon.feature_enabled("phantom") then
 -- retreats upward when damaged, burns in daylight — Bettercraft's full AI)
 -- ---------------------------------------------------------------------------
 mcl_mobs.register_mob("mcl_mobs_addon:phantom", {
@@ -630,7 +632,8 @@ end)
 mcln_base_hp("mcl_mobs_addon:phantom", 20, 20)
 
 -- ---------------------------------------------------------------------------
--- SNIFFER  (MC 1.23; peaceful relic hunter — eggs only until the ruins
+end
+if mcl_mobs_addon.feature_enabled("sniffer") then
 -- spawn condition is portable; drops TODO: sniffable seeds)
 -- ---------------------------------------------------------------------------
 mcl_mobs.register_mob("mcl_mobs_addon:sniffer", {
@@ -675,3 +678,4 @@ mcl_mobs_addon.register_egg("mcl_mobs_addon:sniffer", S("Sniffer"), "#872618", "
 mcln_base_hp("mcl_mobs_addon:sniffer", 14, 14)
 
 minetest.log("action", "[mcl_mobs_addon] imported Bettercraft mobs: frog, turtle, phantom, sniffer")
+end

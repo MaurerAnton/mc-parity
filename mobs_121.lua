@@ -15,7 +15,7 @@
 local S = minetest.get_translator("mcl_mobs_addon")
 
 -- ---------------------------------------------------------------------------
--- ARMADILLO
+if mcl_mobs_addon.feature_enabled("armadillo") then
 -- ---------------------------------------------------------------------------
 mcl_mobs.register_mob("mcl_mobs_addon:armadillo", {
 	description = S("Armadillo"),
@@ -106,7 +106,8 @@ mcl_mobs_addon.register_spawn("mcl_mobs_addon:armadillo",
 mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:armadillo", 12, 12)
 
 -- ---------------------------------------------------------------------------
--- ARMADILLO SCUTE + WOLF ARMOR
+end
+if mcl_mobs_addon.feature_enabled("wolf_armor") then
 -- ---------------------------------------------------------------------------
 minetest.register_craftitem("mcl_mobs_addon:armadillo_scute", {
 	description = S("Armadillo Scute"),
@@ -133,7 +134,8 @@ minetest.register_craft({
 })
 
 -- ---------------------------------------------------------------------------
--- WOLF VARIANTS + WOLF ARMOR (runtime patch of the game's mobs_mc:wolf)
+end
+if mcl_mobs_addon.feature_enabled("wolf_variants") then
 -- ---------------------------------------------------------------------------
 -- MC 1.20.5 biome map, adapted to the games' actual biome names:
 -- (VL and Mineclonia both use the classic names: ColdTaiga, MegaTaiga...
@@ -253,8 +255,9 @@ minetest.register_on_mods_loaded(function()
 	minetest.log("action", "[mcl_mobs_addon] wolf patched: biome variants + armor")
 end)
 
+end
 -- ---------------------------------------------------------------------------
--- BOGGED (MC 1.21): a moss-covered skeleton — does NOT burn in daylight,
+if mcl_mobs_addon.feature_enabled("bogged") then
 -- shoots poison arrows, drops slimeballs. Textures from Bettercraft (GPLv3)
 -- on the game's skeleton model (no new model needed).
 -- ---------------------------------------------------------------------------
@@ -356,7 +359,8 @@ mcl_mobs_addon.register_spawn("mcl_mobs_addon:bogged",
 mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:bogged", 20, 20)
 
 -- ---------------------------------------------------------------------------
--- BREEZE (MC 1.21 trial chambers): a wind golem — hops around, fires wind
+end
+if mcl_mobs_addon.feature_enabled("breeze") then
 -- charges (a 3-ray fan that knocks targets back hard). Cuboid model via
 -- tools/gen_b3d.py + painted texture. MC spawns it only in trial chambers
 -- (no such structure here yet) — spawn egg only for now.
@@ -471,7 +475,8 @@ mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:breeze", 30, 30)
 minetest.log("action", "[mcl_mobs_addon] bogged + breeze registered (MC 1.21)")
 
 -- ---------------------------------------------------------------------------
--- DROWNED (MC 1.13): a water zombie — spawns in oceans, swims (floats=1),
+end
+if mcl_mobs_addon.feature_enabled("drowned") then
 -- drops fishing rods / nautilus shells / tridents. Textures: the game's
 -- zombie tinted teal-green (legal — game media, CC BY-SA).
 -- ---------------------------------------------------------------------------
@@ -531,3 +536,4 @@ mcl_mobs_addon.register_spawn("mcl_mobs_addon:drowned",
 		"Taiga_ocean", "ColdTaiga_ocean",
 	}, 30)
 mcl_mobs_addon.mcln_base_hp("mcl_mobs_addon:drowned", 20, 20)
+end
