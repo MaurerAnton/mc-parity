@@ -51,12 +51,26 @@ function vib.emit(pos, freq, player)
 		minetest.set_node(sensor, n)
 		minetest.after(1, function()
 			local nn = minetest.get_node(sensor)
-			if nn.name == "mcl_mobs_addon:sculk_sensor" then
-				minetest.set_node(sensor, { name = "mcl_mobs_addon:sculk_sensor", param2 = 0 })
+			if nn.name == "mcl_mobs_addon:sculk_sensor" and nn.param2 == 1 then
+				nn.param2 = 0
+				minetest.set_node(sensor, nn)
 			end
 		end)
+		-- mesecons output: swap to the powered twin for a ~0.8s pulse
+		-- (MC: sensors emit a redstone pulse on vibration; shriekers don't)
+		if rawget(_G, "mesecon") and minetest.registered_nodes["mcl_mobs_addon:sculk_sensor_active"] then
+			local cn = minetest.get_node(sensor)
+			if cn.name == "mcl_mobs_addon:sculk_sensor" then
+				minetest.set_node(sensor, { name = "mcl_mobs_addon:sculk_sensor_active" })
+				minetest.after(0.8, function()
+					local an = minetest.get_node(sensor)
+					if an.name == "mcl_mobs_addon:sculk_sensor_active" then
+						minetest.set_node(sensor, { name = "mcl_mobs_addon:sculk_sensor" })
+					end
+				end)
+			end
+		end
 	end
-
 	-- shriekers scream within 8 nodes
 	local shrieker = minetest.find_node_near(pos, 8, { "mcl_mobs_addon:sculk_shrieker" })
 	if shrieker then

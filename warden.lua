@@ -5,10 +5,62 @@
 --   - HEARING: the warden is blind — it reacts to vibrations (the addon's
 --     vibration system, vibrations.lua) within 24 nodes and targets the
 --     player who caused them; target decays after 60 s without stimuli
---   - SONIC BOOM: ranged attack at 4-15 blocks (VL: vl_projectile; the
---     Bettercraft arrow existed but was dead code — attack_type was melee)
+--   - SONIC BOOM: ranged attack at 4-15 blocks. MC parity: the boom is a
+--     shockwave that PASSES THROUGH WALLS — implemented as a ray (damage
+--     along the facing cone) instead of a projectile, so it works
+--     identically on both games (Bettercraft's arrow was dead code)
+--   - DARKNESS: an angry warden darkens the sky for its target (the addon
+--     registers the mcl_potions "darkness" effect; VoxeLibre's skycolor
+--     has a handler for it, Mineclonia applies the effect without the
+--     sky change)
+--   - HEARTBEAT: while agitated the warden plays a heartbeat (synthesized
+--     CC0 sound, tools/gen_sounds.py)
 
 local S = minetest.get_translator("mcl_mobs_addon")
+local BOOM_SOUND = "mcl_mobs_addon_warden_boom"
+local HEARTBEAT = "mcl_mobs_addon_warden_heartbeat"
+
+-- MC: the sonic boom is a shockwave along the warden's facing direction,
+-- 4-15 nodes, IGNORING blocks (no line-of-sight check). Aimed at the
+-- TARGET (not the current yaw — a freshly summoned warden's yaw is
+-- arbitrary; the framework only rotates mobs while moving)
+local function sonic_boom(self, target_pos)
+	local sp = self.object:get_pos()
+	if not sp or not target_pos then return end
+	local dir = vector.normalize(vector.subtract(target_pos, sp))
+	dir.y = 0
+	minetest.sound_play(BOOM_SOUND, { pos = sp, gain = 0.9, max_hear_distance = 24 }, true)
+	for _, obj in ipairs(minetest.get_objects_inside_radius(sp, 15)) do
+		local op = obj:get_pos()
+		if op then
+			local rel = vector.subtract(op, sp)
+			local dist = vector.length(rel)
+			if dist > 4 and dist <= 15 then
+				local nd = vector.normalize(rel)
+				if nd.x * dir.x + nd.z * dir.z > 0.7 then  -- ~45 deg cone
+					-- framework damage: no knockback (mcl_util, both games)
+					if obj ~= self.object and mcl_util and mcl_util.deal_damage then
+						mcl_util.deal_damage(obj, 10, { type = "sonic_boom" })
+					end
+				end
+			end
+		end
+	end
+end
+
+-- darkness effect: registered once mcl_potions is available (both games
+-- ship the same API). VoxeLibre's skycolor applies the visual darkness.
+local function register_darkness_effect()
+	if not mcl_potions or not mcl_potions.register_effect then return end
+	if mcl_potions.registered_effects and mcl_potions.registered_effects.darkness then return end
+	pcall(mcl_potions.register_effect, {
+		name = "darkness",
+		description = S("Darkness"),
+		icon = "mcl_mobs_addon_effect_darkness.png",
+	})
+	minetest.log("action", "[mcl_mobs_addon] darkness effect registered")
+end
+minetest.register_on_mods_loaded(register_darkness_effect)
 
 mcl_mobs.register_mob("mcl_mobs_addon:warden", {
 	description = S("Warden"),
@@ -80,27 +132,31 @@ mcl_mobs.register_mob("mcl_mobs_addon:warden", {
 			local tp = target:get_pos()
 			if sp and tp then
 				local dist = vector.distance(sp, tp)
-				-- sonic boom at 4-15 blocks (VoxeLibre; Mineclonia = melee v1)
-				if dist > 4 and dist < 15 and vl_projectile then
+				-- sonic boom at 4-15 blocks (ray through walls — MC parity)
+				if dist > 4 and dist < 15 then
 					self._mca_boom_t = (self._mca_boom_t or 1) - dtime
 					if self._mca_boom_t <= 0 then
 						self._mca_boom_t = 2
-						local p = vector.offset(sp, 0, 2, 0)
-						local arrow = vl_projectile.create("mcl_mobs_addon:sonic_boom", {
-							pos = p,
-							owner = self,
-						})
-						local ent = arrow and arrow:get_luaentity()
-						if ent then
-							ent._shooter = self.object
-							ent._saved_shooter_pos = sp
-							ent.velocity = 14
-							ent.switch = 1
-						end
+						sonic_boom(self, tp)
 					end
 				elseif dist > 3 then
 					-- close the distance (Bettercraft's chase logic)
 					self:gopath(tp, 0.9)
+				end
+				-- DARKNESS: an angry warden darkens its target (MC parity);
+				-- re-applied every 3s, 5s duration (VL skycolor darkens the sky)
+				if target:is_player() then
+					self._mca_dark_t = (self._mca_dark_t or 0) - dtime
+					if self._mca_dark_t <= 0 and mcl_potions and mcl_potions.give_effect_by_level then
+						self._mca_dark_t = 3
+						pcall(mcl_potions.give_effect_by_level, "darkness", target, 1, 5)
+					end
+				end
+				-- HEARTBEAT: audible while the warden is agitated (MC parity)
+				self._mca_hb_t = (self._mca_hb_t or 0) - dtime
+				if self._mca_hb_t <= 0 then
+					self._mca_hb_t = 1.1
+					minetest.sound_play(HEARTBEAT, { pos = sp, gain = 0.7, max_hear_distance = 24 }, true)
 				end
 			end
 		elseif tpos then
@@ -128,24 +184,9 @@ if mcl_mobs.register_spawner then
 	end
 end
 
--- sonic boom projectile (dead code in Bettercraft — wired up here)
-mcl_mobs.register_arrow("mcl_mobs_addon:sonic_boom", {
-	description = S("Sonic Boom"),
-	visual = "sprite",
-	visual_size = { x = 1, y = 1 },
-	textures = { "mcl_mobs_addon_sonic_boom.png" },
-	velocity = 14,
-	tail = 1,
-	tail_texture = "mcl_mobs_addon_sonic_boom.png",
-	tail_size = 10,
-	glow = 5,
-	expire = 1,
-	collisionbox = { -0.5, -0.5, -0.5, 0.5, 0.5, 0.5 },
-	redirectable = true,
-	hit_player = mcl_mobs.get_arrow_damage_func(10),  -- MC parity (was 25)
-	hit_mob = mcl_mobs.get_arrow_damage_func(10),
-	hit_node = function() end,
-})
+-- sonic boom: ray-based (see sonic_boom above) — the Bettercraft arrow
+-- was dead code and the vl_projectile variant stopped at walls; the ray
+-- passes through blocks like MC and works on both games.
 
 -- hearing: the blind warden reacts to vibrations within 24 nodes
 if mcl_mobs_addon.vibrations and mcl_mobs_addon.vibrations.register_listener then

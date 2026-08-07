@@ -69,6 +69,22 @@ if not node_exists(SENSOR) then
 		_mcl_hardness = 3,
 		_mcl_silk_touch_drop = true,
 	})
+	-- mesecons output (MC parity: sensors emit a redstone pulse): an
+	-- "active" twin whose receptor state is ON; the vibration handler
+	-- swaps the nodes for a ~0.8s pulse (modern mesecons has no runtime
+	-- receptor_on — the state lives in the node def). Registered at load
+	-- time (NOT in on_mods_loaded — no mod context there -> the engine's
+	-- naming-convention check fails). mesecons is an optional_depends, so
+	-- it is already loaded when this runs.
+	if rawget(_G, "mesecon") and mesecon.rules then
+		local active = table.copy(minetest.registered_nodes[SENSOR])
+		active.description = S("Sculk Sensor (powered)")
+		active.mesecons = {
+			receptor = { state = mesecon.state.on, rules = mesecon.rules.alldirs },
+		}
+		minetest.register_node(SENSOR .. "_active", active)
+		minetest.log("action", "[mcl_mobs_addon] sculk sensor: mesecons output enabled")
+	end
 	minetest.log("action", "[mcl_mobs_addon] registered " .. SENSOR)
 end
 if not node_exists(SHRIEKER) then
