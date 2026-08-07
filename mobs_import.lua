@@ -238,12 +238,14 @@ mcl_mobs.register_mob("mcl_mobs_addon:turtle", {
 		end
 	end,
 	do_custom = function(self, dtime)
-		-- baby turtles grow to full size after ~5 minutes
+		-- baby turtles grow to full size after ~5 minutes; the growth
+		-- drops a scute (MC parity — missed in the original port)
 		if self._mca_baby then
 			self._mca_grow = (self._mca_grow or 300) - dtime
 			if self._mca_grow <= 0 then
 				self._mca_baby = nil
 				self.object:set_properties({ visual_size = { x = 1, y = 1 } })
+				minetest.add_item(self.object:get_pos(), "mcl_mobs_addon:scute")
 			end
 		end
 		-- breeding: go home, then lay the egg on a nearby sand block
@@ -316,6 +318,73 @@ minetest.register_node("mcl_mobs_addon:turtle_egg", {
 		return false
 	end,
 })
+
+-- turtle scute (MC 1.13; neither game has it — turtles are ours)
+minetest.register_craftitem("mcl_mobs_addon:scute", {
+	description = S("Scute"),
+	inventory_image = "mcl_mobs_addon_scute.png",
+	groups = { craftitem = 1 },
+	stack_max = 64,
+})
+
+-- turtle shell helmet (MC: crafted from 5 scute; grants water breathing)
+if mcl_armor and mcl_armor.register_set then
+	-- VoxeLibre / Mineclonia armor API: full set, but only the head piece
+	-- has armor points (the others are harmless placeholders)
+	mcl_armor.register_set({
+		name = "turtle",
+		description = S("Turtle Shell"),
+		points = { head = 2, torso = 0, legs = 0, feet = 0 },
+		toughness = 0,
+		durability = 275,
+		enchantability = 9,
+		textures = { head = "mcl_mobs_addon_turtle_helmet.png" },
+		groups = { armor = 1, mcl_armor = 1, mcl_armor_turtle = 1 },
+	})
+	minetest.register_craft({
+		output = "mcl_mobs_addon:helmet_turtle",
+		recipe = {
+			{ "mcl_mobs_addon:scute", "mcl_mobs_addon:scute", "mcl_mobs_addon:scute" },
+			{ "mcl_mobs_addon:scute", "", "mcl_mobs_addon:scute" },
+		},
+	})
+	-- water breathing while the shell is worn and the head is underwater
+	local HELMET = "mcl_mobs_addon:helmet_turtle"
+	local head_index = mcl_armor.elements and mcl_armor.elements.head
+		and mcl_armor.elements.head.index or 2
+	minetest.register_globalstep(function(dtime)
+		for _, player in ipairs(minetest.get_connected_players()) do
+			local inv = player:get_inventory()
+			local worn = inv and inv:get_stack("armor", head_index)
+			if worn and worn:get_name() == HELMET and worn:get_wear() < 65535 then
+				local ppos = player:get_pos()
+				local head = ppos and vector.offset(ppos, 0, 1.5, 0)
+				if head then
+					local n = minetest.get_node(head)
+					if minetest.get_item_group(n.name, "water") ~= 0 then
+						if mcl_potions and mcl_potions.give_effect_by_level then
+							mcl_potions.give_effect_by_level("water_breathing", player, 1, 15)
+						end
+					end
+				end
+			end
+		end
+	end)
+else
+	-- no armor API (unlikely): plain wearable helmet without the effect
+	minetest.register_craftitem("mcl_mobs_addon:helmet_turtle", {
+		description = S("Turtle Shell"),
+		inventory_image = "mcl_mobs_addon_turtle_helmet.png",
+		groups = { armor_head = 1, armor = 1 },
+	})
+	minetest.register_craft({
+		output = "mcl_mobs_addon:helmet_turtle",
+		recipe = {
+			{ "mcl_mobs_addon:scute", "mcl_mobs_addon:scute", "mcl_mobs_addon:scute" },
+			{ "mcl_mobs_addon:scute", "", "mcl_mobs_addon:scute" },
+		},
+	})
+end
 
 -- ---------------------------------------------------------------------------
 -- PHANTOM  (MC 1.13; circles high above, dives on non-creative players,
