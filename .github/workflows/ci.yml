@@ -11,13 +11,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install luanti (PPA) + luac
+      - name: Install build deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository -y ppa:minetestdevs/stable
-          sudo apt-get update
-          sudo apt-get install -y luanti-server luanti lua5.1 git
+          sudo apt-get install -y build-essential cmake ninja-build \
+            libz-dev libcurl4-openssl-dev libjpeg-dev libpng-dev \
+            libsqlite3-dev libluajit-5.1-dev libgmp-dev libjsoncpp-dev \
+            libglm-dev libzstd-dev git lua5.1
+
+      - name: Build luanti 5.16 server (Ubuntu's minetest 5.8 is too old for the 2026 games)
+        run: |
+          git clone -q --depth 1 --branch 5.16.0 https://github.com/luanti-org/luanti.git
+          cmake -S luanti -B luanti/build -G Ninja -DBUILD_CLIENT=FALSE -DBUILD_SERVER=TRUE \
+            -DENABLE_CURL=TRUE -DENABLE_GETTEXT=FALSE -DENABLE_LEVELDB=FALSE \
+            -DENABLE_POSTGRESQL=FALSE -DENABLE_REDIS=FALSE -DENABLE_PROMETHEUS=FALSE
+          cmake --build luanti/build -j2
+          sudo cmake --install luanti/build
 
       - name: Run tools/verify.sh
         run: |

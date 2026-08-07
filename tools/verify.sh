@@ -52,7 +52,7 @@ grep -q 'register_mob("mcl_mobs_addon:breeze"' "$SRC/mobs_121.lua" && PASS "bree
 
 # ---- 3. in-engine (needs luanti + the games; skipped when unavailable) ----
 echo "== [3/5] in-engine checks =="
-ENGINE_BIN="$(command -v luanti || command -v minetest || true)"
+ENGINE_BIN="$(command -v luanti-server || command -v luanti || command -v minetest || true)"
 if [ -z "$ENGINE_BIN" ]; then
 	echo "SKIP: luanti/minetest not installed (luac checks only)"
 else
