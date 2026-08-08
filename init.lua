@@ -811,6 +811,21 @@ local function register_source_snippet()
 		local label
 		if mod == "mc_parity" then
 			label = "MC Parity addon (mc_parity)"
+			local id = itemstring:match("^mc_parity:([^:]+)$")
+			if id then
+				local v = mc_parity.item_version(id)
+				if v then
+					label = label .. " — " .. (mc_parity.item_version_label(v) or v)
+				end
+			end
+		elseif itemstring == "mcl_jukebox:record_cat"
+				or itemstring == "mcl_jukebox:record_stal"
+				or itemstring == "mcl_jukebox:record_ward"
+				or itemstring == "mcl_jukebox:record_11" then
+			-- our discs live in the game's mcl_jukebox namespace
+			label = "MC Parity addon (mc_parity) — MC pre-1.13"
+		elseif itemstring == "mcl_jukebox:record_relic" then
+			label = "MC Parity addon (mc_parity) — MC 1.20"
 		elseif mod:find("^mcl_", 1) or mod == "mobs_mc" then
 			label = game_label .. " (" .. mod .. ")"
 		else

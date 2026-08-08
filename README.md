@@ -463,9 +463,12 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
 31. [x] 0.1-beta polish (installability + UX):
         - ITEM-SOURCE TOOLTIPS: every item's hover tooltip ends with a
           "From: <mod/game>" line via the game's tt.register_snippet —
-          mc_parity items are labeled as the addon, mcl_*/mobs_mc as the
-          game (Mineclonia/VoxeLibre detected at runtime), third-party
-          mods by their raw mod name.
+          mc_parity items are labeled as the addon (plus the related MC
+          version, e.g. "— MC 1.21", from the config menu's version
+          groups; loop-generated ids like coral_*/candle_*/sherds are
+          matched by prefix, our jukebox discs by explicit id),
+          mcl_*/mobs_mc as the game (Mineclonia/VoxeLibre detected at
+          runtime), third-party mods by their raw mod name.
           PITFALL: tt's append pass runs in ITS on_mods_loaded, and tt
           loads BEFORE this mod on Mineclonia — registering the snippet
           from our on_mods_loaded was TOO LATE (silent: the pass already
