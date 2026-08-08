@@ -196,7 +196,9 @@ end
 if mcl_structures and mcl_structures.register_structure then
 	mcl_structures.register_structure("mc_parity:woodland_mansion", {
 		place_on = { "group:grass_block", "group:dirt", "mcl_core:dirt_with_grass" },
-		biomes = { "RoofedForest", "RoofedForestM" },
+		-- Mineclonia lacks the RoofedForestM (mutated) variant — VL keeps both
+		biomes = mcl_mobs.register_spawner and { "RoofedForest" }
+			or { "RoofedForest", "RoofedForestM" },
 		y_min = 1,
 		y_max = 40,
 		place_func = mc_parity.build_woodland_mansion,

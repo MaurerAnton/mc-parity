@@ -6,7 +6,7 @@
 -- (registrations happen at load time).
 -- ---------------------------------------------------------------------------
 
-mc_parity = mc_parity or {}  -- loaded first, before init.lua creates it
+mc_parity = {}  -- loaded first, before init.lua uses it (no `or {}` — that read trips Luanti's strict undeclared-global warning)
 
 local S = minetest.get_translator("mc_parity")
 
@@ -119,22 +119,26 @@ local function open_menu(player)
 	for id in pairs(FEATURES) do
 		feats[id] = config.disabled[id] ~= true
 	end
-	local formspec = "size[9,10]"
+	local formspec = "formspec_version[6]"
+		.. "size[9,10]"
 		.. "label[0.3,0.2;" .. minetest.formspec_escape(
 			S("mc_parity feature selection")) .. "]"
 		.. "label[0.3,0.7;" .. minetest.formspec_escape(
 			S("Choose which Minecraft-version features are active.")) .. "]"
 		.. "label[0.3,1.1;" .. minetest.formspec_escape(
 			S("Changes apply after a server restart.")) .. "]"
-		.. "scrollbaroptions[4;0.3]"
-	local y = 1.6
+		-- scrollable list (formspec v6 scroll_container; the game's
+		-- settings/creative forms use the same pattern). scroll_factor 0.01
+		-- keeps the scrollbar value in fine-grained units (0.01 per unit).
+		.. "scroll_container[0.3,1.5;8.4,7.2;_mcparity_scroll;vertical;0.01]"
+	local y = 0
 	for _, v in ipairs(VERSION_ORDER) do
 		formspec = formspec .. string.format(
-			"checkbox[0.3,%g;ver_%s;%s;%s]", y, v, VERSION_LABEL[v], ver[v] and "true" or "false")
+			"checkbox[0,%g;ver_%s;%s;%s]", y, v, VERSION_LABEL[v], ver[v] and "true" or "false")
 		y = y + 0.4
 	end
 	y = y + 0.3
-	formspec = formspec .. "label[0.3," .. y .. ";" .. minetest.formspec_escape(
+	formspec = formspec .. "label[0," .. y .. ";" .. minetest.formspec_escape(
 		S("Individual features (fine-grained overrides):")) .. "]"
 	y = y + 0.4
 	for _, v in ipairs(VERSION_ORDER) do
@@ -142,20 +146,32 @@ local function open_menu(player)
 			if f.version == v then
 				local state = feats[id] and "true" or "false"
 				local label = string.format("  [%s] %s", VERSION_LABEL[v]:match("^([0-9.]+)") or v, f.desc)
-				formspec = formspec .. string.format("checkbox[0.3,%g;feat_%s;%s;%s]",
+				formspec = formspec .. string.format("checkbox[0,%g;feat_%s;%s;%s]",
 					y, id, minetest.formspec_escape(label), state)
 				y = y + 0.4
 			end
 		end
 	end
+	local view_h = 7.2
+	local scroll_max = math.ceil(math.max(0, y - view_h) / 0.01)
+	local thumb_size = math.floor((view_h / y) * scroll_max)
 	formspec = formspec
-		.. string.format("button[1.0,%g;3,0.9;save;%s]", y, S("Save"))
-		.. string.format("button[5.0,%g;3,0.9;reset;%s]", y, S("Reset to all enabled"))
+		.. "scroll_container_end[]"
+		.. string.format("scrollbaroptions[smallstep=50;largestep=150;max=%d;thumbsize=%d]",
+			scroll_max, thumb_size)
+		.. "scrollbar[8.7,1.5;0.3,7.2;vertical;_mcparity_scroll;0]"
+		.. string.format("button[1.0,9.0;3,0.8;save;%s]", S("Save"))
+		.. string.format("button[5.0,9.0;3,0.8;reset;%s]", S("Reset to all enabled"))
 	minetest.show_formspec(name, "mc_parity:config", formspec)
 end
 
+-- track any interaction with our menu (open/clicks/ESC all arrive here),
+-- so the auto-show knows the player actually saw it
+local menu_seen = false
+
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "mc_parity:config" then return end
+	menu_seen = true
 	if fields.reset then
 		config.versions = {}
 		config.disabled = {}
@@ -188,13 +204,24 @@ minetest.register_chatcommand("mca-config", {
 	end,
 })
 
--- show the menu once on the first join (when nothing has been configured)
+-- show the menu once on the first join (when nothing has been configured).
+-- Retry once after 6 s if the player never saw it (the first send can be
+-- dropped while the client is still loading the world).
 if storage:get_string("configured") ~= "true" then
 	minetest.register_on_joinplayer(function(player)
 		if storage:get_string("configured") ~= "true" then
 			storage:set_string("configured", "true")  -- show once
+			local pname = player:get_player_name()
+			local function show()
+				local p = minetest.get_player_by_name(pname)
+				if p then open_menu(p) end
+			end
 			minetest.after(1, function()
-				if player and player:is_player() then open_menu(player) end
+				if menu_seen then return end
+				show()
+				minetest.after(6, function()
+					if not menu_seen then show() end
+				end)
 			end)
 		end
 	end)

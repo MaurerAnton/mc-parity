@@ -108,7 +108,7 @@ local BULB = "mc_parity:copper_bulb"
 local BULB_LIT = "mc_parity:copper_bulb_lit"
 for _, def in ipairs({
 	{ BULB, "Copper Bulb", 0 },
-	{ BULB_LIT, "Copper Bulb (lit)", 15 },
+	{ BULB_LIT, "Copper Bulb (lit)", 14 },  -- engine max light is 14 (15 was clamped)
 }) do
 	minetest.register_node(def[1], {
 		description = S(def[2]),

@@ -10,8 +10,28 @@
 
 local S = minetest.get_translator("mc_parity")
 
-local LAVA_TILE = "mcl_core_lava_source_animation.png"
-local LAVA_FLOW = "mcl_core_lava_flow_animation.png"
+-- Derive the lava tile names from the game's OWN lava node (the games name
+-- them "default_lava_*_animated.png"; hardcoding "mcl_core_lava_*" produced
+-- dummy textures on the client). Fallbacks keep the node registrable if
+-- mcl_core is ever absent.
+local function lava_tex(node_name, fallback)
+	local n = minetest.registered_nodes[node_name]
+	if n then
+		local t = n.special_tiles and n.special_tiles[1]
+		if t then
+			if type(t) == "table" then return t.name or fallback end
+			return t:match("^([^%^]+)") or fallback
+		end
+		t = n.tiles and n.tiles[1]
+		if t then
+			if type(t) == "table" then return t.name or fallback end
+			return t:match("^([^%^]+)") or fallback
+		end
+	end
+	return fallback
+end
+local LAVA_TILE = lava_tex("mcl_core:lava_source", "default_lava_source_animated.png")
+local LAVA_FLOW = lava_tex("mcl_core:lava_flowing", "default_lava_flowing_animated.png")
 
 minetest.register_node("mc_parity:nether_lava_source", {
 	description = S("Nether Lava Source"),

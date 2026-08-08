@@ -1511,7 +1511,6 @@ minetest.register_node("mc_parity:chain", {
 	},
 	groups = {pickaxey = 1, deco_block = 1},
 	sounds = mcl_sounds.node_sound_metal_defaults(),
-	on_place = place_chain,
 	_mcl_blast_resistance = 6,
 	_mcl_hardness = 5,
 })

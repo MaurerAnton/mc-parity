@@ -334,7 +334,14 @@ if mcl_armor and mcl_armor.register_set then
 	-- has armor points (the others are harmless placeholders)
 	mcl_armor.register_set({
 		name = "turtle",
-		description = S("Turtle Shell"),
+		-- modern API: per-element localized descriptions (the old
+		-- `description` field is deprecated in both games)
+		descriptions = {
+			head  = S("Turtle Shell Helmet"),
+			torso = S("Turtle Shell Chestplate"),
+			legs  = S("Turtle Shell Leggings"),
+			feet  = S("Turtle Shell Boots"),
+		},
 		points = { head = 2, torso = 0, legs = 0, feet = 0 },
 		toughness = 0,
 		durability = 275,

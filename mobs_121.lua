@@ -484,6 +484,7 @@ if mc_parity.feature_enabled("drowned") then
 local drowned_tex = "mobs_mc_zombie.png^[colorize:#3f9e8e:140"
 local DROWNED = {
 	type = "monster",
+	description = S("Drowned"),  -- needed for death messages
 	spawn_class = "hostile",
 	attack_player = true,
 	hp_min = 20,

@@ -689,15 +689,22 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 end)
 
--- MC recipe: 6 rabbit hide + 2 string (VL: rabbit hide = leather_piece)
-minetest.register_craft({
-	output = "mc_parity:bundle",
-	recipe = {
-		{"mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece"},
-		{"mcl_mobitems:leather_piece", "mcl_mobitems:string", "mcl_mobitems:leather_piece"},
-		{"mcl_mobitems:leather_piece", "mcl_mobitems:string", "mcl_mobitems:leather_piece"},
-	},
-})
+-- MC recipe: 6 rabbit hide + 2 string (VL: rabbit hide = leather_piece,
+-- Mineclonia: plain mcl_mobitems:leather)
+local hide = minetest.registered_items["mcl_mobitems:leather_piece"]
+	and "mcl_mobitems:leather_piece"
+	or (minetest.registered_items["mcl_mobitems:leather"]
+		and "mcl_mobitems:leather")
+if hide then
+	minetest.register_craft({
+		output = "mc_parity:bundle",
+		recipe = {
+			{hide, hide, hide},
+			{hide, "mcl_mobitems:string", hide},
+			{hide, "mcl_mobitems:string", hide},
+		},
+	})
+end
 
 -- ---------------------------------------------------------------------------
 -- SHULKER UPGRADE — MC-parity face attachment + the 900-degree spin quirk.

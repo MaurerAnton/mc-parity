@@ -130,13 +130,20 @@ minetest.register_node("mc_parity:dragon_head", {
 	groups = { handy = 1, dig_by_hand = 1, deco_block = 1 },
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 })
-minetest.register_craft({
-	output = "mc_parity:dragon_head",
-	recipe = {
-		{ "mcl_mobitems:dragon_breath", "mcl_mobitems:dragon_breath" },
-		{ "mcl_mobitems:dragon_breath", "mcl_mobitems:dragon_breath" },
-	},
-})
+-- dragon head: VL keeps the breath in mcl_mobitems, Mineclonia in mcl_potions
+local breath = minetest.registered_items["mcl_mobitems:dragon_breath"]
+	and "mcl_mobitems:dragon_breath"
+	or (minetest.registered_items["mcl_potions:dragon_breath"]
+		and "mcl_potions:dragon_breath")
+if breath then
+	minetest.register_craft({
+		output = "mc_parity:dragon_head",
+		recipe = {
+			{ breath, breath },
+			{ breath, breath },
+		},
+	})
+end
 
 -- -------------------------------------------------------- shulker boxes ----
 local SHULKER_COLORS = {
@@ -300,14 +307,25 @@ if base_arrow then
 			},
 		})
 	end
-	-- spectral: 1 arrow + 4 glowstone -> 2 spectral arrows
-	minetest.register_craft({
-		output = "mc_parity:arrow_spectral 2",
-		recipe = {
-			{ "mcl_core:glowstone_dust", "mcl_core:glowstone_dust" },
-			{ "mcl_core:glowstone_dust", "mcl_bows:arrow" },
-		},
-	})
+	-- spectral: 1 arrow + 4 glowstone -> 2 spectral arrows.
+	-- glowstone dust: mcl_core:glowstone_dust (VL) vs mcl_nether:glowstone_dust
+	-- (Mineclonia) — mcl_nether is not an optional_dep, so resolve once all
+	-- mods are loaded.
+	minetest.register_on_mods_loaded(function()
+		local dust = minetest.registered_items["mcl_core:glowstone_dust"]
+			and "mcl_core:glowstone_dust"
+			or (minetest.registered_items["mcl_nether:glowstone_dust"]
+				and "mcl_nether:glowstone_dust")
+		if dust then
+			minetest.register_craft({
+				output = "mc_parity:arrow_spectral 2",
+				recipe = {
+					{ dust, dust },
+					{ dust, "mcl_bows:arrow" },
+				},
+			})
+		end
+	end)
 end
 
 minetest.log("action", "[mc_parity] legacy items: lead + dragon head + shulker boxes + tipped arrows")
