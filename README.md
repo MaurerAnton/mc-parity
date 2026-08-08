@@ -460,6 +460,47 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
         - Verified headless BOTH games: all 15 features registered, the
           crafter crafts (2 wood -> pressure plate), coral + bubble
           nodes place.
+31. [x] 0.1-beta polish (installability + UX):
+        - ITEM-SOURCE TOOLTIPS: every item's hover tooltip ends with a
+          "From: <mod/game>" line via the game's tt.register_snippet —
+          mc_parity items are labeled as the addon, mcl_*/mobs_mc as the
+          game (Mineclonia/VoxeLibre detected at runtime), third-party
+          mods by their raw mod name.
+          PITFALL: tt's append pass runs in ITS on_mods_loaded, and tt
+          loads BEFORE this mod on Mineclonia — registering the snippet
+          from our on_mods_loaded was TOO LATE (silent: the pass already
+          iterated tt.registered_snippets). Register at LOAD time when
+          tt exists; fall back to on_mods_loaded only when it doesn't.
+        - CONFIG MENU: scrollable feature list (formspec v6
+          scroll_container + scrollbar; the old layout was 17 units tall
+          in a 10-unit form — every feature checkbox and the Save button
+          were off-screen), Save now closes the menu, first-join
+          auto-show retries once if the client was still loading (a
+          dropped send made later clicks fail with "server hasn't sent
+          formspec to client" — and the save was silently discarded).
+        - DUAL-GAME RECIPE NAMES: bundle (leather_piece vs leather),
+          dragon head (mcl_mobitems vs mcl_potions dragon_breath),
+          spectral arrow (mcl_core vs mcl_nether glowstone_dust) resolve
+          the item per game — fixes the mcl_craftguide "ingredient X
+          doesn't exist" warnings on Mineclonia.
+        - MUSIC DISCS: all register_record calls use the table form
+          (the positional form is deprecated and spammed mcl_jukebox
+          warnings on every start).
+        - MEDIA COMPLETION: turtle armor inventory icons
+          (mc_parity_inv_*_turtle), chain inventory icon, heavy core
+          block textures (procedural, tools/gen_heavy_core.py) — the
+          missing files rendered as client dummy images.
+        - NETHER LAVA tiles derived from the game's own lava node
+          (default_lava_*_animated.png) — the hardcoded names produced
+          client dummy textures.
+        - MISC: woodland mansion drops RoofedForestM on Mineclonia (the
+          biome doesn't exist there — "get_biome_list: failed"), drowned
+          gets a description (death messages), copper bulb light_source
+          14 (15 is clamped by the engine), dead on_place = place_chain
+          removed.
+        - Verified headless: clean log (no ModError/Undeclared/biome/
+          craftguide/jukebox warnings), descriptions carry the From:
+          line, 24 load banners.
 
 ## Model pipeline (WIP mobs)
 
@@ -496,6 +537,47 @@ animation frames (see the existing models/ for frame conventions).
   then grep the log for `[mc_parity]` banner / `ModError` / `ERROR`.
 - Runtime check: the banner log line sits AFTER all register calls in
   init.lua — its presence in the log proves every registration succeeded.
+
+## Troubleshooting
+
+### Client errors `Don't know how to load file "<lang>.po"` (Mineclonia + Luanti 5.16.x)
+
+Mineclonia still ships part of its translations in the OLD naming
+convention (`mods/ITEMS/mcl_core/locale/<lang>.po`, no mod prefix).
+Luanti's client-side translation loader only recognises files named
+`<mod>.<lang>.po` (it extracts the language from the second dot) — the
+unprefixed files are sent to the client as media, fail that check and
+log `Client: Don't know how to load file "be.po"` (one line per
+language) on every start. Server-side translations are unaffected; the
+errors are cosmetic but noisy. A fix in the engine (client-side .po
+support) exists upstream but is not in a stable release yet.
+
+This is a GAME-side issue, not a mod bug — fix it once in the installed
+game (re-run after updating Mineclonia):
+
+```bash
+cd ~/.minetest/games/mineclonia/mods/ITEMS/mcl_core/locale && for f in *.po; do case "$f" in mcl_core.*) ;; *) if [ -f "mcl_core.$f" ]; then rm -f "$f"; else mv "$f" "mcl_core.$f"; fi;; esac; done
+```
+
+What it does: for every unprefixed `<lang>.po` — if a prefixed twin
+`mcl_core.<lang>.po` exists (23 of them, identical or older snapshots)
+it deletes the leftover; the two languages without a twin (zh_Hans,
+zh_Hant) are renamed to the prefixed form (they now actually load).
+Restart the world afterwards — the media list is built at server start.
+
+### The first-join feature menu does not appear / is not scrollable
+
+Versions before 0.1-beta had a fixed-size form whose content was taller
+than the window: the per-feature checkboxes and the Save/Reset buttons
+were off-screen and there was no scrollbar. Update the mod and reopen
+with `/mca-config`. The menu shows once per world; it can be reopened
+any time with that command (privilege `server`).
+
+### Tooltip line `From: ...` not visible
+
+Every item's hover tooltip gets a `From: <mod/game>` line (see work
+plan item 31). If it is missing, the installed copy predates commit
+`7c14d07` — reinstall from `main`.
 
 ## License
 
