@@ -794,10 +794,15 @@ end
 -- ---------------------------------------------------------------------------
 -- ITEM SOURCE TOOLTIPS — every item's hover tooltip gets a "From: ..." line
 -- showing which mod/game it belongs to (the game's tt mod turns snippets
--- into extra tooltip lines; mc_parity loads before tt alphabetically, so
--- our on_mods_loaded callback runs before tt's append pass).
+-- into extra tooltip lines).
+-- Registration-order pitfall (verified 2026-08): tt's append pass runs in
+-- ITS on_mods_loaded callback. If tt loads BEFORE this mod (Mineclonia does),
+-- registering the snippet from OUR on_mods_loaded is TOO LATE — the pass
+-- already iterated tt.registered_snippets. Fix: register immediately at
+-- load time when tt exists (its append always runs after all mods load), and
+-- fall back to on_mods_loaded only when tt is not loaded yet (VL order).
 -- ---------------------------------------------------------------------------
-minetest.register_on_mods_loaded(function()
+local function register_source_snippet()
 	if not (tt and tt.register_snippet) then return end
 	local game_label = mcl_mobs.register_spawner and "Mineclonia" or "VoxeLibre"
 	tt.register_snippet(function(itemstring)
@@ -813,7 +818,12 @@ minetest.register_on_mods_loaded(function()
 		end
 		return "From: " .. label
 	end)
-end)
+end
+if tt and tt.register_snippet then
+	register_source_snippet()
+else
+	minetest.register_on_mods_loaded(register_source_snippet)
+end
 
 -- ---------------------------------------------------------------------------
 -- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already
