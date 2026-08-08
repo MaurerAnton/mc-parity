@@ -191,6 +191,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		save_config()
 		minetest.chat_send_player(player:get_player_name(),
 			S("Configuration saved. Restart the server for the changes to take effect."))
+		-- close the menu so the "saved" state is obvious (and the
+		-- auto-shown first-join menu doesn't linger)
+		minetest.close_formspec(player:get_player_name(), "mc_parity:config")
 	end
 end)
 

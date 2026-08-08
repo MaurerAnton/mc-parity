@@ -792,6 +792,30 @@ if mc_parity.feature_enabled("glass_chests") then
 end
 
 -- ---------------------------------------------------------------------------
+-- ITEM SOURCE TOOLTIPS — every item's hover tooltip gets a "From: ..." line
+-- showing which mod/game it belongs to (the game's tt mod turns snippets
+-- into extra tooltip lines; mc_parity loads before tt alphabetically, so
+-- our on_mods_loaded callback runs before tt's append pass).
+-- ---------------------------------------------------------------------------
+minetest.register_on_mods_loaded(function()
+	if not (tt and tt.register_snippet) then return end
+	local game_label = mcl_mobs.register_spawner and "Mineclonia" or "VoxeLibre"
+	tt.register_snippet(function(itemstring)
+		local mod = itemstring:match("^([^:]+)")
+		if not mod or mod == "" then return end
+		local label
+		if mod == "mc_parity" then
+			label = "MC Parity addon (mc_parity)"
+		elseif mod:find("^mcl_", 1) or mod == "mobs_mc" then
+			label = game_label .. " (" .. mod .. ")"
+		else
+			label = mod
+		end
+		return "From: " .. label
+	end)
+end)
+
+-- ---------------------------------------------------------------------------
 -- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already
 -- shipped in textures/:
 --   allay     mc_parity_allay.png

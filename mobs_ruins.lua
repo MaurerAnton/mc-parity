@@ -121,8 +121,10 @@ minetest.register_node("mc_parity:suspicious_gravel", {
 
 -- Relic music disc (plays a game track — CC BY-SA, compatible)
 if mcl_jukebox and mcl_jukebox.register_record then
-	mcl_jukebox.register_record("Relic", "Aaron Cherof", "relic",
-		"mc_parity_disc_relic.png", "mcl_jukebox_track_1.ogg")
+	mcl_jukebox.register_record({
+		title = "Relic", author = "Aaron Cherof", id = "relic",
+		texture = "mc_parity_disc_relic.png", sound = "mcl_jukebox_track_1.ogg",
+	})
 end
 
 -- ------------------------------------------------------------ structure --

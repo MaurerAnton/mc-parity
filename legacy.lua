@@ -276,14 +276,23 @@ end
 -- the games' own CC BY-SA jukebox recordings (compatible with our media
 -- license); the labels are painted.
 if mcl_jukebox and mcl_jukebox.register_record then
-	mcl_jukebox.register_record("Cat", "Jordach", "cat",
-		"mc_parity_record_cat.png", "mcl_jukebox_track_3")
-	mcl_jukebox.register_record("Stal", "Jordach", "stal",
-		"mc_parity_record_stal.png", "mcl_jukebox_track_6")
-	mcl_jukebox.register_record("Ward", "Tom Peter", "ward",
-		"mc_parity_record_ward.png", "mcl_jukebox_track_5")
-	mcl_jukebox.register_record("11", "SoundHelix", "11",
-		"mc_parity_record_11.png", "mcl_jukebox_track_8")
+	-- table form (the positional form is deprecated in both games)
+	mcl_jukebox.register_record({
+		title = "Cat", author = "Jordach", id = "cat",
+		texture = "mc_parity_record_cat.png", sound = "mcl_jukebox_track_3",
+	})
+	mcl_jukebox.register_record({
+		title = "Stal", author = "Jordach", id = "stal",
+		texture = "mc_parity_record_stal.png", sound = "mcl_jukebox_track_6",
+	})
+	mcl_jukebox.register_record({
+		title = "Ward", author = "Tom Peter", id = "ward",
+		texture = "mc_parity_record_ward.png", sound = "mcl_jukebox_track_5",
+	})
+	mcl_jukebox.register_record({
+		title = "11", author = "SoundHelix", id = "11",
+		texture = "mc_parity_record_11.png", sound = "mcl_jukebox_track_8",
+	})
 end
 
 minetest.log("action", "[mc_parity] legacy closers: mansion + end city + discs")
