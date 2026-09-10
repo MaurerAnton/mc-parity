@@ -18,6 +18,7 @@ local FEATURES = {
 	bogged          = { version = "1.21", desc = "Bogged (swamp skeleton)" },
 	breeze          = { version = "1.21", desc = "Breeze + wind volley" },
 	trial_chambers  = { version = "1.21", desc = "Trial chambers + spawner + vault" },
+	pale            = { version = "1.21", desc = "Creaking + heart + resin + eyeblossom" },
 	-- 1.20 (Trails & Tales)
 	sniffer         = { version = "1.20", desc = "Sniffer" },
 	camel           = { version = "1.20", desc = "Camel + seats" },
@@ -85,6 +86,10 @@ local ITEM_VERSION = {
 	vault = "1.21", mace = "1.21", heavy_core = "1.21",
 	copper_bulb = "1.21", copper_bulb_lit = "1.21", crafter = "1.21",
 	recovery_compass = "1.21", poison_arrow = "1.21",
+	creaking = "1.21", creaking_heart = "1.21",
+	resin_clump = "1.21", resin_brick = "1.21", resin_bricks = "1.21",
+	chiseled_resin_bricks = "1.21",
+	eyeblossom_open = "1.21", eyeblossom_closed = "1.21",
 	-- 1.20 (Trails & Tales)
 	sniffer = "1.20", camel = "1.20", brush = "1.20", decorated_pot = "1.20",
 	suspicious_gravel = "1.20", suspicious_sand = "1.20",
@@ -93,6 +98,7 @@ local ITEM_VERSION = {
 	-- 1.19 (The Wild)
 	warden = "1.19", allay = "1.19", frog = "1.19",
 	tadpole = "1.19", bucket_tadpole = "1.19", frogspawn = "1.19",
+	disc_fragment_5 = "1.19",
 	sculk_sensor = "1.19", sculk_sensor_active = "1.19", sculk_shrieker = "1.19",
 	echo_shard = "1.19",
 	-- 1.17 (Caves & Cliffs)

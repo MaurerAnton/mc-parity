@@ -116,11 +116,23 @@ TADPOLE = [
     ((-0.02, 0.15, -1.25), (0.02, 0.95, -0.9)),   # tail fin (thin, tall)
 ]
 
+# --- Creaking (MC 1.21.4; tall gaunt bark humanoid) ---
+# Model ~7 units tall; the mob def uses visual_size 1.8 -> ~2.7 nodes.
+CREAKING = [
+    ((-0.5, 2.2, -0.5), (0.5, 5.2, 0.5)),         # torso (long, thin)
+    ((-0.45, 5.2, -0.45), (0.45, 6.2, 0.45)),     # head
+    ((-1.1, 2.6, -0.25), (-0.5, 5.0, 0.25)),      # arm L (long, hanging)
+    ((0.5, 2.6, -0.25), (1.1, 5.0, 0.25)),        # arm R
+    ((-0.35, 0.0, -0.3), (-0.05, 2.2, 0.3)),      # leg L
+    ((0.05, 0.0, -0.3), (0.35, 2.2, 0.3)),        # leg R
+]
+
 if __name__ == "__main__":
     # gen_b3d.py out.b3d            -> goat (default, historical usage)
-    # gen_b3d.py tadpole out.b3d    -> tadpole
-    if len(sys.argv) > 2 and sys.argv[1] == "tadpole":
-        write_b3d(sys.argv[2], TADPOLE)
+    # gen_b3d.py <which> out.b3d    -> tadpole | creaking
+    SPECS = {"tadpole": TADPOLE, "creaking": CREAKING}
+    if len(sys.argv) > 2 and sys.argv[1] in SPECS:
+        write_b3d(sys.argv[2], SPECS[sys.argv[1]])
     else:
         out = sys.argv[1] if len(sys.argv) > 1 else "mc_parity_goat.b3d"
         write_b3d(out, GOAT)

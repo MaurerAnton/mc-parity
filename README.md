@@ -35,6 +35,8 @@ implemented as a standalone addon mod. Works on top of the game's existing
 | bogged         | game skeleton model + overlay             | bogged.png (Bettercraft, GPLv3)         | Swampland    | in-game* |
 | creeper/enderman/blaze/pufferfish/ravager/trader | ported models (mobs_port.lua) | game textures | per-biome | in-game* |
 | drowned        | game zombie tinted teal                   | ^[colorize                              | *_ocean      | in-game* |
+| creaking       | mc_parity_creaking.b3d (**procedural**)   | painted bark (tools/paint_pale.py)      | heart-only + egg | silent (MC) |
+|                | (+ heart node, resin chain, eyeblossom)   | painted                                 | RoofedForest scatter | —    |
 
 ## Install
 
@@ -572,6 +574,51 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           that exist; inventory-checked execution with world-drop
           fallback; stale-trader offers cleared. Mineclonia path
           untouched.
+34. [x] Round 3 — leads grow up (`next` branch):
+        - LEAD REWRITE (legacy_items.lua): the old id-keyed table called
+          minetest.get_entity_by_id — an engine function that does not
+          exist (0 hits in lua_api.md). It stayed hidden because the loop
+          body only runs while a leash is active, which headless CI never
+          has. Storage is now ObjectRef-keyed; new follow-target kind
+          (moving ObjectRef) alongside anchor/owner; public
+          mc_parity.leash_attach/detach/is_leashed API.
+        - RIGHT-CLICK ATTACH: the lead's description always said
+          "right-click a mob", but only fence-punch tethering existed
+          (entity punches never reach the item). The lead now has
+          on_secondary_use for mob attach/toggle + fence tether.
+        - TRADER LLAMAS (mobs_port.lua): the 3 "once leashes exist" TODOs
+          are closed — llamas spawn leashed to their trader, re-leash on
+          the locate pass after reloads, and is_leashed() reads the lead
+          system (gopath follow retained for steering).
+35. [x] Round 4 — small parity pack (`next` branch):
+        - WIND CHARGES (mobs_trial.lua): 1 breeze rod -> 4 wind charges
+          (MC 1.21 shapeless craft; trial loot is no longer the only
+          source).
+        - BRUSHABLE ARMADILLO (mobs_121.lua): right-click with the brush
+          drops a scute at brush-wear cost (no cooldown in MC — the
+          64-use brush is the limiter).
+        - DISC "5" (deepdark.lua): MC 1.19 fragment loop — fragments in
+          ancient city chests, 9 -> the record_5 disc (dual-game
+          register_record + From:-tooltip entry; MC-correct id shadows
+          VL's legacy record_5->chirp alias).
+        - ALLAY DUPLICATION (allay.lua, MC 1.19): amethyst shard + a
+          loaded jukebox nearby -> twin after 2 s (5 min cooldown;
+          amethyst name runtime-guarded).
+        - BUNDLE TOOLTIP (init.lua): per-stack meta description shows
+          fill (n/64) + first 5 contents — MC hover preview.
+36. [x] Round 5 — leashes, sniffing, pale garden (`next` branch):
+        - LEAD REWRITE + LLAMAS: see 34.
+        - SNIFFER SNIFFING (mobs_import.lua, MC 1.20): every 2-4 min on
+          dirt-like ground the sniffer digs up a torchflower or pitcher
+          item (closes the "sniffable seeds" TODO — the plants are
+          placeable nodes, so the item is its own seed).
+        - PALE TIE-IN (mobs_pale.lua, MC 1.21.4): gaze-frozen creaking
+          (procedural model, immune, 3-damage hit, day-despawn,
+          heart-linked), creaking heart (night spawner), resin
+          clump->brick->blocks chain, day/night eyeblossoms, heart +
+          eyeblossom scatter in dark forests (runtime biome filter).
+          Out of scope on purpose: the full pale-garden biome needs the
+          pale oak wood set (new logs/leaves/planks).
 
 ## Model pipeline (done — reference for future mobs)
 

@@ -199,6 +199,13 @@ minetest.register_craftitem("mc_parity:wind_charge", {
 	inventory_image = "mc_parity_wind_charge.png",
 	groups = { craftitem = 1 },
 })
+-- MC 1.21: 1 breeze rod -> 4 wind charges (breeze rods also drop from the
+-- breeze itself, mobs_121.lua — trial loot is not the only source)
+minetest.register_craft({
+	type = "shapeless",
+	output = "mc_parity:wind_charge 4",
+	recipe = { "mc_parity:breeze_rod" },
+})
 
 -- ------------------------------------------------------------ structure --
 local T = "mcl_deepslate:tuff"

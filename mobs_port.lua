@@ -2515,7 +2515,8 @@ function wandering_trader:ai_step (dtime)
 		end
 	end
 	-- Search within a 16 node radius for llamas belonging to this
-	-- trader.  TODO: revisit this once leashes are available.
+	-- trader (re-links reloaded/manual llamas; spawned ones arrive
+	-- pre-leashed via the lead system in spawn_one_llama).
 	if #valid_llamas < 2
 		and self:check_timer ("locate_llamas", 0.5) then
 		local self_pos = self.object:get_pos ()
@@ -2524,6 +2525,8 @@ function wandering_trader:ai_step (dtime)
 			if entity and entity.name == "mc_parity:trader_llama"
 				and entity._trader_id == self._trader_id then
 				entity._get_owner = self._provide_owner
+				-- re-leash after reloads (leash state is runtime-only)
+				mc_parity.leash_attach (object, { follow = self.object })
 				table.insert (valid_llamas, object)
 			end
 		end
@@ -2693,6 +2696,10 @@ local function spawn_one_llama (around, entity)
 			llama._get_owner = entity._provide_owner
 			llama._life_timer = entity._life_timer
 			table.insert (entity._llamas, llama.object)
+			-- leash the llama to its trader (lead system, legacy_items.lua;
+			-- complements the gopath follow below: the lead pulls past 10
+			-- nodes, the follow AI steers inside 6-20)
+			mc_parity.leash_attach (llama.object, { follow = entity.object })
 			return
 		end
 	end
@@ -2858,11 +2865,12 @@ function trader_llama:_get_owner ()
 end
 
 function trader_llama:is_leashed ()
-	-- TODO: revise this once leashes are introduced.
-	return self:_get_owner () ~= nil
+	-- lead system (legacy_items.lua); owner fallback for pre-lead llamas
+	return mc_parity.is_leashed (self.object) or self:_get_owner () ~= nil
 end
 
--- XXX: revisit this function once leashes are implemented.
+-- Llamas stay near their trader through the lead (spawn) + the gopath
+-- follow below (6-20 nodes); beyond 20 they unlink and go wild.
 local function trader_llama_follow_owner (self, self_pos, dtime)
 	if self._following_owner then
 		local owner = self:_get_owner ()

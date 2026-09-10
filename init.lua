@@ -627,16 +627,34 @@ local function bundle_get_inv(itemstack)
 	return ok and type(list) == "table" and list or {}
 end
 
-local function bundle_set_inv(itemstack, list)
-	itemstack:get_meta():set_string("inv", minetest.serialize(list))
-end
-
 local function bundle_count(list)
 	local n = 0
 	for _, s in pairs(list) do
 		n = n + ItemStack(s):get_count()
 	end
 	return n
+end
+
+local function bundle_set_inv(itemstack, list)
+	itemstack:get_meta():set_string("inv", minetest.serialize(list))
+	-- MC-style hover preview: contents summary travels in the description
+	-- (per-stack meta, so each bundle shows its own fill)
+	local meta = itemstack:get_meta()
+	local n = bundle_count(list)
+	local lines = { S("Bundle") .. " (" .. n .. "/" .. BUNDLE_MAX_ITEMS .. ")" }
+	local shown = 0
+	for _, s in pairs(list) do
+		if shown >= 5 then break end
+		local st = ItemStack(s)
+		if not st:is_empty() then
+			local def = minetest.registered_items[st:get_name()]
+			local label = def and def.description or st:get_name()
+			label = tostring(label):gsub("\n.*$", "")  -- first line only
+			lines[#lines + 1] = st:get_count() .. "x " .. label
+			shown = shown + 1
+		end
+	end
+	meta:set_string("description", table.concat(lines, "\n"))
 end
 
 local function bundle_formspec(list)
@@ -889,6 +907,14 @@ if mc_parity.feature_enabled("trail_ruins") then
 end
 
 -- ---------------------------------------------------------------------------
+-- PALE GARDEN TIE-IN (MC 1.21.4: creaking + heart + resin + eyeblossom) —
+-- see mobs_pale.lua. No bloomery/wood set in scope (see file header).
+-- ---------------------------------------------------------------------------
+if mc_parity.feature_enabled("pale") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_pale.lua")
+end
+
+-- ---------------------------------------------------------------------------
 -- PORTED MC MOBS: creeper, enderman, blaze, pufferfish, ravager,
 -- wandering trader (from Mineclonia, GPLv3 — see mobs_port.lua)
 -- ---------------------------------------------------------------------------
@@ -936,6 +962,10 @@ local function register_source_snippet()
 				or itemstring == "mcl_jukebox:record_11" then
 			-- our discs live in the game's mcl_jukebox namespace
 			label = "MC Parity addon (mc_parity) — MC pre-1.13"
+		elseif itemstring == "mcl_jukebox:record_5" then
+			-- our disc 5 (MC 1.19 fragment craft; shadows VL's legacy
+			-- record_5->chirp alias — MC-correct id wins)
+			label = "MC Parity addon (mc_parity) — MC 1.19"
 		elseif itemstring == "mcl_jukebox:record_relic" then
 			label = "MC Parity addon (mc_parity) — MC 1.20"
 		elseif mod:find("^mcl_", 1) or mod == "mobs_mc" then

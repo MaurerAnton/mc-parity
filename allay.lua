@@ -6,10 +6,30 @@
 --
 -- Behavior (MC parity): give it an item — it flies off to collect
 -- matching dropped items within 32 nodes and returns them to you.
+-- Duplication (MC 1.19): hand it an amethyst shard while a nearby jukebox
+-- plays music — it dances up a twin (5 min cooldown).
 -- No natural spawn (MC: pillager outposts/woodland mansions only — not
 -- expressible in either spawn system): creative egg only.
 
 local S = minetest.get_translator("mc_parity")
+
+local AMETHYST = "mcl_amethyst:amethyst_shard"
+local JUKEBOX = "mcl_jukebox:jukebox"
+local DUPE_COOLDOWN_S = 300
+
+-- a jukebox with a disc inside counts as "playing" on both games
+-- (active-track state is engine-local in VL, public in Mineclonia —
+-- the loaded disc is the portable signal)
+local function jukebox_playing_near(pos)
+	if not minetest.registered_nodes[JUKEBOX] then return false end
+	for _, p in ipairs(minetest.find_nodes_in_area(
+			vector.offset(pos, -8, -8, -8),
+			vector.offset(pos, 8, 8, 8), { JUKEBOX })) do
+		local inv = minetest.get_meta(p):get_inventory()
+		if inv and not inv:is_empty("main") then return true end
+	end
+	return false
+end
 
 -- forward declarations (the def table's closures below reference them;
 -- they are NOT def fields — VoxeLibre's register_mob whitelist drops
@@ -69,6 +89,26 @@ local allay = {
 	-- give an item (or collect the delivered one back)
 	on_rightclick = function(self, clicker)
 		local wi = clicker:get_wielded_item()
+		-- duplication: amethyst + music (MC 1.19; amethyst guarded — the
+		-- shard name is game-version-dependent)
+		if wi:get_name() == AMETHYST and minetest.registered_items[AMETHYST]
+				and not (self._mca_dupe and os.time() - self._mca_dupe < DUPE_COOLDOWN_S) then
+			local pos = self.object:get_pos()
+			if pos and jukebox_playing_near(pos) then
+				if not minetest.is_creative_enabled(clicker:get_player_name()) then
+					wi:take_item()
+					clicker:set_wielded_item(wi)
+				end
+				self._mca_dupe = os.time()
+				minetest.after(2, function()
+					if self.object and self.object:is_valid() then
+						local p = self.object:get_pos()
+						if p then minetest.add_entity(p, "mc_parity:allay") end
+					end
+				end)
+				return
+			end
+		end
 		if not self._given_item and not wi:is_empty() then
 			self._player = clicker:get_player_name()
 			self._given_item = wi:get_name()

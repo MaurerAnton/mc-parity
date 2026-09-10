@@ -332,10 +332,33 @@ if mcl_structures and mcl_structures.register_structure then
 					{ itemstring = "mcl_books:book", weight = 4, amount_min = 1, amount_max = 3 },
 					{ itemstring = "mcl_core:emerald", weight = 3, amount_min = 1, amount_max = 3 },
 					{ itemstring = "mcl_core:diamond", weight = 2, amount_min = 1, amount_max = 2 },
+					-- MC 1.19: disc fragments hide in ancient city chests
+					{ itemstring = "mc_parity:disc_fragment_5", weight = 2, amount_min = 1, amount_max = 2 },
 				},
 			} },
 		},
 	})
 	minetest.log("action", "[mc_parity] Ancient City structure registered")
 end
+
+-- MC 1.19 music disc "5": 9 fragments from ancient city chests.
+-- (Dual-game dispatch via mc_parity.register_record, config.lua.)
+minetest.register_craftitem("mc_parity:disc_fragment_5", {
+	description = S("Disc Fragment"),
+	inventory_image = "mc_parity_disc_fragment_5.png",
+	groups = { craftitem = 1 },
+	stack_max = 64,
+})
+minetest.register_craft({
+	output = "mcl_jukebox:record_5",
+	recipe = {
+		{ "mc_parity:disc_fragment_5", "mc_parity:disc_fragment_5", "mc_parity:disc_fragment_5" },
+		{ "mc_parity:disc_fragment_5", "mc_parity:disc_fragment_5", "mc_parity:disc_fragment_5" },
+		{ "mc_parity:disc_fragment_5", "mc_parity:disc_fragment_5", "mc_parity:disc_fragment_5" },
+	},
+})
+mc_parity.register_record({
+	title = "5", author = "Samuel Aberg", id = "5",
+	texture = "mc_parity_record_5.png", sound = "mcl_jukebox_track_4",
+})
 end

@@ -641,8 +641,17 @@ mcln_base_hp("mc_parity:phantom", 20, 20)
 -- ---------------------------------------------------------------------------
 end
 if mc_parity.feature_enabled("sniffer") then
--- spawn condition is portable; drops TODO: sniffable seeds)
+-- spawn condition is portable; sniffing digs up torchflower/pitcher items
+-- (MC 1.20 "sniffable seeds" — our plants double as their own seeds)
 -- ---------------------------------------------------------------------------
+-- dirt-like ground the sniffer digs in (both games share these names)
+local SNIFF_GROUND = {
+	["mcl_core:dirt"] = true,
+	["mcl_core:dirt_with_grass"] = true,
+	["mcl_core:coarse_dirt"] = true,
+	["mcl_mud:mud"] = true,
+	["mcl_lush_caves:rooted_dirt"] = true,
+}
 mcl_mobs.register_mob("mc_parity:sniffer", {
 	description = S("Sniffer"),
 	type = "animal",
@@ -679,6 +688,24 @@ mcl_mobs.register_mob("mc_parity:sniffer", {
 		stand_start = 140, stand_end = 150, stand_speed = 10,
 		walk_start = 40, walk_end = 120, speed_normal = 10,
 	},
+	do_custom = function(self, dtime)
+		-- MC 1.20 sniffing: every 2-4 min on diggable ground, dig up a
+		-- torchflower or pitcher item (the "sniffable seeds" loop — our
+		-- plants are placeable nodes, so the item is its own seed)
+		self._mca_sniff_t = self._mca_sniff_t or (120 + math.random(0, 120))
+		self._mca_sniff_t = self._mca_sniff_t - dtime
+		if self._mca_sniff_t > 0 then return true end
+		self._mca_sniff_t = 120 + math.random(0, 120)
+		local pos = self.object:get_pos()
+		if not pos then return true end
+		local below = minetest.get_node(vector.offset(pos, 0, -1, 0))
+		if below and SNIFF_GROUND[below.name] then
+			local seed = math.random(2) == 1
+				and "mc_parity:torchflower" or "mc_parity:pitcher_plant"
+			minetest.add_item(vector.offset(pos, 0, 1, 0), seed)
+		end
+		return true
+	end,
 })
 
 mc_parity.register_egg("mc_parity:sniffer", S("Sniffer"), "#872618", "#254017", 0)

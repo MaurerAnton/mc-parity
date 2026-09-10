@@ -6,6 +6,8 @@
 
 local S = minetest.get_translator("mc_parity")
 
+local leash_target  -- fwd decl: defined below, used by the lead's on_secondary_use
+
 -- ------------------------------------------------------------------ lead --
 minetest.register_craftitem("mc_parity:lead", {
 	description = S("Lead"),
@@ -14,6 +16,18 @@ minetest.register_craftitem("mc_parity:lead", {
 		.. "to tether it, right-click again to detach."),
 	inventory_image = "mc_parity_lead.png",
 	groups = { craftitem = 1 },
+	-- right-click attach (left-click/punch on a mob reaches the mob's own
+	-- on_punch, never the item — so attach lives here, like MC)
+	on_secondary_use = function(itemstack, user, pointed_thing)
+		if user and user:is_player() and pointed_thing then
+			if pointed_thing.type == "object" then
+				leash_target(user, pointed_thing)
+			elseif pointed_thing.type == "node" then
+				leash_target(user, pointed_thing, pointed_thing.under)
+			end
+		end
+		return itemstack
+	end,
 })
 minetest.register_craft({
 	output = "mc_parity:lead 2",
@@ -24,7 +38,11 @@ minetest.register_craft({
 	},
 })
 
--- leashed entities: { [entity_id] = { anchor = pos | nil, owner = name } }
+-- leashed entities, keyed by ObjectRef: obj -> { anchor = pos | nil,
+-- owner = player name | nil, follow = ObjectRef | nil (moving target) }
+-- (The old id-keyed table + minetest.get_entity_by_id never worked: the
+-- engine has no get_entity_by_id — it only stayed hidden because the loop
+-- body runs solely while a leash is active, which headless CI never has.)
 local leashed = {}
 
 minetest.register_globalstep(function(dtime)
@@ -32,15 +50,20 @@ minetest.register_globalstep(function(dtime)
 	mc_parity._lead_step = mc_parity._lead_step + dtime
 	if mc_parity._lead_step < 0.5 then return end
 	mc_parity._lead_step = 0
-	for id, data in pairs(leashed) do
-		local obj = minetest.get_entity_by_id(id)
-		if not obj or not obj:is_valid() then
-			leashed[id] = nil
+	for obj, data in pairs(leashed) do
+		if not obj:is_valid() then
+			leashed[obj] = nil
 		else
 			local mpos = obj:get_pos()
 			local target = nil
 			if data.anchor then
 				target = data.anchor
+			elseif data.follow then
+				if data.follow:is_valid() then
+					target = data.follow:get_pos()
+				else
+					leashed[obj] = nil
+				end
 			elseif data.owner then
 				local p = minetest.get_player_by_name(data.owner)
 				if p then target = p:get_pos() end
@@ -60,32 +83,52 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-local function leash_target(player, pointed_thing, anchor)
+-- Public lead API (used by the trader llamas, mobs_port.lua).
+-- target: {} detaches; {anchor=pos} / {owner=name} / {follow=objref}.
+function mc_parity.leash_attach(obj, target)
+	if not (obj and obj:is_valid()) then return false end
+	if not target or (not target.anchor and not target.owner and not target.follow) then
+		return mc_parity.leash_detach(obj)
+	end
+	leashed[obj] = { anchor = target.anchor, owner = target.owner, follow = target.follow }
+	local le = obj:get_luaentity()
+	if le then le._mca_leash = true end
+	return true
+end
+
+function mc_parity.leash_detach(obj)
+	if not obj then return false end
+	leashed[obj] = nil
+	if obj:is_valid() then
+		local le = obj:get_luaentity()
+		if le then le._mca_leash = nil end
+	end
+	return true
+end
+
+function mc_parity.is_leashed(obj)
+	return obj ~= nil and leashed[obj] ~= nil
+end
+
+leash_target = function(player, pointed_thing, anchor)
 	if not pointed_thing or not pointed_thing.type then return false end
 	if pointed_thing.type == "object" then
 		local obj = pointed_thing.ref
 		if not obj or not obj:get_luaentity() then return false end
 		-- toggle: attached mob -> detach
-		if leashed[obj:get_luaentity()._id or obj:get_entity_name()] then
-			leashed[obj:get_luaentity()._id or obj:get_entity_name()] = nil
-			if obj:get_luaentity() and obj:get_luaentity()._mca_leash then
-				obj:get_luaentity()._mca_leash = nil
-			end
-			return true
+		if mc_parity.is_leashed(obj) then
+			return mc_parity.leash_detach(obj)
 		end
-		local le = obj:get_luaentity()
-		leashed[le._id or obj:get_entity_name()] = {
+		return mc_parity.leash_attach(obj, {
 			owner = player:get_player_name(),
 			anchor = anchor,
-		}
-		if le then le._mca_leash = true end
-		return true
+		})
 	elseif pointed_thing.type == "node" then
 		-- tether to a fence post
 		local n = minetest.get_node(pointed_thing.under)
 		if minetest.get_item_group(n.name, "fence") == 0 then return false end
 		-- find the nearest leashed-by-me mob and anchor it here
-		for id, data in pairs(leashed) do
+		for obj, data in pairs(leashed) do
 			if data.owner == player:get_player_name() and not data.anchor then
 				data.anchor = pointed_thing.under
 				return true

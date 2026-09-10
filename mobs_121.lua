@@ -46,6 +46,20 @@ mcl_mobs.register_mob("mc_parity:armadillo", {
 		stand_start = 0, stand_end = 0, stand_speed = 10,
 		walk_start = 0, walk_end = 0, speed_normal = 10,
 	},
+	on_rightclick = function(self, clicker)
+		-- MC: brushing an armadillo drops a scute (brush takes wear).
+		-- The brush's own on_use handles suspicious blocks; entity
+		-- rightclicks land here. No cooldown in MC — the 64-use brush
+		-- durability is the limiter.
+		if not (clicker and clicker:is_player()) then return end
+		local wielded = clicker:get_wielded_item()
+		if wielded:get_name() == "mc_parity:brush" and not self._mca_rolled then
+			local pos = self.object:get_pos()
+			if pos then minetest.add_item(pos, "mc_parity:armadillo_scute") end
+			wielded:add_wear(65535 / 64)
+			clicker:set_wielded_item(wielded)
+		end
+	end,
 	do_custom = function(self, dtime)
 		-- armadillo scute every 5-10 minutes (MC 1.21.2+)
 		self._mca_scute_t = (self._mca_scute_t or 300 + math.random(0, 300)) - dtime
