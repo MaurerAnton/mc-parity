@@ -17,7 +17,10 @@ local FEATURES = {
 	wolf_armor      = { version = "1.21", desc = "Wolf armor" },
 	bogged          = { version = "1.21", desc = "Bogged (swamp skeleton)" },
 	breeze          = { version = "1.21", desc = "Breeze + wind volley" },
+	wind_charge     = { version = "1.21", desc = "Wind charge (throwable) + wind burst" },
 	trial_chambers  = { version = "1.21", desc = "Trial chambers + spawner + vault" },
+	pale            = { version = "1.21", desc = "Creaking + heart + resin + eyeblossom" },
+	pale_oak        = { version = "1.21", desc = "Pale garden: pale oak wood set + biome (VoxeLibre port)" },
 	-- 1.20 (Trails & Tales)
 	sniffer         = { version = "1.20", desc = "Sniffer" },
 	camel           = { version = "1.20", desc = "Camel + seats" },
@@ -27,6 +30,7 @@ local FEATURES = {
 	warden          = { version = "1.19", desc = "Warden + sonic boom + darkness" },
 	allay           = { version = "1.19", desc = "Allay" },
 	frog            = { version = "1.19", desc = "Frog" },
+	tadpole         = { version = "1.19", desc = "Tadpole + frogspawn + bucket (frog breeding)" },
 	deep_dark       = { version = "1.19", desc = "Deep dark biome + ancient city" },
 	sculk           = { version = "1.19", desc = "Sculk sensor/shrieker + vibrations + redstone" },
 	-- 1.17 (Caves & Cliffs)
@@ -84,6 +88,10 @@ local ITEM_VERSION = {
 	vault = "1.21", mace = "1.21", heavy_core = "1.21",
 	copper_bulb = "1.21", copper_bulb_lit = "1.21", crafter = "1.21",
 	recovery_compass = "1.21", poison_arrow = "1.21",
+	creaking = "1.21", creaking_heart = "1.21",
+	resin_clump = "1.21", resin_brick = "1.21", resin_bricks = "1.21",
+	chiseled_resin_bricks = "1.21", block_of_resin = "1.21",
+	eyeblossom_open = "1.21", eyeblossom_closed = "1.21",
 	-- 1.20 (Trails & Tales)
 	sniffer = "1.20", camel = "1.20", brush = "1.20", decorated_pot = "1.20",
 	suspicious_gravel = "1.20", suspicious_sand = "1.20",
@@ -91,6 +99,8 @@ local ITEM_VERSION = {
 	pitcher_plant = "1.20", torchflower = "1.20",
 	-- 1.19 (The Wild)
 	warden = "1.19", allay = "1.19", frog = "1.19",
+	tadpole = "1.19", bucket_tadpole = "1.19", frogspawn = "1.19",
+	disc_fragment_5 = "1.19",
 	sculk_sensor = "1.19", sculk_sensor_active = "1.19", sculk_shrieker = "1.19",
 	echo_shard = "1.19",
 	-- 1.17 (Caves & Cliffs)
@@ -120,6 +130,7 @@ local ITEM_VERSION = {
 	["coral_block_"] = "1.13", ["coral_fan_"] = "1.13",
 	["candle_"] = "1.17", ["dripstone_top_"] = "1.17", ["dripstone_bottom_"] = "1.17",
 	["pottery_sherd_"] = "1.20", ["arrow_"] = "classic", ["shulker_box"] = "classic",
+	["pale_oak_"] = "1.21",
 }
 
 local VERSION_SHORT = {
@@ -141,6 +152,20 @@ end
 
 function mc_parity.item_version_label(v)
 	return VERSION_SHORT[v]
+end
+
+-- jukebox discs, dual-game: Mineclonia takes the table form (its positional
+-- form is deprecated and warns on every start); VoxeLibre master only
+-- understands the positional form (verified: table form ModErrors in
+-- VL's mcl_jukebox/init.lua concatenating the identifier). The positional
+-- order (title, author, id, texture, sound) is identical on both games.
+function mc_parity.register_record(def)
+	if not (mcl_jukebox and mcl_jukebox.register_record) then return end
+	if mcl_mobs.register_spawner then
+		mcl_jukebox.register_record(def)
+	else
+		mcl_jukebox.register_record(def.title, def.author, def.id, def.texture, def.sound)
+	end
 end
 
 -- ---------------------------------------------------------------- config --

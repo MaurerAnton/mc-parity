@@ -194,11 +194,15 @@ minetest.register_craftitem("mc_parity:trial_key", {
 	inventory_image = "mc_parity_trial_key.png",
 	groups = { craftitem = 1 },
 })
-minetest.register_craftitem("mc_parity:wind_charge", {
-	description = S("Wind Charge"),
-	inventory_image = "mc_parity_wind_charge.png",
-	groups = { craftitem = 1 },
-})
+-- wind charge item + entity live in wind_charge.lua (feature "wind_charge",
+-- loaded before this file); drop them from the loot pool when disabled
+if not minetest.registered_items["mc_parity:wind_charge"] then
+	for i = #TRIAL_LOOT, 1, -1 do
+		if TRIAL_LOOT[i]:find("mc_parity:wind_charge", 1, true) then
+			table.remove(TRIAL_LOOT, i)
+		end
+	end
+end
 
 -- ------------------------------------------------------------ structure --
 local T = "mcl_deepslate:tuff"

@@ -1,29 +1,43 @@
 # MC Parity (mc_parity)
 
+> Last tested: commit `5924554` (2026-08-08, `main`) — headless verify on
+> VoxeLibre + Mineclonia with Luanti 5.16. See `tools/verify.sh`.
+
 Extra Minecraft-style mobs for **VoxeLibre** (and eventually Mineclonia),
 implemented as a standalone addon mod. Works on top of the game's existing
 `mcl_mobs` / `mobs_mc` framework.
 
-## Status (2026-08-07)
+## Status (2026-08-08, commit `5924554` — all mobs implemented)
 
-| Mob            | Model base (from VoxeLibre)      | Texture (Pixel-Perfection-Legacy)       | Spawn        | Sounds |
-|----------------|----------------------------------|-----------------------------------------|--------------|--------|
-| fox            | mobs_mc_wolf.b3d                 | fox.png (+ snow/sleep variants shipped) | Taiga family | in-game*|
-|                |                                  | hunts chickens/rabbits (MC parity)     |              |        |
-| panda          | mobs_mc_polarbear.b3d            | panda.png (+ 6 personality variants)   | BambooJungle | in-game*|
-| camel          | mobs_mc_llama.b3d                | camel.png                               | Desert       | in-game*|
-|                |                                  | rideable (llama driver pattern)        |              |        |
-| skeleton_horse | mobs_mc_horse.b3d                | horse_skeleton.png                      | trap only    | in-game*|
-|                |                                  | lightning skeleton trap (VL)           |              |        |
-| goat           | **procedural b3d** (tools/gen_b3d.py, no Blender needed!) | goat.png (Pixel-Perfection) | ExtremeHills/#is_mountain | TODO   |
-| bundle (item)  | — (craftitem)                     | bundle.png                              | —            | —      |
-| allay          | **new Blender model needed**     | allay.png                               | —            | TODO   |
-| frog           | **new Blender model needed**     | frog_{temperate,cold,warm}.png          | —            | TODO   |
-| warden         | **new Blender model needed**     | warden.png (+ glow/ears layers)         | —            | TODO   |
-| phantom        | **new Blender model needed**     | phantom.png (+ eyes)                    | —            | TODO   |
-| turtle         | **new Blender model needed**     | big_sea_turtle.png                      | —            | TODO   |
-| sniffer        | **new Blender model needed**     | sniffer.png                             | —            | TODO   |
-| goat           | **new Blender model needed**     | goat.png                                | —            | TODO   |
+| Mob            | Model (shipped in `models/`)             | Texture (Pixel-Perfection-Legacy)       | Spawn        | Sounds |
+|----------------|------------------------------------------|-----------------------------------------|--------------|--------|
+| fox            | mc_parity_fox.b3d (VL wolf base)         | fox.png (+ snow/sleep variants shipped) | Taiga family | synthesized CC0 |
+|                |                                          | hunts chickens/rabbits (MC parity)     |              |        |
+| panda          | mc_parity_panda.b3d (real model)         | panda.png (+ 6 personality variants)   | BambooJungle | in-game*|
+| camel          | mc_parity_camel.b3d (real model)         | camel.png                               | Desert       | in-game*|
+|                |                                          | rideable, 2 seats (MC parity)          |              |        |
+| skeleton_horse | mc_parity_skeleton_horse.b3d (VL base)   | horse_skeleton.png                      | trap only    | in-game*|
+|                |                                          | lightning skeleton trap (both games)   |              |        |
+| goat           | mc_parity_goat.b3d (**procedural**, tools/gen_b3d.py) | goat.png (Pixel-Perfection) | ExtremeHills/#is_mountain | synthesized CC0 |
+|                |                                          | ramming + horns (MC parity)            |              |        |
+| bundle (item)  | — (craftitem)                             | bundle.png                              | —            | —      |
+| allay          | mc_parity_allay.b3d                       | allay.png                               | egg only     | in-game* |
+| frog           | mc_parity_frog.b3d                        | frog_{temperate,cold,warm}.png          | Swampland    | in-game* |
+| tadpole        | mc_parity_tadpole.b3d (**procedural**)    | painted (tools/paint_tadpole.py)        | Swampland    | silent (MC) |
+|                | (+ frogspawn node, bucket, slimeball breeding) |                                    |              |        |
+| warden         | mc_parity_warden.b3d                      | warden.png (+ glow/ears layers)         | shrieker-only| synthesized CC0 |
+| phantom        | mc_parity_phantom.b3d                     | phantom.png (+ eyes)                    | night / 3 sleepless nights | in-game* |
+| turtle         | mc_parity_turtle.b3d                      | big_sea_turtle.png (+ eggs/shell)       | StoneBeach   | in-game* |
+| sniffer        | mc_parity_sniffer.b3d                     | sniffer.png                             | egg only     | in-game* |
+| armadillo      | mc_parity_armadillo.b3d (**procedural**)  | painted (tools/paint_121.py)            | Savanna      | in-game* |
+| bee            | mc_parity_bee.b3d (**procedural**)        | painted stripes + wings                 | flowers      | synthesized CC0 |
+| breeze         | mc_parity_breeze.b3d (**procedural**)     | painted white/blue                      | trial spawner + egg | in-game* |
+| bogged         | game skeleton model + overlay             | bogged.png (Bettercraft, GPLv3)         | Swampland    | in-game* |
+| creeper/enderman/blaze/pufferfish/ravager/trader | ported models (mobs_port.lua) | game textures | per-biome | in-game* |
+| drowned        | game zombie tinted teal                   | ^[colorize                              | *_ocean      | in-game* |
+| creaking       | mc_parity_creaking.b3d (**procedural**)   | painted bark (tools/paint_pale.py)      | heart-only + egg | silent (MC) |
+|                | (+ heart node, resin chain, eyeblossom)   | painted                                 | RoofedForest scatter | —    |
+| pale oak       | — (full block set, pale_oak.lua)          | Mineclonia (CC BY-SA, ported)           | PaleGarden biome | —      |
 
 ## Install
 
@@ -41,28 +55,40 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
 - Models: copied from VoxeLibre (GPLv3+ code / free media) and renamed with
   the `mc_parity_` prefix so they don't clash with the game's files:
   - https://git.minetest.land/VoxeLibre/VoxeLibre (mods/ENTITIES/mobs_mc/models/)
+- Pale garden textures + tree schematics: ported from **Mineclonia**
+  (`mcl_pale_oak`, GPLv3 code / CC BY-SA 4.0 media based on Pixel
+  Perfection — see Mineclonia LEGAL.md), renamed to `mc_parity_*` and
+  node-remapped by `tools/port_pale_oak.py`:
+  - https://codeberg.org/Mineclonia/Mineclonia (mods/ITEMS/mcl_pale_oak)
+- Wind charge entity model + entity/burst textures: ported from
+  **Mineclonia** (`mcl_charges`, GPLv3 / CC BY-SA 4.0):
+  - https://codeberg.org/Mineclonia/Mineclonia (mods/ENTITIES/mcl_charges)
 - All new files in this mod are prefixed `mc_parity_` to stay unique
   across the game's global texture/model namespace.
 
 ## Work plan (in order)
 
 1. [x] 4 retexture mobs registered (fox, panda, camel, skeleton_horse)
-2. [x] Sounds for all 4 mobs — in-game free sounds (CC BY-SA); *CC0 external
-        sounds remain optional (fox uses wolf barks as placeholder)
+2. [x] Sounds — CC0 synthesized barks/bleats/buzz (tools/gen_sounds.py,
+        ours, no external media); the rest use in-game free sounds (CC BY-SA)
 3. [x] Fox: chicken/rabbit hunting behavior (MC parity)
 4. [x] Panda personalities (variant textures already shipped)
 5. [x] Skeleton horse: lightning skeleton trap (VL; 4 skeletons, hostile)
-6. [x] Camel riding (llama driver pattern; MC 2-seat = TODO)
+6. [x] Camel riding (llama driver pattern; MC 2-seat done — see 17)
 7. [x] GOAT — first mob with a procedurally generated .b3d (tools/gen_b3d.py,
         no Blender needed) — unique: no goat exists in VL/Mineclonia/
         Bettercraft/ContentDB
 8. [x] BUNDLE (MC 1.17) — contents travel in item metadata; craft 6 leather
-        + 2 string; v1: view + take out (insert = TODO)
-9. [ ] Import from Bettercraft (GPLv3): warden/allay/frog+tadpole/phantom/
+        + 2 string; v2: view + take out + insert wielded stack (formspec
+        "Insert wielded" button + right-click quick-insert, 64-item cap,
+        16 distinct slots, formspec refreshes after every change)
+9. [x] Import from Bettercraft (GPLv3): warden/allay/frog+tadpole/phantom/
         sniffer/turtle mobs + real panda/camel models + bubble column +
         daylight detector + trial spawners/mace + froglight
-10. [ ] Warden AI: vibration sensing + anger + sonic boom (VL sculk sensor
-        is a stub — the vibration system must be built; genuinely unique)
+        (done — see 14/15/16/22/25/30)
+10. [x] Warden AI: vibration sensing + anger + sonic boom (VL sculk sensor
+        was a stub — the vibration system is now built; genuinely unique)
+        (done — see 14/21)
 11. [x] Deep Dark + Ancient City (deepdark.lua) — the FULL MC 1.19 package:
         - sculk sensor + shrieker NODES registered (absent in BOTH games —
           commented out in both mcl_sculk mods) with the game textures
@@ -129,13 +155,13 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           _mcl_biome_type), hops, eats tiny slimes/magma cubes and drops
           froglight from magma cubes; spawns Swampland/MangroveSwamp
         - TURTLE: slow beach walker, swims, seagrass-breedable on
-          Mineclonia (feed_tame feature-detected; egg-laying TODO — needs
-          the nest block); spawns StoneBeach
+          Mineclonia (feed_tame feature-detected; egg-laying done — see 18);
+          spawns StoneBeach
         - PHANTOM: full Bettercraft AI — circles 18-20 blocks above the
           nearest non-creative player, random dives (punch fleshy 6),
           retreats upward 2s when damaged, burns in daylight (light>12);
-          drops phantom membrane; egg-only spawn (the spawn systems have
-          no time-of-day filter — MC night-only spawning is TODO)
+          drops phantom membrane; egg-only spawn at import time
+          (MC night-only spawning done — see 17/18)
         - SNIFFER: peaceful relic hunter, egg-only for now
         - PANDA: real model + Bettercraft animations (stand 0-25, walk/
           punch 30-70); personality textures stay ours
@@ -164,12 +190,12 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
 17. [x] Goat polish (init.lua): MC ramming — provoked goats wind up 0.7s,
         charge (damage fleshy 2 + knockback), charged rams drop goat horns
         (new mc_parity:goat_horn item, Pixel-Perfection texture); horn
-        drop on death; llama/cow sounds (the game's own CC BY-SA media).
+        drop on death; CC0 synthesized bleats (tools/gen_sounds.py).
         Skeleton trap: confirmed working on BOTH games — Mineclonia ships a
         COMPAT "lightning" shim whose metatable resolves lightning.* to
         mcl_lightning (same register_on_strike API as VL).
         Phantom night spawn: globalstep spawns phantoms at night near
-        non-creative players (no 3-sleepless-nights tracking yet — TODO).
+        non-creative players (3-sleepless-nights tracking done — see 18).
         Camel: second seat (MC parity) — passenger attaches behind the
         driver, both dismount together.
 18. [x] TODO-tail + far items:
@@ -199,9 +225,9 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           (MC parity). The patch covers any mcl_beds:* node.
         - GOAT HORN INSTRUMENT: the horn plays a random note from the
           game's own mesecons_noteblock sounds (CC BY-SA game media).
-        - CC0 goat sounds: searched OpenGameArt — only a CC-BY variant
-          with a broken attachment; the goat keeps the game's llama/cow
-          sounds (legal). Real CC0 samples: TODO.
+        - CC0 goat sounds: synthesized in-house (tools/gen_sounds.py:
+          bleat + hurt) after the OpenGameArt search turned up only a
+          CC-BY variant with a broken attachment.
         - CAMEL SEATS: tuned to the REAL camel model geometry (parsed the
           b3d vertex bounds: camel = 24.7 model units tall vs llama 21.7)
           — driver on the hump (y=22), passenger behind (y=19, z=6);
@@ -297,8 +323,7 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           4 FLOATING limbs) + painted white/blue texture; hops around;
           WIND CHARGE VOLLEY: a 3-ray fan (MC: 3-5 charges) with 1
           damage + HARD KNOCKBACK, through blocks; drops a breeze rod.
-          MC: trial-chamber-only — spawn egg only (no structure here
-          yet; trial chambers TODO).
+          MC: trial-chamber-only — spawn egg + trial chambers (see 25).
         - PITFALL: the framework's "shoot" attack fires registered
           arrows via def.arrow automatically (the shulker pattern — no
           custom shoot_arrow needed); mob AI overrides set_velocity
@@ -315,8 +340,8 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           MCLN-only targeting-rule API -> attack_player aggro; the
           raid/gwp/fish-movement machinery stripped; villager_base
           (a nil LOCAL) -> {}; the MCLN villager trade API guarded (the
-          trader wanders with llamas; the trade UI is MCLN-only for
-          now); spawn_class added (VL asserts); table.merge shim;
+          trader wanders with llamas; Mineclonia keeps its native trade
+          UI, VoxeLibre gets a minimal emerald trade UI (see 33); spawn_class added (VL asserts); table.merge shim;
           mcln_base_hp for all 8 entities; biome lists verified against
           BOTH games (RoofedForest, Nether, *_ocean variants).
         - PITFALLS: mob_class.X(self, ...) must call
@@ -486,9 +511,13 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           spectral arrow (mcl_core vs mcl_nether glowstone_dust) resolve
           the item per game — fixes the mcl_craftguide "ingredient X
           doesn't exist" warnings on Mineclonia.
-        - MUSIC DISCS: all register_record calls use the table form
-          (the positional form is deprecated and spammed mcl_jukebox
-          warnings on every start).
+        - MUSIC DISCS: all disc registrations go through
+          mc_parity.register_record (config.lua) — table form on
+          Mineclonia (its positional form is deprecated and spammed
+          mcl_jukebox warnings on every start), positional
+          (title, author, id, texture, sound) on VoxeLibre master
+          (its register_record is positional-only — the table form
+          ModErrors concatenating the identifier).
         - MEDIA COMPLETION: turtle armor inventory icons
           (mc_parity_inv_*_turtle), chain inventory icon, heavy core
           block textures (procedural, tools/gen_heavy_core.py) — the
@@ -504,18 +533,166 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
         - Verified headless: clean log (no ModError/Undeclared/biome/
           craftguide/jukebox warnings), descriptions carry the From:
           line, 24 load banners.
+32. [x] `next`-branch hardening (post-0.1-beta):
+        - BUNDLE v2 (init.lua): insert wielded stack via the formspec
+          button or right-click quick-insert (64-item cap, 16 distinct
+          slots, per-stack max respected); take/insert refreshes the
+          formspec (the old view went stale after every take); nil-safe
+          on_use/receive_fields.
+        - BEE sting (mobs_bee.lua): mcl_potions/mcl_util calls guarded
+          (pcall + presence check, same pattern as the bogged arrow in
+          mobs_121.lua) — no crash when mcl_potions is absent.
+        - TRADER rightclick (mobs_port.lua): show_trade_formspec guarded —
+          on VoxeLibre villager_base is {} so there is no trade UI (the
+          trader still wanders with llamas); rightclick no longer errors.
+          Full VL trade UI remains a TODO (needs the villager trade API).
+        - CI: verify.sh disc markers updated to the table form
+          (title = "Relic"/"Cat") — the 0.1-beta jukebox fix changed the
+          call shape without updating the markers (3 red runs on main).
+          Engine probe now finds `luantiserver` (the 5.16 server binary
+          name) — before, the in-engine stage silently SKIPPED on every
+          CI run because it only looked for `luanti-server`.
+        - JUKEBOX dual-game fix (legacy.lua, mobs_ruins.lua, config.lua):
+          the table-form discs ModErrored on VoxeLibre master (VL-only
+          API, Mineclonia-only table support) — found by the re-enabled
+          in-engine stage. Relic sound id normalized to extensionless
+          (matches both games' own record ids).
+33. [x] Round 2 — the last TODO-tail (`next` branch):
+        - CC0 SOUNDS (tools/gen_sounds.py — extended, still ours, still
+          no external media): fox barks + hurt whine, loopable bee buzz
+          (integer-cycle partials, no loop click), goat bleat + hurt;
+          wired into fox/goat/bee, replacing the wolf/llama/cow
+          placeholders. Also fixed along the way: the warden's
+          mc_parity_* oggs were never generated (only the stale
+          pre-rename mcl_mobs_addon_* files shipped — now deleted), and
+          the boom's per-sample RNG reseed froze its noise into a DC
+          offset (seed once: real noise sweep now).
+        - TADPOLE CHAIN (mobs_tadpole.lua — MC 1.19 frog breeding):
+          procedural tadpole model (tools/gen_b3d.py tadpole) + painted
+          tadpole/frogspawn/bucket textures (tools/paint_tadpole.py);
+          tadpole mob (swims, grows into a frog after ~20 min, bucket
+          pickup, swamp spawn + egg); frogspawn node (hatches 2-4
+          tadpoles); bucket of tadpole; slimeball feeding lays frogspawn
+          on nearby water (runtime patch of the live frog class —
+          wolf-variant pattern). New `tadpole` feature gate (1.19) +
+          tooltip versions.
+        - VL TRADE UI (mobs_port.lua): the wandering trader on VoxeLibre
+          had no trade UI at all (native API is Mineclonia-only).
+          Minimal emerald trade formspec: 2 buys + 4 sells rolled per
+          trader from an MC-plausible pool, runtime-filtered to items
+          that exist; inventory-checked execution with world-drop
+          fallback; stale-trader offers cleared. Mineclonia path
+          untouched.
+34. [x] Round 3 — leads grow up (`next` branch):
+        - LEAD REWRITE (legacy_items.lua): the old id-keyed table called
+          minetest.get_entity_by_id — an engine function that does not
+          exist (0 hits in lua_api.md). It stayed hidden because the loop
+          body only runs while a leash is active, which headless CI never
+          has. Storage is now ObjectRef-keyed; new follow-target kind
+          (moving ObjectRef) alongside anchor/owner; public
+          mc_parity.leash_attach/detach/is_leashed API.
+        - RIGHT-CLICK ATTACH: the lead's description always said
+          "right-click a mob", but only fence-punch tethering existed
+          (entity punches never reach the item). The lead now has
+          on_secondary_use for mob attach/toggle + fence tether.
+        - TRADER LLAMAS (mobs_port.lua): the 3 "once leashes exist" TODOs
+          are closed — llamas spawn leashed to their trader, re-leash on
+          the locate pass after reloads, and is_leashed() reads the lead
+          system (gopath follow retained for steering).
+35. [x] Round 4 — small parity pack (`next` branch):
+        - WIND CHARGES (mobs_trial.lua): 1 breeze rod -> 4 wind charges
+          (MC 1.21 shapeless craft; trial loot is no longer the only
+          source).
+        - BRUSHABLE ARMADILLO (mobs_121.lua): right-click with the brush
+          drops a scute at brush-wear cost (no cooldown in MC — the
+          64-use brush is the limiter).
+        - DISC "5" (deepdark.lua): MC 1.19 fragment loop — fragments in
+          ancient city chests, 9 -> the record_5 disc (dual-game
+          register_record + From:-tooltip entry; MC-correct id shadows
+          VL's legacy record_5->chirp alias).
+        - ALLAY DUPLICATION (allay.lua, MC 1.19): amethyst shard + a
+          loaded jukebox nearby -> twin after 2 s (5 min cooldown;
+          amethyst name runtime-guarded).
+        - BUNDLE TOOLTIP (init.lua): per-stack meta description shows
+          fill (n/64) + first 5 contents — MC hover preview.
+36. [x] Round 5 — leashes, sniffing, pale garden (`next` branch):
+        - LEAD REWRITE + LLAMAS: see 34.
+        - SNIFFER SNIFFING (mobs_import.lua, MC 1.20): every 2-4 min on
+          dirt-like ground the sniffer digs up a torchflower or pitcher
+          item (closes the "sniffable seeds" TODO — the plants are
+          placeable nodes, so the item is its own seed).
+        - PALE TIE-IN (mobs_pale.lua, MC 1.21.4): gaze-frozen creaking
+          (procedural model, immune, 3-damage hit, day-despawn,
+          heart-linked), creaking heart (night spawner), resin
+          clump->brick->blocks chain, day/night eyeblossoms, heart +
+          eyeblossom scatter in dark forests (runtime biome filter).
+          Out of scope on purpose: the full pale-garden biome needs the
+          pale oak wood set (new logs/leaves/planks).
+37. [x] Round 6 — full pale garden for VoxeLibre (`next` branch):
+        - PALE OAK WOOD SET (pale_oak.lua): Mineclonia ships the complete
+          pale oak via its mcl_trees API; VL has nothing. Ported to VL
+          through VL's own wood APIs (mcl_core.register_tree_trunk/
+          stripped/planks/leaves/sapling, mcl_doors, mcl_stairs,
+          mcl_fences, mcl_signs): log/wood, stripped, planks, leaves,
+          sapling, door, trapdoor, fence + gate, stairs, slab, sign
+          (mcl_signs namespace, planks texture — Mineclonia ships no
+          sign art), pale moss + carpet, hanging moss + tip, block of
+          resin. Sapling growth ABM + bone-meal patch (mcl_core's
+          grow_sapling has no pale oak branch).
+        - TREE SCHEMATICS: the 3 Mineclonia .mts trees were rewritten
+          to our node ids by tools/port_pale_oak.py — the name table is
+          remapped, the zlib node blob + mappings are copied verbatim
+          (no decompression needed; documented MTSM layout).
+        - PALE GARDEN BIOME: registered a hair off RoofedForest's
+          heat/humidity point (rare dark-forest variant), moss as the
+          top node, pale oak schematic decorations + moss/carpet/
+          eyeblossom patches; the creaking-heart scatter now includes
+          PaleGarden.
+        - SKIP LOGIC: the module is a no-op when the game already
+          provides pale oak (Mineclonia) or lacks the VL wood API —
+          verified with a stub harness (25 assertions incl. the skip
+          path) and an in-engine probe spot-check (`pale_oak=true` on
+          both games).
+38. [x] Round 7 — throwable wind charge (`next` branch):
+        - WIND CHARGE (wind_charge.lua, MC 1.21): the item was a dead
+          craftitem; it now throws (right-click node or air, 0.5 s
+          cooldown, 30 m/s, gravity-free) and bursts on impact:
+          knockback + 1 damage in a 3-block radius (the thrower gets the
+          push but no damage — wind-charge jumps work), mobs get a
+          lifted gust, lit candles/candle cakes extinguish via the
+          ported _on_wind_charge_hit hooks, decorated pots shatter,
+          bells ring. Burst = pitched-up tnt_explode + wind particles.
+        - Entity model + entity/burst textures ported from Mineclonia
+          (mcl_charges, GPLv3 / CC BY-SA 4.0).
+        - Feature gate "wind_charge" (1.21); item moved out of
+          mobs_trial.lua (its loot pool filters the charge when the
+          feature is off); breeze-rod craft guarded on the breeze
+          feature.
+        - Verified with a 22-assertion stub harness (throw/cooldown/
+          creative, burst damage + thrower immunity, hooks, lifetime).
+39. [x] Round 8 — pale garden polish (`next` branch):
+        - RESIN STAIRS/SLAB/WALL (mobs_pale.lua): the full MC 1.21.4
+          resin block family via the VL mcl_stairs/mcl_walls helpers
+          (crafts auto-generated from the brick block).
+        - HANGING MOSS GROWTH (pale_oak.lua): bone meal elongates the
+          strand by one node (cap 8, tip conversion), breaking a segment
+          removes the floating tail below it, placing under a tip
+          converts it to a body node (Mineclonia behavior adapted to
+          VL's APIs). Verified with a 12-assertion stub harness.
 
-## Model pipeline (WIP mobs)
+## Model pipeline (done — reference for future mobs)
 
-New mobs need .b3d models in the game's cuboid style with walk/idle/run
-animation frames (see the existing models/ for frame conventions).
+All mobs now ship their .b3d in `models/` (Bettercraft imports + procedural
+`tools/gen_b3d.py` for goat/armadillo/bee/breeze — no Blender needed for
+cuboid mobs). Textures in `textures/` (Pixel Perfection / REFI, CC BY-SA 4.0,
+see Asset provenance). New mobs: follow the game's cuboid style with
+walk/idle/run animation frames (see the existing `models/` for frame
+conventions).
 
 - Formats overview: https://docs.luanti.org/for-creators/models/
 - Blender:        https://docs.luanti.org/for-creators/models/using-blender/
 - Blockbench:     https://docs.luanti.org/for-creators/models/using-blockbench/
 - Texture bases: Pixel Perfection / REFI (CC BY-SA 4.0), see Asset provenance.
-- After export: place as `models/mc_parity_<mob>.b3d` and uncomment the
-  registration template in init.lua (WIP section).
 
 ## Pitfalls (verified with luanti 5.16.1 + VoxeLibre 0.92.1, headless)
 
@@ -536,7 +713,9 @@ animation frames (see the existing models/ for frame conventions).
 - **Loading**: placing the addon in `<game>/mods/` loads reliably; world-mods
   in `worlddir/mods/` need matching `load_mod_<name> = true` in world.mt.
 - **Headless test recipe**:
-  `timeout 90 luanti --server --world <path> --logfile /tmp/t.log`
+  `timeout 90 luantiserver --world <path> --logfile /tmp/t.log`
+  (dedicated server binary — no `--server` flag; the combined `luanti`
+  binary needs `luanti --server --world …`)
   then grep the log for `[mc_parity]` banner / `ModError` / `ERROR`.
 - Runtime check: the banner log line sits AFTER all register calls in
   init.lua — its presence in the log proves every registration succeeded.

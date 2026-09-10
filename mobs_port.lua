@@ -1495,7 +1495,9 @@ function pufferfish:on_rightclick (clicker)
 	if bn == "mcl_buckets:bucket_water" or bn == "mcl_buckets:bucket_river_water" then
 		self:safe_remove ()
 		clicker:set_wielded_item ("mcl_buckets:bucket_pufferfish")
-		awards.unlock (clicker:get_player_name (), "mcl:tacticalFishing")
+		if awards and awards.unlock then
+			awards.unlock (clicker:get_player_name (), "mcl:tacticalFishing")
+		end
 	end
 end
 
@@ -2300,6 +2302,100 @@ local trades_ordinary_table = {
 
 local pr = PcgRandom (os.time () + 593)
 
+------------------------------------------------------------------------
+-- VoxeLibre trade UI (VL ships no villager trade API — Mineclonia does,
+-- and keeps its native UI above). Static MC-plausible offers,
+-- runtime-filtered to items that actually exist, so this is safe on both
+-- games: {give, give_n, get, get_n} per row.
+------------------------------------------------------------------------
+
+local VL_TRADE_POOL = {
+	-- trader buys (player pays goods, earns emeralds)
+	{ "mcl_buckets:bucket_water", 1, "mcl_core:emerald", 1 },
+	{ "mcl_mobitems:milk_bucket", 1, "mcl_core:emerald", 1 },
+	{ "mcl_farming:potato_item_baked", 1, "mcl_core:emerald", 1 },
+	{ "mcl_farming:hay_block", 1, "mcl_core:emerald", 1 },
+	-- trader sells (player pays emeralds, gets goods)
+	{ "mcl_core:emerald", 5, "mcl_mobitems:nautilus_shell", 1 },
+	{ "mcl_core:emerald", 1, "mcl_mobitems:gunpowder", 1 },
+	{ "mcl_core:emerald", 1, "mcl_mobitems:slimeball", 1 },
+	{ "mcl_core:emerald", 3, "mcl_nether:glowstone", 2 },
+	{ "mcl_core:emerald", 1, "mcl_farming:pumpkin_seeds", 1 },
+	{ "mcl_core:emerald", 2, "mcl_flowers:waterlily", 1 },
+}
+
+function mc_parity.vl_trader_deal (_trader)
+	-- 2 buys + 4 sells, MC-style spread
+	local buys, sells = {}, {}
+	for _, t in ipairs (VL_TRADE_POOL) do
+		if minetest.registered_items[t[1]] and minetest.registered_items[t[3]] then
+			if t[3] == "mcl_core:emerald" then table.insert (buys, t)
+			else table.insert (sells, t) end
+		end
+	end
+	local out = {}
+	local function take_n (pool, n)
+		pool = table.copy (pool)
+		for _ = 1, n do
+			if #pool == 0 then break end
+			table.insert (out, table.remove (pool, math.random (#pool)))
+		end
+	end
+	take_n (buys, 2)
+	take_n (sells, 4)
+	return out
+end
+
+mc_parity._vl_offers = mc_parity._vl_offers or {}
+
+function mc_parity.vl_trader_show (trader, clicker)
+	if not (clicker and clicker:is_player ()) then return end
+	local trades = trader._mca_vl_trades
+	if not trades or #trades == 0 then return end
+	mc_parity._vl_offers[clicker:get_player_name ()] =
+		{ trades = trades, trader = trader.object }
+	local fs = { "formspec_version[4]", "size[8,7]",
+		"label[0.3,0.2;Wandering Trader]" }
+	for i, t in ipairs (trades) do
+		local y = 0.7 + (i - 1) * 0.85
+		fs[#fs + 1] = string.format ("item_image[0.5,%g;0.8,0.8;%s]", y, t[1])
+		fs[#fs + 1] = string.format ("label[1.5,%g;->]", y + 0.15)
+		fs[#fs + 1] = string.format ("item_image[2.2,%g;0.8,0.8;%s]", y, t[3])
+		fs[#fs + 1] = string.format ("button[3.4,%g;2.0,0.8;deal_%d;Trade]", y, i)
+		fs[#fs + 1] = string.format ("label[5.6,%g;%dx %s]", y + 0.15,
+			t[2], t[1]:match (":([^:]+)$"))
+	end
+	fs[#fs + 1] = "button_exit[3.0,6.2;2,0.7;close;Close]"
+	minetest.show_formspec (clicker:get_player_name (), "mc_parity:vl_trader",
+		table.concat (fs))
+end
+
+minetest.register_on_player_receive_fields (function (player, formname, fields)
+	if formname ~= "mc_parity:vl_trader" then return end
+	if not (player and player:is_player ()) then return end
+	local pname = player:get_player_name ()
+	local offer = mc_parity._vl_offers[pname]
+	if not offer then return end
+	if not (offer.trader and offer.trader:is_valid ()) then
+		mc_parity._vl_offers[pname] = nil
+		return
+	end
+	for i, t in ipairs (offer.trades) do
+		if fields["deal_" .. i] then
+			local inv = player:get_inventory ()
+			if inv and inv:contains_item ("main", ItemStack (t[1] .. " " .. t[2])) then
+				inv:remove_item ("main", ItemStack (t[1] .. " " .. t[2]))
+				local leftover = inv:add_item ("main", ItemStack (t[3] .. " " .. t[4]))
+				if not leftover:is_empty () then
+					local pos = player:get_pos ()
+					if pos then minetest.add_item (pos, leftover) end
+				end
+			end
+			break
+		end
+	end
+end)
+
 local function get_wandering_trades ()
 	if not (mobs_mc and mobs_mc.trade_from_table) then return {} end
 	local purch = table.copy (trades_purchasing_table)
@@ -2322,16 +2418,29 @@ end
 function wandering_trader:on_spawn ()
 	if self.update_trades then
 		self:update_trades (get_wandering_trades ())
+	elseif not self._mca_vl_trades then
+		-- VoxeLibre: no native trade API — roll our own offer list
+		self._mca_vl_trades = mc_parity.vl_trader_deal(self)
 	end
 end
 
 function wandering_trader:on_rightclick (clicker)
-	local clicker_pos = clicker:get_pos ()
-	local self_pos = self.object:get_pos ()
-
-	if vector.distance (clicker_pos, self_pos) < 16 then
-		self:show_trade_formspec (clicker, 0)
+	if not (clicker and clicker:is_player ()) then return end
+	if self.show_trade_formspec then
+		-- Mineclonia native trade UI
+		local clicker_pos = clicker:get_pos ()
+		local self_pos = self.object:get_pos ()
+		if not (clicker_pos and self_pos) then return end
+		if vector.distance (clicker_pos, self_pos) < 16 then
+			self:show_trade_formspec (clicker, 0)
+		end
+		return
 	end
+	-- VoxeLibre: our own minimal trade UI (MC trade-port TODO closed)
+	if not self._mca_vl_trades then
+		self._mca_vl_trades = mc_parity.vl_trader_deal(self)
+	end
+	mc_parity.vl_trader_show(self, clicker)
 end
 
 function wandering_trader:show_trade_progress_bar ()
@@ -2408,7 +2517,8 @@ function wandering_trader:ai_step (dtime)
 		end
 	end
 	-- Search within a 16 node radius for llamas belonging to this
-	-- trader.  TODO: revisit this once leashes are available.
+	-- trader (re-links reloaded/manual llamas; spawned ones arrive
+	-- pre-leashed via the lead system in spawn_one_llama).
 	if #valid_llamas < 2
 		and self:check_timer ("locate_llamas", 0.5) then
 		local self_pos = self.object:get_pos ()
@@ -2417,6 +2527,8 @@ function wandering_trader:ai_step (dtime)
 			if entity and entity.name == "mc_parity:trader_llama"
 				and entity._trader_id == self._trader_id then
 				entity._get_owner = self._provide_owner
+				-- re-leash after reloads (leash state is runtime-only)
+				mc_parity.leash_attach (object, { follow = self.object })
 				table.insert (valid_llamas, object)
 			end
 		end
@@ -2586,6 +2698,10 @@ local function spawn_one_llama (around, entity)
 			llama._get_owner = entity._provide_owner
 			llama._life_timer = entity._life_timer
 			table.insert (entity._llamas, llama.object)
+			-- leash the llama to its trader (lead system, legacy_items.lua;
+			-- complements the gopath follow below: the lead pulls past 10
+			-- nodes, the follow AI steers inside 6-20)
+			mc_parity.leash_attach (llama.object, { follow = entity.object })
 			return
 		end
 	end
@@ -2751,11 +2867,12 @@ function trader_llama:_get_owner ()
 end
 
 function trader_llama:is_leashed ()
-	-- TODO: revise this once leashes are introduced.
-	return self:_get_owner () ~= nil
+	-- lead system (legacy_items.lua); owner fallback for pre-lead llamas
+	return mc_parity.is_leashed (self.object) or self:_get_owner () ~= nil
 end
 
--- XXX: revisit this function once leashes are implemented.
+-- Llamas stay near their trader through the lead (spawn) + the gopath
+-- follow below (6-20 nodes); beyond 20 they unlink and go wild.
 local function trader_llama_follow_owner (self, self_pos, dtime)
 	if self._following_owner then
 		local owner = self:_get_owner ()

@@ -119,11 +119,14 @@ minetest.register_node("mc_parity:suspicious_gravel", {
 	end,
 })
 
--- Relic music disc (plays a game track — CC BY-SA, compatible)
+-- Relic music disc (plays a game track — CC BY-SA, compatible).
+-- Dual-game dispatch (config.lua): Mineclonia takes the table form,
+-- VoxeLibre the positional form. Sound id extensionless like the games'
+-- own records (VL looks the string up verbatim in sound_play).
 if mcl_jukebox and mcl_jukebox.register_record then
-	mcl_jukebox.register_record({
+	mc_parity.register_record({
 		title = "Relic", author = "Aaron Cherof", id = "relic",
-		texture = "mc_parity_disc_relic.png", sound = "mcl_jukebox_track_1.ogg",
+		texture = "mc_parity_disc_relic.png", sound = "mcl_jukebox_track_1",
 	})
 end
 

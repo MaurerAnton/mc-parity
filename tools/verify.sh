@@ -46,6 +46,33 @@ grep -q 'register_mob ("mc_parity:pufferfish"' "$SRC/mobs_port.lua" && PASS "puf
 grep -q 'register_mob ("mc_parity:ravager"' "$SRC/mobs_port.lua" && PASS "ravager" || BAD "ravager"
 grep -q 'register_mob ("mc_parity:wandering_trader"' "$SRC/mobs_port.lua" && PASS "wandering trader" || BAD "trader"
 grep -q 'register_mob("mc_parity:bee"' "$SRC/mobs_bee.lua" && PASS "bee" || BAD "bee"
+grep -q 'register_mob("mc_parity:tadpole"' "$SRC/mobs_tadpole.lua" && PASS "tadpole" || BAD "tadpole"
+grep -q 'register_node("mc_parity:frogspawn"' "$SRC/mobs_tadpole.lua" && PASS "frogspawn" || BAD "frogspawn"
+grep -q 'register_craftitem("mc_parity:bucket_tadpole"' "$SRC/mobs_tadpole.lua" && PASS "tadpole bucket" || BAD "tadpole bucket"
+grep -q 'mc_parity:vl_trader' "$SRC/mobs_port.lua" && PASS "VL trade UI" || BAD "VL trade UI"
+grep -q 'function mc_parity.leash_attach' "$SRC/legacy_items.lua" && PASS "lead API" || BAD "lead API"
+grep -q 'leash_attach (llama.object' "$SRC/mobs_port.lua" && PASS "llama leash" || BAD "llama leash"
+grep -q 'wind_charge 4' "$SRC/wind_charge.lua" && PASS "wind charge craft" || BAD "wind charge craft"
+grep -q 'register_entity(ENTITY' "$SRC/wind_charge.lua" && PASS "wind charge entity" || BAD "wind charge entity"
+grep -q 'on_secondary_use' "$SRC/wind_charge.lua" && PASS "wind charge throw" || BAD "wind charge throw"
+grep -q 'resin_brick_wall' "$SRC/mobs_pale.lua" && PASS "resin wall" || BAD "resin wall"
+grep -q 'grow_hanging_moss' "$SRC/pale_oak.lua" && PASS "hanging moss growth" || BAD "hanging moss growth"
+grep -q 'mc_parity:brush' "$SRC/mobs_121.lua" && PASS "brushable armadillo" || BAD "brushable armadillo"
+grep -q 'disc_fragment_5' "$SRC/deepdark.lua" && PASS "disc 5" || BAD "disc 5"
+grep -q '_mca_dupe' "$SRC/allay.lua" && PASS "allay duplication" || BAD "allay duplication"
+grep -q 'meta:set_string("description"' "$SRC/init.lua" && PASS "bundle tooltip" || BAD "bundle tooltip"
+grep -q '_mca_sniff_t' "$SRC/mobs_import.lua" && PASS "sniffer sniffing" || BAD "sniffer sniffing"
+grep -q 'register_mob("mc_parity:creaking"' "$SRC/mobs_pale.lua" && PASS "creaking" || BAD "creaking"
+grep -q 'register_node(HEART' "$SRC/mobs_pale.lua" && grep -q 'creaking_heart = "mc_parity:creaking_heart"\|HEART = "mc_parity:creaking_heart"' "$SRC/mobs_pale.lua" && PASS "creaking heart" || BAD "creaking heart"
+grep -q 'register_craftitem("mc_parity:resin_clump"' "$SRC/mobs_pale.lua" && PASS "resin" || BAD "resin"
+grep -q 'eyeblossom_open' "$SRC/mobs_pale.lua" && PASS "eyeblossom" || BAD "eyeblossom"
+grep -q 'register_tree_trunk("pale_oak_tree"' "$SRC/pale_oak.lua" && PASS "pale oak wood" || BAD "pale oak wood"
+grep -q 'name = "PaleGarden"' "$SRC/pale_oak.lua" && PASS "pale garden biome" || BAD "pale garden biome"
+grep -q 'register_node("mc_parity:block_of_resin"' "$SRC/mobs_pale.lua" && PASS "block of resin" || BAD "block of resin"
+for i in 1 2 3; do
+	[ -f "$SRC/schematics/mc_parity_pale_oak_$i.mts" ] || BAD "pale oak schematic $i"
+done
+[ -f "$SRC/schematics/mc_parity_pale_oak_1.mts" ] && PASS "pale oak schematics" || true
 grep -q 'register_mob("mc_parity:drowned"' "$SRC/mobs_121.lua" && PASS "drowned" || BAD "drowned"
 grep -q 'register_mob("mc_parity:bogged"' "$SRC/mobs_121.lua" && PASS "bogged" || BAD "bogged"
 grep -q 'register_mob("mc_parity:breeze"' "$SRC/mobs_121.lua" && PASS "breeze" || BAD "breeze"
@@ -54,56 +81,122 @@ grep -q 'register_node("mc_parity:vault"' "$SRC/mobs_trial.lua" && PASS "vault" 
 grep -q 'register_node("mc_parity:suspicious_sand"' "$SRC/mobs_ruins.lua" && PASS "suspicious sand" || BAD "suspicious sand"
 grep -q 'register_node("mc_parity:suspicious_gravel"' "$SRC/mobs_ruins.lua" && PASS "suspicious gravel" || BAD "suspicious gravel"
 grep -q 'register_tool("mc_parity:brush"' "$SRC/mobs_ruins.lua" && PASS "brush" || BAD "brush"
-grep -q 'register_record("Relic"' "$SRC/mobs_ruins.lua" && PASS "relic disc" || BAD "relic disc"
+grep -q 'title = "Relic"' "$SRC/mobs_ruins.lua" && PASS "relic disc" || BAD "relic disc"
 grep -q 'build_woodland_mansion' "$SRC/legacy.lua" && PASS "mansion builder" || BAD "mansion"
 grep -q 'build_end_city_tower' "$SRC/legacy.lua" && PASS "end city builder" || BAD "end city"
-grep -q 'register_record("Cat"' "$SRC/legacy.lua" && PASS "cat disc" || BAD "cat disc"
+grep -q 'title = "Cat"' "$SRC/legacy.lua" && PASS "cat disc" || BAD "cat disc"
 
 # ---- 3. in-engine (needs luanti + the games; skipped when unavailable) ----
 echo "== [3/5] in-engine checks =="
-ENGINE_BIN="$(command -v luanti-server || command -v luanti || command -v minetest || true)"
+ENGINE_BIN="$(command -v luantiserver || command -v luanti-server || command -v luanti || command -v minetest || true)"
 if [ -z "$ENGINE_BIN" ]; then
 	echo "SKIP: luanti/minetest not installed (luac checks only)"
 else
-	if [ ! -d "$VL_GAME" ]; then
-		echo "cloning VoxeLibre ($VL_TAG)…"
-		git clone -q --depth 1 --branch "$VL_TAG" "$VL_REPO" "$VL_GAME" || { BAD "vl clone"; }
-	fi
-	if [ ! -d "$MCLN_GAME" ]; then
-		echo "cloning Mineclonia ($MCLN_TAG)…"
-		git clone -q --depth 1 --branch "$MCLN_TAG" "$MCLN_REPO" "$MCLN_GAME" || { BAD "mcln clone"; }
-	fi
+	echo "engine: $ENGINE_BIN"
+	if ! "$ENGINE_BIN" --version >/dev/null 2>&1; then BAD "engine not runnable"; fi
+	clone_game() {  # $1 = repo, $2 = branch, $3 = dir, $4 = label
+		local i
+		for i in 1 2 3; do
+			if [ -d "$3/.git" ]; then return 0; fi
+			echo "cloning $4 ($2, try $i)…"
+			if git clone -q --depth 1 --branch "$2" "$1" "$3" 2>"$WORK/$4.clone.err"; then
+				return 0
+			fi
+			head -3 "$WORK/$4.clone.err" 2>/dev/null
+			rm -rf "$3"  # never keep a partial clone
+			sleep 15
+		done
+		BAD "$4 clone"
+		return 1
+	}
+	clone_game "$VL_REPO" "$VL_TAG" "$VL_GAME" "VoxeLibre"
+	clone_game "$MCLN_REPO" "$MCLN_TAG" "$MCLN_GAME" "Mineclonia"
 
-	mkdir -p "$VL_WORLD/worldmods" "$MCLN_WORLD/worldmods"
-	cp -r "$SRC" "$VL_GAME/mods/mc_parity"
-	cp -r "$SRC" "$MCLN_GAME/mods/mc_parity"
+	# the engine only finds games under its user path: point HOME at our
+	# sandbox (still never touches the real ~/.minetest) and link the
+	# cloned games in as mineclone2 / mineclonia.
+	export HOME="$WORK/fakehome"
+	mkdir -p "$HOME/.minetest/games"
+	ln -sfn "$VL_GAME" "$HOME/.minetest/games/mineclone2"
+	ln -sfn "$MCLN_GAME" "$HOME/.minetest/games/mineclonia"
 
-	# the in-engine probe (spawns every unique mob, checks meshes)
-	PROBE="$VL_WORLD/worldmods/mcl_addon_probe"
-	mkdir -p "$PROBE"
-	cat > "$PROBE/mod.conf" <<'EOF'
+	run_world() {  # $1 = world dir, $2 = gameid, $3 = log file, $4 = label
+		# dedicated server binaries (luantiserver/…) run headless by
+		# default; the combined client binaries need the --server flag
+		# (5.16 errors on Unknown command-line parameter "--server").
+		local flags=()
+		case "$(basename "$ENGINE_BIN")" in
+			luantiserver|luanti-server|minetestserver) ;;
+			*) flags=(--server) ;;
+		esac
+		timeout 90 "$ENGINE_BIN" "${flags[@]}" --world "$1" --gameid "$2" \
+			--logfile "$3" >"$WORK/$4.out.log" 2>"$WORK/$4.err.log"
+		if [ ! -f "$3" ]; then
+			BAD "$4: no log (server never started)"
+			echo "--- $4 stdout (head) ---"; head -20 "$WORK/$4.out.log" 2>/dev/null
+			echo "--- $4 stderr (head) ---"; head -20 "$WORK/$4.err.log" 2>/dev/null
+			return
+		fi
+		# the engine must have found the game (a failed clone used to
+		# fall back to the other game and fake a spawn pass)
+		if grep -q "Game \".*\" not found" "$3"; then
+			BAD "$4: game not found"
+			grep "Game \".*\" not found" "$3" | head -2
+			return
+		fi
+		if grep -q "\[verify_probe\] loaded=23/23" "$3"; then
+			PASS "23 mobs spawn ($4)"
+		else
+			BAD "$4 spawn: $(grep -o '\[verify_probe\] loaded=.*' "$3" | head -1)"
+		fi
+		# pale garden port (VL) or game-provided pale oak (Mineclonia)
+		if grep -q "\[verify_probe\] pale_oak=true" "$3"; then
+			PASS "pale oak present ($4)"
+		else
+			BAD "$4: pale oak missing ($(grep -o '\[verify_probe\] pale_oak=.*' "$3" | head -1))"
+		fi
+		if grep -q "ModError\|ERROR\[Main\]" "$3"; then
+			BAD "$4 errors"
+			grep "ModError\|ERROR\[Main\]" "$3" | head -5
+		else PASS "$4 clean"; fi
+	}
+
+	write_probe() {  # $1 = world dir
+		local probe="$1/worldmods/mcl_addon_probe"
+		mkdir -p "$probe"
+		cat > "$probe/mod.conf" <<'EOF'
 name = mcl_addon_probe
 description = verify probe (tools/verify.sh)
 depends = mcl_core
 optional_depends = mc_parity, mobs_mc
 EOF
-	cat > "$PROBE/init.lua" <<'EOF'
+		cat > "$probe/init.lua" <<'EOF'
 minetest.register_on_mods_loaded(function()
 	minetest.after(3, function()
 		local c = { x = 0, y = 0, z = 0 }
-		for dx = -6, 6 do for dy = -6, 8 do for dz = -6, 6 do
+		for dx = -30, 30 do for dy = -6, 8 do for dz = -6, 6 do
 			minetest.set_node(vector.add(c, { x = dx, y = dy, z = dz }), { name = "air" })
 		end end end
 		local IS_MCLN = mcl_mobs and mcl_mobs.register_spawner ~= nil
 		local mobs = {
-			"mc_parity:creeper", "mc_parity:enderman",
-			"mc_parity:blaze", "mc_parity:pufferfish",
-			"mc_parity:ravager", "mc_parity:wandering_trader",
-			"mc_parity:bee", "mc_parity:drowned",
+			-- the five original mobs
+			"mc_parity:fox", "mc_parity:panda", "mc_parity:camel",
+			"mc_parity:skeleton_horse", "mc_parity:goat",
+			-- ported classics
+			"mc_parity:creeper", "mc_parity:enderman", "mc_parity:blaze",
+			"mc_parity:pufferfish", "mc_parity:ravager",
+			"mc_parity:wandering_trader",
+			-- 1.13-1.19 imports
+			"mc_parity:phantom", "mc_parity:turtle", "mc_parity:frog",
+			"mc_parity:sniffer", "mc_parity:allay", "mc_parity:tadpole",
+			-- 1.15-1.21 uniques
+			"mc_parity:bee", "mc_parity:drowned", "mc_parity:bogged",
+			"mc_parity:armadillo", "mc_parity:breeze", "mc_parity:creaking",
 		}
 		local objs = {}
+		local half = math.ceil(#mobs / 2)
 		for i, m in ipairs(mobs) do
-			local o = minetest.add_entity({ x = (i - 5) * 3, y = 3, z = 0 }, m)
+			local o = minetest.add_entity({ x = (i - half) * 2, y = 3, z = 0 }, m)
 			if o then table.insert(objs, o) end
 		end
 		minetest.after(IS_MCLN and 0.05 or 0.2, function()
@@ -116,27 +209,48 @@ minetest.register_on_mods_loaded(function()
 					if props and props.mesh then valid = valid + 1 end
 				end
 			end
-			minetest.log("action", "[verify_probe] loaded=" .. valid)
+			minetest.log("action", "[verify_probe] loaded=" .. valid .. "/" .. #mobs)
 			for _, o in ipairs(objs) do if o:is_valid() then o:remove() end end
+
+			-- registration spot-checks: pale garden port (VL) or the
+			-- game's own pale oak (Mineclonia)
+			local function has_prefix(prefix)
+				for n in pairs(minetest.registered_nodes) do
+					if n:find(prefix, 1, true) == 1 then return true end
+				end
+				return false
+			end
+			local pale = minetest.registered_nodes["mc_parity:pale_oak_planks"] ~= nil
+				or has_prefix("mcl_pale_oak:")
+			minetest.log("action", "[verify_probe] pale_oak=" .. tostring(pale)
+				.. " biome=" .. tostring(minetest.registered_biomes["PaleGarden"] ~= nil))
 		end)
 	end)
 end)
 EOF
+	}
 
-	echo "-- VoxeLibre --"
-	cp -r "$VL_WORLD" "$VL_WORLD.bak" 2>/dev/null; rm -rf "$VL_WORLD.bak"
-	timeout 60 "$ENGINE_BIN" --server --world "$VL_WORLD" --gameid mineclone2 \
-		--logfile "$WORK/vl.log" >/dev/null 2>&1
-	if grep -q "loaded=8" "$WORK/vl.log"; then PASS "8 mobs spawn (VL)"; else BAD "VL spawn: $(grep -o 'loaded=.*' "$WORK/vl.log" | head -1)"; fi
-	if grep -q "ModError\|ERROR\[Main\]" "$WORK/vl.log"; then BAD "VL errors"; else PASS "VL clean"; fi
+	have_vl=0; have_mcln=0
+	[ -d "$VL_GAME/.git" ] && have_vl=1
+	[ -d "$MCLN_GAME/.git" ] && have_mcln=1
 
-	echo "-- Mineclonia --"
-	cp -r "$VL_WORLD" "$MCLN_WORLD" && rm -rf "$MCLN_WORLD/worldmods" && mkdir -p "$MCLN_WORLD/worldmods"
-	cp -r "$PROBE" "$MCLN_WORLD/worldmods/mcl_addon_probe"
-	timeout 60 "$ENGINE_BIN" --server --world "$MCLN_WORLD" --gameid mineclonia \
-		--logfile "$WORK/mcln.log" >/dev/null 2>&1
-	if grep -q "loaded=8" "$WORK/mcln.log"; then PASS "8 mobs spawn (Mineclonia)"; else BAD "MCLN spawn: $(grep -o 'loaded=.*' "$WORK/mcln.log" | head -1)"; fi
-	if grep -q "ModError\|ERROR\[Main\]" "$WORK/mcln.log"; then BAD "MCLN errors"; else PASS "MCLN clean"; fi
+	mkdir -p "$VL_WORLD/worldmods" "$MCLN_WORLD/worldmods"
+	if [ "$have_vl" = 1 ]; then
+		cp -r "$SRC" "$VL_GAME/mods/mc_parity"
+		write_probe "$VL_WORLD"
+		echo "-- VoxeLibre --"
+		run_world "$VL_WORLD" mineclone2 "$WORK/vl.log" "VL"
+	else
+		BAD "VL: clone unavailable — in-engine stage skipped"
+	fi
+	if [ "$have_mcln" = 1 ]; then
+		cp -r "$SRC" "$MCLN_GAME/mods/mc_parity"
+		write_probe "$MCLN_WORLD"
+		echo "-- Mineclonia --"
+		run_world "$MCLN_WORLD" mineclonia "$WORK/mcln.log" "MCLN"
+	else
+		BAD "MCLN: clone unavailable — in-engine stage skipped"
+	fi
 fi
 
 # ---- 4. git state ----

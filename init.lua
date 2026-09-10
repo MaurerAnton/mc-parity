@@ -1,15 +1,17 @@
 --[[
 mc_parity — Extra Minecraft-style mobs for VoxeLibre / Mineclonia.
 
-Implemented (retexture of existing game models, assets from
-Pixel-Perfection-Legacy, CC BY-SA 4.0):
-  fox            (mesh base: mobs_mc_wolf.b3d)      — hunts chickens/rabbits
-  panda          (mesh base: mobs_mc_polarbear.b3d) — 7 personalities
-  camel          (mesh base: mobs_mc_llama.b3d)     — rideable (1 driver)
-  skeleton_horse (mesh base: mobs_mc_horse.b3d)     — lightning skeleton trap
-
-WIP (need new .b3d models in Blender — no model exists anywhere in Luanti):
-  allay, frog, warden, phantom, turtle, sniffer, goat
+Implemented (see README work plan 1-31, all done as of 2026-08-08):
+  fox, panda, camel (2 seats), skeleton_horse (+ trap), goat (+ horns),
+  allay, frog, warden (+ vibrations/sonic boom), phantom (3-nights),
+  turtle (+ eggs/scute/shell), sniffer, armadillo, bee, drowned,
+  bogged, breeze (+ trial chambers), creeper/enderman/blaze/pufferfish/
+  ravager/trader (VL ports), bundle, deep dark + ancient city,
+  woodland mansion, end city towers, trail ruins, glass chests,
+  spectator mode, nether lava + 100% item closure (1.0-1.21).
+Assets: models/ ships every .b3d (procedural via tools/gen_b3d.py where
+noted); textures from Pixel-Perfection-Legacy, CC BY-SA 4.0.
+Remaining TODO-tail (genuinely open): none — see README work plan.
 
 API notes (verified 2026-08):
   - registration: mcl_mobs.register_mob("<mod>:<name>", def) — both games;
@@ -138,11 +140,11 @@ local fox = {
 	fear_height = 4,
 	jump = true,
 	floats = 1,
-	-- Placeholder: game's wolf sounds (free, CC BY-SA). TODO: CC0 fox barks.
+	-- CC0 synthesized barks (tools/gen_sounds.py — ours, no external media)
 	sounds = {
-		random = "mobs_mc_wolf_bark",
-		damage = {name = "mobs_mc_wolf_hurt", gain = 0.6},
-		death = {name = "mobs_mc_wolf_death", gain = 0.6},
+		random = "mc_parity_fox_bark",
+		damage = {name = "mc_parity_fox_hurt", gain = 0.8},
+		death = {name = "mc_parity_fox_hurt", gain = 0.8},
 		distance = 16,
 	},
 	animation = {
@@ -295,7 +297,7 @@ local camel = {
 		eat = "mobs_mc_animal_eat_generic",
 		distance = 16,
 	},
-	-- Riding (llama driver pattern; MC camels seat 2 — TODO: second seat)
+	-- Riding (llama driver pattern; MC 2-seat: passenger handled in on_rightclick below)
 	do_custom = function(self, dtime)
 		if not self.v3 then
 			self.v3 = 0
@@ -400,9 +402,10 @@ local goat = {
 		run_start = 0, run_end = 0,
 	},
 	sounds = {
-		random = "mobs_mc_llama",
-		damage = { name = "mobs_mc_cow_hurt", gain = 0.6 },
-		death = { name = "mobs_mc_cow_hurt", gain = 0.6 },
+		-- CC0 synthesized bleats (tools/gen_sounds.py — ours)
+		random = "mc_parity_goat_bleat",
+		damage = { name = "mc_parity_goat_hurt", gain = 0.8 },
+		death = { name = "mc_parity_goat_hurt", gain = 0.8 },
 		distance = 16,
 	},
 	-- MC parity: horns come ONLY from charged rams (1-2), never on death
@@ -610,7 +613,7 @@ end
 if mc_parity.feature_enabled("bundle") then
 -- Bettercraft/ContentDB). Contents travel with the item (serialized in item
 -- metadata), so a dropped bundle keeps its items — the MC bundle property.
--- v1: craft, view, take items out. TODO: shift-click insert (MC parity).
+-- v2: craft, view, take items out, insert wielded stack (button + right-click).
 -- ---------------------------------------------------------------------------
 local BUNDLE_MAX_ITEMS = 64
 local BUNDLE_SLOTS = 16
@@ -624,10 +627,6 @@ local function bundle_get_inv(itemstack)
 	return ok and type(list) == "table" and list or {}
 end
 
-local function bundle_set_inv(itemstack, list)
-	itemstack:get_meta():set_string("inv", minetest.serialize(list))
-end
-
 local function bundle_count(list)
 	local n = 0
 	for _, s in pairs(list) do
@@ -636,8 +635,30 @@ local function bundle_count(list)
 	return n
 end
 
+local function bundle_set_inv(itemstack, list)
+	itemstack:get_meta():set_string("inv", minetest.serialize(list))
+	-- MC-style hover preview: contents summary travels in the description
+	-- (per-stack meta, so each bundle shows its own fill)
+	local meta = itemstack:get_meta()
+	local n = bundle_count(list)
+	local lines = { S("Bundle") .. " (" .. n .. "/" .. BUNDLE_MAX_ITEMS .. ")" }
+	local shown = 0
+	for _, s in pairs(list) do
+		if shown >= 5 then break end
+		local st = ItemStack(s)
+		if not st:is_empty() then
+			local def = minetest.registered_items[st:get_name()]
+			local label = def and def.description or st:get_name()
+			label = tostring(label):gsub("\n.*$", "")  -- first line only
+			lines[#lines + 1] = st:get_count() .. "x " .. label
+			shown = shown + 1
+		end
+	end
+	meta:set_string("description", table.concat(lines, "\n"))
+end
+
 local function bundle_formspec(list)
-	local parts = {"size[7.2,3.2]", "label[0,0;Bundle (" .. bundle_count(list) .. "/" .. BUNDLE_MAX_ITEMS .. ")]"}
+	local parts = {"size[7.2,3.9]", "label[0,0;Bundle (" .. bundle_count(list) .. "/" .. BUNDLE_MAX_ITEMS .. ")]"}
 	for i = 0, BUNDLE_SLOTS - 1 do
 		local x, y = (i % 8) * 0.9, math.floor(i / 8) * 0.9 + 0.5
 		local s = list[i]
@@ -648,8 +669,57 @@ local function bundle_formspec(list)
 		parts[#parts + 1] = "item_image[" .. x .. "," .. y .. ";0.85,0.85;" .. img .. "]"
 		parts[#parts + 1] = "button[" .. x .. "," .. y .. ";0.85,0.85;" .. tostring(i) .. ";take]"
 	end
-	parts[#parts + 1] = "button[2.9,2.3;1.4,0.7;close;Close]"
+	parts[#parts + 1] = "button[0.0,2.3;3.4,0.7;insert;Insert wielded]"
+	parts[#parts + 1] = "button[3.8,2.3;3.4,0.7;close;Close]"
 	return table.concat(parts)
+end
+
+-- Insert as much of `stack` as fits (MC: 1 item = 1 bundle unit, cap 64).
+-- Returns the leftover ItemStack.
+local function bundle_insert(list, stack)
+	local leftover = ItemStack(stack)
+	if leftover:is_empty() then return leftover end
+	local room = BUNDLE_MAX_ITEMS - bundle_count(list)
+	while room > 0 and not leftover:is_empty() do
+		local name = leftover:get_name()
+		local placed = false
+		for i = 0, BUNDLE_SLOTS - 1 do
+			local cur = list[i] and ItemStack(list[i]) or nil
+			if cur and not cur:is_empty() and cur:get_name() == name
+					and ItemStack(cur):get_stack_max() > cur:get_count()
+					and leftover:get_count() > 0 then
+				cur:set_count(cur:get_count() + 1)
+				list[i] = cur:to_string()
+				leftover:set_count(leftover:get_count() - 1)
+				room = room - 1
+				placed = true
+				break
+			end
+		end
+		if not placed then
+			for i = 0, BUNDLE_SLOTS - 1 do
+				local cur = list[i] and ItemStack(list[i]) or nil
+				if not cur or cur:is_empty() then
+					local one = leftover:get_name() .. " 1"
+					list[i] = ItemStack(one):to_string()
+					leftover:set_count(leftover:get_count() - 1)
+					room = room - 1
+					placed = true
+					break
+				end
+			end
+		end
+		if not placed then break end  -- slots exhausted (16 distinct stacks)
+	end
+	return leftover
+end
+
+local function bundle_show(player)
+	if not player or not player:is_player() then return end
+	local itemstack = player:get_wielded_item()
+	if itemstack:get_name() ~= "mc_parity:bundle" then return end
+	minetest.show_formspec(player:get_player_name(), "mc_parity:bundle",
+		bundle_formspec(bundle_get_inv(itemstack)))
 end
 
 minetest.register_craftitem("mc_parity:bundle", {
@@ -658,8 +728,35 @@ minetest.register_craftitem("mc_parity:bundle", {
 	stack_max = 1,
 	groups = { bundle = 1 },
 	on_use = function(itemstack, user)
-		minetest.show_formspec(user:get_player_name(), "mc_parity:bundle",
-			bundle_formspec(bundle_get_inv(itemstack)))
+		if user and user:is_player() then
+			bundle_show(user)
+		end
+		return itemstack
+	end,
+	-- Right-click (secondary use): quick-insert the wielded stack without
+	-- opening the menu. MC flow: pick up items, right-click the bundle.
+	on_secondary_use = function(itemstack, user)
+		if not user or not user:is_player() then return itemstack end
+		local inv = user:get_inventory()
+		if not inv then return itemstack end
+		-- the bundle itself is wielded, so take the next stack in main
+		-- (first non-empty non-bundle stack) as the insert source
+		local src_idx
+		for i = 1, inv:get_size("main") do
+			local s = inv:get_stack("main", i)
+			if not s:is_empty() and s:get_name() ~= "mc_parity:bundle" then
+				src_idx = i
+				break
+			end
+		end
+		if not src_idx then return itemstack end
+		local list = bundle_get_inv(itemstack)
+		local leftover = bundle_insert(list, inv:get_stack("main", src_idx))
+		if leftover:get_count() ~= inv:get_stack("main", src_idx):get_count() then
+			bundle_set_inv(itemstack, list)
+			inv:set_stack("main", src_idx, leftover)
+			user:set_wielded_item(itemstack)
+		end
 		return itemstack
 	end,
 })
@@ -668,24 +765,48 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "mc_parity:bundle" then
 		return
 	end
+	if not player or not player:is_player() then return end
 	local itemstack = player:get_wielded_item()
 	if itemstack:get_name() ~= "mc_parity:bundle" then
 		return
 	end
 	local list = bundle_get_inv(itemstack)
-	for i = 0, BUNDLE_SLOTS - 1 do
-		if fields[tostring(i)] then
-			local s = list[i]
-			if s then
-				local leftover = player:get_inventory():add_item("main", s)
-				if leftover:is_empty() then
-					list[i] = nil
-					bundle_set_inv(itemstack, list)
-					player:set_wielded_item(itemstack)
+	local changed = false
+	if fields.insert then
+		-- insert from the next non-bundle stack in main (see on_secondary_use)
+		local inv = player:get_inventory()
+		if inv then
+			for i = 1, inv:get_size("main") do
+				local s = inv:get_stack("main", i)
+				if not s:is_empty() and s:get_name() ~= "mc_parity:bundle" then
+					local leftover = bundle_insert(list, s)
+					inv:set_stack("main", i, leftover)
+					changed = true
+					break
 				end
 			end
-			break
 		end
+	else
+		for i = 0, BUNDLE_SLOTS - 1 do
+			if fields[tostring(i)] then
+				local s = list[i]
+				if s then
+					local leftover = player:get_inventory():add_item("main", s)
+					if leftover:is_empty() then
+						list[i] = nil
+						changed = true
+					end
+				end
+				break
+			end
+		end
+	end
+	if changed then
+		bundle_set_inv(itemstack, list)
+		player:set_wielded_item(itemstack)
+		-- refresh so the player sees the new contents (old code left the
+		-- stale 16-slot view up after every take)
+		bundle_show(player)
 	end
 end)
 
@@ -746,6 +867,15 @@ end
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_import.lua")
 
 -- ---------------------------------------------------------------------------
+-- TADPOLE CHAIN (frog breeding: slimeball -> frogspawn -> tadpole -> frog;
+-- bucket of tadpole) — see mobs_tadpole.lua. Loads after mobs_import so the
+-- frog entity exists for the breeding patch (no-op when frog is disabled).
+-- ---------------------------------------------------------------------------
+if mc_parity.feature_enabled("tadpole") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_tadpole.lua")
+end
+
+-- ---------------------------------------------------------------------------
 -- ALLAY (Bettercraft import + movement rewrite for both games) — allay.lua
 -- ---------------------------------------------------------------------------
 if mc_parity.feature_enabled("allay") then
@@ -766,6 +896,15 @@ end
 -- MC 1.20.5/1.21: ARMADILLO + WOLF VARIANTS + WOLF ARMOR (see mobs_121.lua)
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_121.lua")
+
+-- ---------------------------------------------------------------------------
+-- WIND CHARGE (MC 1.21) — throwable projectile + wind burst (see
+-- wind_charge.lua). Loads after mobs_121 (breeze rod for the craft) and
+-- before mobs_trial (its loot pool checks the item at load).
+-- ---------------------------------------------------------------------------
+if mc_parity.feature_enabled("wind_charge") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/wind_charge.lua")
+end
 if mc_parity.feature_enabled("bee") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_bee.lua")
 end
@@ -774,6 +913,23 @@ if mc_parity.feature_enabled("trial_chambers") then
 end
 if mc_parity.feature_enabled("trail_ruins") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_ruins.lua")
+end
+
+-- ---------------------------------------------------------------------------
+-- PALE GARDEN (MC 1.21.4) — full pale oak wood set + biome port for
+-- VoxeLibre (see pale_oak.lua). Must load BEFORE mobs_pale.lua so the
+-- PaleGarden biome exists for the creaking-heart/eyeblossom scatter.
+-- ---------------------------------------------------------------------------
+if mc_parity.feature_enabled("pale_oak") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/pale_oak.lua")
+end
+
+-- ---------------------------------------------------------------------------
+-- PALE GARDEN TIE-IN (MC 1.21.4: creaking + heart + resin + eyeblossom) —
+-- see mobs_pale.lua. No bloomery in scope (see file header).
+-- ---------------------------------------------------------------------------
+if mc_parity.feature_enabled("pale") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_pale.lua")
 end
 
 -- ---------------------------------------------------------------------------
@@ -824,6 +980,10 @@ local function register_source_snippet()
 				or itemstring == "mcl_jukebox:record_11" then
 			-- our discs live in the game's mcl_jukebox namespace
 			label = "MC Parity addon (mc_parity) — MC pre-1.13"
+		elseif itemstring == "mcl_jukebox:record_5" then
+			-- our disc 5 (MC 1.19 fragment craft; shadows VL's legacy
+			-- record_5->chirp alias — MC-correct id wins)
+			label = "MC Parity addon (mc_parity) — MC 1.19"
 		elseif itemstring == "mcl_jukebox:record_relic" then
 			label = "MC Parity addon (mc_parity) — MC 1.20"
 		elseif mod:find("^mcl_", 1) or mod == "mobs_mc" then
@@ -841,19 +1001,14 @@ else
 end
 
 -- ---------------------------------------------------------------------------
--- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already
--- shipped in textures/:
---   allay     mc_parity_allay.png
---   frog      mc_parity_frog_{temperate,cold,warm}.png
---   warden    mc_parity_warden.png (+ _glow, _ears)
---   phantom   mc_parity_phantom.png (+ _eyes)
---   turtle    mc_parity_turtle.png
---   sniffer   mc_parity_sniffer.png
---   goat      mc_parity_goat.png
+-- MODEL PIPELINE (done — kept as reference for future mobs).
+-- All WIP mobs now ship their .b3d in models/ (Bettercraft imports +
+-- procedural tools/gen_b3d.py for goat/armadillo/bee/breeze). Textures in
+-- textures/. New mobs: follow the VL cuboid style.
 -- Model pipeline docs: https://docs.luanti.org/for-creators/models/
 --   Using Blender:      https://docs.luanti.org/for-creators/models/using-blender/
 --   Using Blockbench:   https://docs.luanti.org/for-creators/models/using-blockbench/
--- Registration template (uncomment once the model exists):
+-- Historical registration template (the warden now lives in warden.lua):
 --
 -- local warden = {
 --     description = S("Warden"),
@@ -868,7 +1023,6 @@ end
 --     mesh = "mc_parity_warden.b3d",
 --     textures = {{"mc_parity_warden.png"}},
 --     visual_size = {x = 3.0, y = 3.0},
---     -- TODO: vibration sensing via mcl_sculk sensor events
 -- }
 -- mcl_mobs.register_mob("mc_parity:warden", warden)
 -- register_egg("mc_parity:warden", S("Warden"), "#0a3b2e", "#7ef0c8", 0)
