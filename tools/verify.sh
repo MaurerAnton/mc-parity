@@ -85,7 +85,15 @@ else
 	ln -sfn "$MCLN_GAME" "$HOME/.minetest/games/mineclonia"
 
 	run_world() {  # $1 = world dir, $2 = gameid, $3 = log file, $4 = label
-		timeout 90 "$ENGINE_BIN" --server --world "$1" --gameid "$2" \
+		# dedicated server binaries (luantiserver/…) run headless by
+		# default; the combined client binaries need the --server flag
+		# (5.16 errors on Unknown command-line parameter "--server").
+		local flags=()
+		case "$(basename "$ENGINE_BIN")" in
+			luantiserver|luanti-server|minetestserver) ;;
+			*) flags=(--server) ;;
+		esac
+		timeout 90 "$ENGINE_BIN" "${flags[@]}" --world "$1" --gameid "$2" \
 			--logfile "$3" >"$WORK/$4.out.log" 2>"$WORK/$4.err.log"
 		if [ ! -f "$3" ]; then
 			BAD "$4: no log (server never started)"

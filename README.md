@@ -569,7 +569,9 @@ conventions).
 - **Loading**: placing the addon in `<game>/mods/` loads reliably; world-mods
   in `worlddir/mods/` need matching `load_mod_<name> = true` in world.mt.
 - **Headless test recipe**:
-  `timeout 90 luanti --server --world <path> --logfile /tmp/t.log`
+  `timeout 90 luantiserver --world <path> --logfile /tmp/t.log`
+  (dedicated server binary — no `--server` flag; the combined `luanti`
+  binary needs `luanti --server --world …`)
   then grep the log for `[mc_parity]` banner / `ModError` / `ERROR`.
 - Runtime check: the banner log line sits AFTER all register calls in
   init.lua — its presence in the log proves every registration succeeded.
