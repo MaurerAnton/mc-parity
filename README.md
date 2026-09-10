@@ -66,7 +66,9 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
         no Blender needed) — unique: no goat exists in VL/Mineclonia/
         Bettercraft/ContentDB
 8. [x] BUNDLE (MC 1.17) — contents travel in item metadata; craft 6 leather
-        + 2 string; v1: view + take out (insert = TODO)
+        + 2 string; v2: view + take out + insert wielded stack (formspec
+        "Insert wielded" button + right-click quick-insert, 64-item cap,
+        16 distinct slots, formspec refreshes after every change)
 9. [x] Import from Bettercraft (GPLv3): warden/allay/frog+tadpole/phantom/
         sniffer/turtle mobs + real panda/camel models + bubble column +
         daylight detector + trial spawners/mace + froglight
@@ -514,6 +516,22 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
         - Verified headless: clean log (no ModError/Undeclared/biome/
           craftguide/jukebox warnings), descriptions carry the From:
           line, 24 load banners.
+32. [x] `next`-branch hardening (post-0.1-beta):
+        - BUNDLE v2 (init.lua): insert wielded stack via the formspec
+          button or right-click quick-insert (64-item cap, 16 distinct
+          slots, per-stack max respected); take/insert refreshes the
+          formspec (the old view went stale after every take); nil-safe
+          on_use/receive_fields.
+        - BEE sting (mobs_bee.lua): mcl_potions/mcl_util calls guarded
+          (pcall + presence check, same pattern as the bogged arrow in
+          mobs_121.lua) — no crash when mcl_potions is absent.
+        - TRADER rightclick (mobs_port.lua): show_trade_formspec guarded —
+          on VoxeLibre villager_base is {} so there is no trade UI (the
+          trader still wanders with llamas); rightclick no longer errors.
+          Full VL trade UI remains a TODO (needs the villager trade API).
+        - CI: verify.sh disc markers updated to the table form
+          (title = "Relic"/"Cat") — the 0.1-beta jukebox fix changed the
+          call shape without updating the markers (3 red runs on main).
 
 ## Model pipeline (done — reference for future mobs)
 

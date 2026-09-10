@@ -11,8 +11,8 @@ Implemented (see README work plan 1-31, all done as of 2026-08-08):
   spectator mode, nether lava + 100% item closure (1.0-1.21).
 Assets: models/ ships every .b3d (procedural via tools/gen_b3d.py where
 noted); textures from Pixel-Perfection-Legacy, CC BY-SA 4.0.
-Remaining TODO-tail (genuinely open): bundle shift-click insert,
-CC0 fox/bee/goat sound samples, trader trade UI on VL, tadpole.
+Remaining TODO-tail (genuinely open): CC0 fox/bee/goat sound samples,
+trader trade UI on VL, tadpole (frog breeding chain).
 
 API notes (verified 2026-08):
   - registration: mcl_mobs.register_mob("<mod>:<name>", def) — both games;
@@ -613,7 +613,7 @@ end
 if mc_parity.feature_enabled("bundle") then
 -- Bettercraft/ContentDB). Contents travel with the item (serialized in item
 -- metadata), so a dropped bundle keeps its items — the MC bundle property.
--- v1: craft, view, take items out. TODO: shift-click insert (MC parity).
+-- v2: craft, view, take items out, insert wielded stack (button + right-click).
 -- ---------------------------------------------------------------------------
 local BUNDLE_MAX_ITEMS = 64
 local BUNDLE_SLOTS = 16
@@ -640,7 +640,7 @@ local function bundle_count(list)
 end
 
 local function bundle_formspec(list)
-	local parts = {"size[7.2,3.2]", "label[0,0;Bundle (" .. bundle_count(list) .. "/" .. BUNDLE_MAX_ITEMS .. ")]"}
+	local parts = {"size[7.2,3.9]", "label[0,0;Bundle (" .. bundle_count(list) .. "/" .. BUNDLE_MAX_ITEMS .. ")]"}
 	for i = 0, BUNDLE_SLOTS - 1 do
 		local x, y = (i % 8) * 0.9, math.floor(i / 8) * 0.9 + 0.5
 		local s = list[i]
@@ -651,8 +651,57 @@ local function bundle_formspec(list)
 		parts[#parts + 1] = "item_image[" .. x .. "," .. y .. ";0.85,0.85;" .. img .. "]"
 		parts[#parts + 1] = "button[" .. x .. "," .. y .. ";0.85,0.85;" .. tostring(i) .. ";take]"
 	end
-	parts[#parts + 1] = "button[2.9,2.3;1.4,0.7;close;Close]"
+	parts[#parts + 1] = "button[0.0,2.3;3.4,0.7;insert;Insert wielded]"
+	parts[#parts + 1] = "button[3.8,2.3;3.4,0.7;close;Close]"
 	return table.concat(parts)
+end
+
+-- Insert as much of `stack` as fits (MC: 1 item = 1 bundle unit, cap 64).
+-- Returns the leftover ItemStack.
+local function bundle_insert(list, stack)
+	local leftover = ItemStack(stack)
+	if leftover:is_empty() then return leftover end
+	local room = BUNDLE_MAX_ITEMS - bundle_count(list)
+	while room > 0 and not leftover:is_empty() do
+		local name = leftover:get_name()
+		local placed = false
+		for i = 0, BUNDLE_SLOTS - 1 do
+			local cur = list[i] and ItemStack(list[i]) or nil
+			if cur and not cur:is_empty() and cur:get_name() == name
+					and ItemStack(cur):get_stack_max() > cur:get_count()
+					and leftover:get_count() > 0 then
+				cur:set_count(cur:get_count() + 1)
+				list[i] = cur:to_string()
+				leftover:set_count(leftover:get_count() - 1)
+				room = room - 1
+				placed = true
+				break
+			end
+		end
+		if not placed then
+			for i = 0, BUNDLE_SLOTS - 1 do
+				local cur = list[i] and ItemStack(list[i]) or nil
+				if not cur or cur:is_empty() then
+					local one = leftover:get_name() .. " 1"
+					list[i] = ItemStack(one):to_string()
+					leftover:set_count(leftover:get_count() - 1)
+					room = room - 1
+					placed = true
+					break
+				end
+			end
+		end
+		if not placed then break end  -- slots exhausted (16 distinct stacks)
+	end
+	return leftover
+end
+
+local function bundle_show(player)
+	if not player or not player:is_player() then return end
+	local itemstack = player:get_wielded_item()
+	if itemstack:get_name() ~= "mc_parity:bundle" then return end
+	minetest.show_formspec(player:get_player_name(), "mc_parity:bundle",
+		bundle_formspec(bundle_get_inv(itemstack)))
 end
 
 minetest.register_craftitem("mc_parity:bundle", {
@@ -661,8 +710,35 @@ minetest.register_craftitem("mc_parity:bundle", {
 	stack_max = 1,
 	groups = { bundle = 1 },
 	on_use = function(itemstack, user)
-		minetest.show_formspec(user:get_player_name(), "mc_parity:bundle",
-			bundle_formspec(bundle_get_inv(itemstack)))
+		if user and user:is_player() then
+			bundle_show(user)
+		end
+		return itemstack
+	end,
+	-- Right-click (secondary use): quick-insert the wielded stack without
+	-- opening the menu. MC flow: pick up items, right-click the bundle.
+	on_secondary_use = function(itemstack, user)
+		if not user or not user:is_player() then return itemstack end
+		local inv = user:get_inventory()
+		if not inv then return itemstack end
+		-- the bundle itself is wielded, so take the next stack in main
+		-- (first non-empty non-bundle stack) as the insert source
+		local src_idx
+		for i = 1, inv:get_size("main") do
+			local s = inv:get_stack("main", i)
+			if not s:is_empty() and s:get_name() ~= "mc_parity:bundle" then
+				src_idx = i
+				break
+			end
+		end
+		if not src_idx then return itemstack end
+		local list = bundle_get_inv(itemstack)
+		local leftover = bundle_insert(list, inv:get_stack("main", src_idx))
+		if leftover:get_count() ~= inv:get_stack("main", src_idx):get_count() then
+			bundle_set_inv(itemstack, list)
+			inv:set_stack("main", src_idx, leftover)
+			user:set_wielded_item(itemstack)
+		end
 		return itemstack
 	end,
 })
@@ -671,24 +747,48 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "mc_parity:bundle" then
 		return
 	end
+	if not player or not player:is_player() then return end
 	local itemstack = player:get_wielded_item()
 	if itemstack:get_name() ~= "mc_parity:bundle" then
 		return
 	end
 	local list = bundle_get_inv(itemstack)
-	for i = 0, BUNDLE_SLOTS - 1 do
-		if fields[tostring(i)] then
-			local s = list[i]
-			if s then
-				local leftover = player:get_inventory():add_item("main", s)
-				if leftover:is_empty() then
-					list[i] = nil
-					bundle_set_inv(itemstack, list)
-					player:set_wielded_item(itemstack)
+	local changed = false
+	if fields.insert then
+		-- insert from the next non-bundle stack in main (see on_secondary_use)
+		local inv = player:get_inventory()
+		if inv then
+			for i = 1, inv:get_size("main") do
+				local s = inv:get_stack("main", i)
+				if not s:is_empty() and s:get_name() ~= "mc_parity:bundle" then
+					local leftover = bundle_insert(list, s)
+					inv:set_stack("main", i, leftover)
+					changed = true
+					break
 				end
 			end
-			break
 		end
+	else
+		for i = 0, BUNDLE_SLOTS - 1 do
+			if fields[tostring(i)] then
+				local s = list[i]
+				if s then
+					local leftover = player:get_inventory():add_item("main", s)
+					if leftover:is_empty() then
+						list[i] = nil
+						changed = true
+					end
+				end
+				break
+			end
+		end
+	end
+	if changed then
+		bundle_set_inv(itemstack, list)
+		player:set_wielded_item(itemstack)
+		-- refresh so the player sees the new contents (old code left the
+		-- stale 16-slot view up after every take)
+		bundle_show(player)
 	end
 end)
 

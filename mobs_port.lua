@@ -2326,8 +2326,15 @@ function wandering_trader:on_spawn ()
 end
 
 function wandering_trader:on_rightclick (clicker)
+	if not (clicker and clicker:is_player ()) then return end
+	-- show_trade_formspec comes from the Mineclonia villager_base; on
+	-- VoxeLibre villager_base is {} so the trader wanders with llamas but
+	-- has no trade UI (MC trade-port TODO). Guard: unguarded call errored
+	-- on rightclick on VL.
+	if not self.show_trade_formspec then return end
 	local clicker_pos = clicker:get_pos ()
 	local self_pos = self.object:get_pos ()
+	if not (clicker_pos and self_pos) then return end
 
 	if vector.distance (clicker_pos, self_pos) < 16 then
 		self:show_trade_formspec (clicker, 0)

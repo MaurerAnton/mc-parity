@@ -140,11 +140,16 @@ local BEE = {
 	end,
 
 	on_attack = function(self, target)
-		-- the sting: poison + the bee dies
+		-- the sting: poison + the bee dies (both calls guarded: mcl_potions
+		-- / mcl_util are optional at load time — cf. mobs_121.lua bogged)
 		if target and target:is_player() then
-			mcl_potions.give_effect_by_level("poison", target, 1, 8)
+			if mcl_potions and mcl_potions.give_effect_by_level then
+				pcall(mcl_potions.give_effect_by_level, "poison", target, 1, 8)
+			end
 		end
-		mcl_util.deal_damage(self.object, 10, { type = "piercing" })
+		if mcl_util and mcl_util.deal_damage then
+			mcl_util.deal_damage(self.object, 10, { type = "piercing" })
+		end
 	end,
 }
 
