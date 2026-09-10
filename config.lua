@@ -17,6 +17,7 @@ local FEATURES = {
 	wolf_armor      = { version = "1.21", desc = "Wolf armor" },
 	bogged          = { version = "1.21", desc = "Bogged (swamp skeleton)" },
 	breeze          = { version = "1.21", desc = "Breeze + wind volley" },
+	wind_charge     = { version = "1.21", desc = "Wind charge (throwable) + wind burst" },
 	trial_chambers  = { version = "1.21", desc = "Trial chambers + spawner + vault" },
 	pale            = { version = "1.21", desc = "Creaking + heart + resin + eyeblossom" },
 	pale_oak        = { version = "1.21", desc = "Pale garden: pale oak wood set + biome (VoxeLibre port)" },

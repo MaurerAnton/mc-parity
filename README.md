@@ -60,6 +60,9 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
   Perfection — see Mineclonia LEGAL.md), renamed to `mc_parity_*` and
   node-remapped by `tools/port_pale_oak.py`:
   - https://codeberg.org/Mineclonia/Mineclonia (mods/ITEMS/mcl_pale_oak)
+- Wind charge entity model + entity/burst textures: ported from
+  **Mineclonia** (`mcl_charges`, GPLv3 / CC BY-SA 4.0):
+  - https://codeberg.org/Mineclonia/Mineclonia (mods/ENTITIES/mcl_charges)
 - All new files in this mod are prefixed `mc_parity_` to stay unique
   across the game's global texture/model namespace.
 
@@ -650,6 +653,23 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           verified with a stub harness (25 assertions incl. the skip
           path) and an in-engine probe spot-check (`pale_oak=true` on
           both games).
+38. [x] Round 7 — throwable wind charge (`next` branch):
+        - WIND CHARGE (wind_charge.lua, MC 1.21): the item was a dead
+          craftitem; it now throws (right-click node or air, 0.5 s
+          cooldown, 30 m/s, gravity-free) and bursts on impact:
+          knockback + 1 damage in a 3-block radius (the thrower gets the
+          push but no damage — wind-charge jumps work), mobs get a
+          lifted gust, lit candles/candle cakes extinguish via the
+          ported _on_wind_charge_hit hooks, decorated pots shatter,
+          bells ring. Burst = pitched-up tnt_explode + wind particles.
+        - Entity model + entity/burst textures ported from Mineclonia
+          (mcl_charges, GPLv3 / CC BY-SA 4.0).
+        - Feature gate "wind_charge" (1.21); item moved out of
+          mobs_trial.lua (its loot pool filters the charge when the
+          feature is off); breeze-rod craft guarded on the breeze
+          feature.
+        - Verified with a 22-assertion stub harness (throw/cooldown/
+          creative, burst damage + thrower immunity, hooks, lifetime).
 
 ## Model pipeline (done — reference for future mobs)
 

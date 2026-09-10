@@ -896,6 +896,15 @@ end
 -- MC 1.20.5/1.21: ARMADILLO + WOLF VARIANTS + WOLF ARMOR (see mobs_121.lua)
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_121.lua")
+
+-- ---------------------------------------------------------------------------
+-- WIND CHARGE (MC 1.21) — throwable projectile + wind burst (see
+-- wind_charge.lua). Loads after mobs_121 (breeze rod for the craft) and
+-- before mobs_trial (its loot pool checks the item at load).
+-- ---------------------------------------------------------------------------
+if mc_parity.feature_enabled("wind_charge") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/wind_charge.lua")
+end
 if mc_parity.feature_enabled("bee") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_bee.lua")
 end
