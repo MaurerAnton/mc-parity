@@ -117,7 +117,7 @@ else
 			echo "--- $4 stderr (head) ---"; head -20 "$WORK/$4.err.log" 2>/dev/null
 			return
 		fi
-		if grep -q "loaded=8" "$3"; then PASS "8 mobs spawn ($4)"; else BAD "$4 spawn: $(grep -o 'loaded=.*' "$3" | head -1)"; fi
+		if grep -q "loaded=9" "$3"; then PASS "9 mobs spawn ($4)"; else BAD "$4 spawn: $(grep -o 'loaded=.*' "$3" | head -1)"; fi
 		if grep -q "ModError\|ERROR\[Main\]" "$3"; then
 			BAD "$4 errors"
 			grep "ModError\|ERROR\[Main\]" "$3" | head -5
@@ -146,6 +146,7 @@ minetest.register_on_mods_loaded(function()
 			"mc_parity:blaze", "mc_parity:pufferfish",
 			"mc_parity:ravager", "mc_parity:wandering_trader",
 			"mc_parity:bee", "mc_parity:drowned",
+			"mc_parity:tadpole",
 		}
 		local objs = {}
 		for i, m in ipairs(mobs) do
