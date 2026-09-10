@@ -65,6 +65,8 @@ ENGINE_BIN="$(command -v luantiserver || command -v luanti-server || command -v 
 if [ -z "$ENGINE_BIN" ]; then
 	echo "SKIP: luanti/minetest not installed (luac checks only)"
 else
+	echo "engine: $ENGINE_BIN"
+	if ! "$ENGINE_BIN" --version >/dev/null 2>&1; then BAD "engine not runnable"; fi
 	if [ ! -d "$VL_GAME" ]; then
 		echo "cloning VoxeLibre ($VL_TAG)…"
 		git clone -q --depth 1 --branch "$VL_TAG" "$VL_REPO" "$VL_GAME" || { BAD "vl clone"; }
@@ -74,20 +76,40 @@ else
 		git clone -q --depth 1 --branch "$MCLN_TAG" "$MCLN_REPO" "$MCLN_GAME" || { BAD "mcln clone"; }
 	fi
 
-	mkdir -p "$VL_WORLD/worldmods" "$MCLN_WORLD/worldmods"
-	cp -r "$SRC" "$VL_GAME/mods/mc_parity"
-	cp -r "$SRC" "$MCLN_GAME/mods/mc_parity"
+	# the engine only finds games under its user path: point HOME at our
+	# sandbox (still never touches the real ~/.minetest) and link the
+	# cloned games in as mineclone2 / mineclonia.
+	export HOME="$WORK/fakehome"
+	mkdir -p "$HOME/.minetest/games"
+	ln -sfn "$VL_GAME" "$HOME/.minetest/games/mineclone2"
+	ln -sfn "$MCLN_GAME" "$HOME/.minetest/games/mineclonia"
 
-	# the in-engine probe (spawns every unique mob, checks meshes)
-	PROBE="$VL_WORLD/worldmods/mcl_addon_probe"
-	mkdir -p "$PROBE"
-	cat > "$PROBE/mod.conf" <<'EOF'
+	run_world() {  # $1 = world dir, $2 = gameid, $3 = log file, $4 = label
+		timeout 90 "$ENGINE_BIN" --server --world "$1" --gameid "$2" \
+			--logfile "$3" >"$WORK/$4.out.log" 2>"$WORK/$4.err.log"
+		if [ ! -f "$3" ]; then
+			BAD "$4: no log (server never started)"
+			echo "--- $4 stdout (head) ---"; head -20 "$WORK/$4.out.log" 2>/dev/null
+			echo "--- $4 stderr (head) ---"; head -20 "$WORK/$4.err.log" 2>/dev/null
+			return
+		fi
+		if grep -q "loaded=8" "$3"; then PASS "8 mobs spawn ($4)"; else BAD "$4 spawn: $(grep -o 'loaded=.*' "$3" | head -1)"; fi
+		if grep -q "ModError\|ERROR\[Main\]" "$3"; then
+			BAD "$4 errors"
+			grep "ModError\|ERROR\[Main\]" "$3" | head -5
+		else PASS "$4 clean"; fi
+	}
+
+	write_probe() {  # $1 = world dir
+		local probe="$1/worldmods/mcl_addon_probe"
+		mkdir -p "$probe"
+		cat > "$probe/mod.conf" <<'EOF'
 name = mcl_addon_probe
 description = verify probe (tools/verify.sh)
 depends = mcl_core
 optional_depends = mc_parity, mobs_mc
 EOF
-	cat > "$PROBE/init.lua" <<'EOF'
+		cat > "$probe/init.lua" <<'EOF'
 minetest.register_on_mods_loaded(function()
 	minetest.after(3, function()
 		local c = { x = 0, y = 0, z = 0 }
@@ -122,21 +144,21 @@ minetest.register_on_mods_loaded(function()
 	end)
 end)
 EOF
+	}
+
+	mkdir -p "$VL_WORLD/worldmods" "$MCLN_WORLD/worldmods"
+	cp -r "$SRC" "$VL_GAME/mods/mc_parity"
+	cp -r "$SRC" "$MCLN_GAME/mods/mc_parity"
+
+	# the in-engine probe (spawns every unique mob, checks meshes)
+	write_probe "$VL_WORLD"
+	write_probe "$MCLN_WORLD"
 
 	echo "-- VoxeLibre --"
-	cp -r "$VL_WORLD" "$VL_WORLD.bak" 2>/dev/null; rm -rf "$VL_WORLD.bak"
-	timeout 60 "$ENGINE_BIN" --server --world "$VL_WORLD" --gameid mineclone2 \
-		--logfile "$WORK/vl.log" >/dev/null 2>&1
-	if grep -q "loaded=8" "$WORK/vl.log"; then PASS "8 mobs spawn (VL)"; else BAD "VL spawn: $(grep -o 'loaded=.*' "$WORK/vl.log" | head -1)"; fi
-	if grep -q "ModError\|ERROR\[Main\]" "$WORK/vl.log"; then BAD "VL errors"; else PASS "VL clean"; fi
+	run_world "$VL_WORLD" mineclone2 "$WORK/vl.log" "VL"
 
 	echo "-- Mineclonia --"
-	cp -r "$VL_WORLD" "$MCLN_WORLD" && rm -rf "$MCLN_WORLD/worldmods" && mkdir -p "$MCLN_WORLD/worldmods"
-	cp -r "$PROBE" "$MCLN_WORLD/worldmods/mcl_addon_probe"
-	timeout 60 "$ENGINE_BIN" --server --world "$MCLN_WORLD" --gameid mineclonia \
-		--logfile "$WORK/mcln.log" >/dev/null 2>&1
-	if grep -q "loaded=8" "$WORK/mcln.log"; then PASS "8 mobs spawn (Mineclonia)"; else BAD "MCLN spawn: $(grep -o 'loaded=.*' "$WORK/mcln.log" | head -1)"; fi
-	if grep -q "ModError\|ERROR\[Main\]" "$WORK/mcln.log"; then BAD "MCLN errors"; else PASS "MCLN clean"; fi
+	run_world "$MCLN_WORLD" mineclonia "$WORK/mcln.log" "MCLN"
 fi
 
 # ---- 4. git state ----
