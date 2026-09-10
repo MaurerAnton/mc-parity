@@ -83,14 +83,23 @@ if [ -z "$ENGINE_BIN" ]; then
 else
 	echo "engine: $ENGINE_BIN"
 	if ! "$ENGINE_BIN" --version >/dev/null 2>&1; then BAD "engine not runnable"; fi
-	if [ ! -d "$VL_GAME" ]; then
-		echo "cloning VoxeLibre ($VL_TAG)…"
-		git clone -q --depth 1 --branch "$VL_TAG" "$VL_REPO" "$VL_GAME" || { BAD "vl clone"; }
-	fi
-	if [ ! -d "$MCLN_GAME" ]; then
-		echo "cloning Mineclonia ($MCLN_TAG)…"
-		git clone -q --depth 1 --branch "$MCLN_TAG" "$MCLN_REPO" "$MCLN_GAME" || { BAD "mcln clone"; }
-	fi
+	clone_game() {  # $1 = repo, $2 = branch, $3 = dir, $4 = label
+		local i
+		for i in 1 2 3; do
+			if [ -d "$3/.git" ]; then return 0; fi
+			echo "cloning $4 ($2, try $i)…"
+			if git clone -q --depth 1 --branch "$2" "$1" "$3" 2>"$WORK/$4.clone.err"; then
+				return 0
+			fi
+			head -3 "$WORK/$4.clone.err" 2>/dev/null
+			rm -rf "$3"  # never keep a partial clone
+			sleep 15
+		done
+		BAD "$4 clone"
+		return 1
+	}
+	clone_game "$VL_REPO" "$VL_TAG" "$VL_GAME" "VoxeLibre"
+	clone_game "$MCLN_REPO" "$MCLN_TAG" "$MCLN_GAME" "Mineclonia"
 
 	# the engine only finds games under its user path: point HOME at our
 	# sandbox (still never touches the real ~/.minetest) and link the
@@ -117,7 +126,18 @@ else
 			echo "--- $4 stderr (head) ---"; head -20 "$WORK/$4.err.log" 2>/dev/null
 			return
 		fi
-		if grep -q "loaded=9" "$3"; then PASS "9 mobs spawn ($4)"; else BAD "$4 spawn: $(grep -o 'loaded=.*' "$3" | head -1)"; fi
+		# the engine must have found the game (a failed clone used to
+		# fall back to the other game and fake a spawn pass)
+		if grep -q "Game \".*\" not found" "$3"; then
+			BAD "$4: game not found"
+			grep "Game \".*\" not found" "$3" | head -2
+			return
+		fi
+		if grep -q "\[verify_probe\] loaded=23/23" "$3"; then
+			PASS "23 mobs spawn ($4)"
+		else
+			BAD "$4 spawn: $(grep -o '\[verify_probe\] loaded=.*' "$3" | head -1)"
+		fi
 		if grep -q "ModError\|ERROR\[Main\]" "$3"; then
 			BAD "$4 errors"
 			grep "ModError\|ERROR\[Main\]" "$3" | head -5
@@ -137,20 +157,29 @@ EOF
 minetest.register_on_mods_loaded(function()
 	minetest.after(3, function()
 		local c = { x = 0, y = 0, z = 0 }
-		for dx = -6, 6 do for dy = -6, 8 do for dz = -6, 6 do
+		for dx = -30, 30 do for dy = -6, 8 do for dz = -6, 6 do
 			minetest.set_node(vector.add(c, { x = dx, y = dy, z = dz }), { name = "air" })
 		end end end
 		local IS_MCLN = mcl_mobs and mcl_mobs.register_spawner ~= nil
 		local mobs = {
-			"mc_parity:creeper", "mc_parity:enderman",
-			"mc_parity:blaze", "mc_parity:pufferfish",
-			"mc_parity:ravager", "mc_parity:wandering_trader",
-			"mc_parity:bee", "mc_parity:drowned",
-			"mc_parity:tadpole",
+			-- the five original mobs
+			"mc_parity:fox", "mc_parity:panda", "mc_parity:camel",
+			"mc_parity:skeleton_horse", "mc_parity:goat",
+			-- ported classics
+			"mc_parity:creeper", "mc_parity:enderman", "mc_parity:blaze",
+			"mc_parity:pufferfish", "mc_parity:ravager",
+			"mc_parity:wandering_trader",
+			-- 1.13-1.19 imports
+			"mc_parity:phantom", "mc_parity:turtle", "mc_parity:frog",
+			"mc_parity:sniffer", "mc_parity:allay", "mc_parity:tadpole",
+			-- 1.15-1.21 uniques
+			"mc_parity:bee", "mc_parity:drowned", "mc_parity:bogged",
+			"mc_parity:armadillo", "mc_parity:breeze", "mc_parity:creaking",
 		}
 		local objs = {}
+		local half = math.ceil(#mobs / 2)
 		for i, m in ipairs(mobs) do
-			local o = minetest.add_entity({ x = (i - 5) * 3, y = 3, z = 0 }, m)
+			local o = minetest.add_entity({ x = (i - half) * 2, y = 3, z = 0 }, m)
 			if o then table.insert(objs, o) end
 		end
 		minetest.after(IS_MCLN and 0.05 or 0.2, function()
@@ -163,7 +192,7 @@ minetest.register_on_mods_loaded(function()
 					if props and props.mesh then valid = valid + 1 end
 				end
 			end
-			minetest.log("action", "[verify_probe] loaded=" .. valid)
+			minetest.log("action", "[verify_probe] loaded=" .. valid .. "/" .. #mobs)
 			for _, o in ipairs(objs) do if o:is_valid() then o:remove() end end
 		end)
 	end)
@@ -171,19 +200,27 @@ end)
 EOF
 	}
 
+	have_vl=0; have_mcln=0
+	[ -d "$VL_GAME/.git" ] && have_vl=1
+	[ -d "$MCLN_GAME/.git" ] && have_mcln=1
+
 	mkdir -p "$VL_WORLD/worldmods" "$MCLN_WORLD/worldmods"
-	cp -r "$SRC" "$VL_GAME/mods/mc_parity"
-	cp -r "$SRC" "$MCLN_GAME/mods/mc_parity"
-
-	# the in-engine probe (spawns every unique mob, checks meshes)
-	write_probe "$VL_WORLD"
-	write_probe "$MCLN_WORLD"
-
-	echo "-- VoxeLibre --"
-	run_world "$VL_WORLD" mineclone2 "$WORK/vl.log" "VL"
-
-	echo "-- Mineclonia --"
-	run_world "$MCLN_WORLD" mineclonia "$WORK/mcln.log" "MCLN"
+	if [ "$have_vl" = 1 ]; then
+		cp -r "$SRC" "$VL_GAME/mods/mc_parity"
+		write_probe "$VL_WORLD"
+		echo "-- VoxeLibre --"
+		run_world "$VL_WORLD" mineclone2 "$WORK/vl.log" "VL"
+	else
+		BAD "VL: clone unavailable — in-engine stage skipped"
+	fi
+	if [ "$have_mcln" = 1 ]; then
+		cp -r "$SRC" "$MCLN_GAME/mods/mc_parity"
+		write_probe "$MCLN_WORLD"
+		echo "-- Mineclonia --"
+		run_world "$MCLN_WORLD" mineclonia "$WORK/mcln.log" "MCLN"
+	else
+		BAD "MCLN: clone unavailable — in-engine stage skipped"
+	fi
 fi
 
 # ---- 4. git state ----
