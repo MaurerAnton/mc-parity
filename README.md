@@ -37,6 +37,7 @@ implemented as a standalone addon mod. Works on top of the game's existing
 | drowned        | game zombie tinted teal                   | ^[colorize                              | *_ocean      | in-game* |
 | creaking       | mc_parity_creaking.b3d (**procedural**)   | painted bark (tools/paint_pale.py)      | heart-only + egg | silent (MC) |
 |                | (+ heart node, resin chain, eyeblossom)   | painted                                 | RoofedForest scatter | —    |
+| pale oak       | — (full block set, pale_oak.lua)          | Mineclonia (CC BY-SA, ported)           | PaleGarden biome | —      |
 
 ## Install
 
@@ -54,6 +55,11 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
 - Models: copied from VoxeLibre (GPLv3+ code / free media) and renamed with
   the `mc_parity_` prefix so they don't clash with the game's files:
   - https://git.minetest.land/VoxeLibre/VoxeLibre (mods/ENTITIES/mobs_mc/models/)
+- Pale garden textures + tree schematics: ported from **Mineclonia**
+  (`mcl_pale_oak`, GPLv3 code / CC BY-SA 4.0 media based on Pixel
+  Perfection — see Mineclonia LEGAL.md), renamed to `mc_parity_*` and
+  node-remapped by `tools/port_pale_oak.py`:
+  - https://codeberg.org/Mineclonia/Mineclonia (mods/ITEMS/mcl_pale_oak)
 - All new files in this mod are prefixed `mc_parity_` to stay unique
   across the game's global texture/model namespace.
 
@@ -619,6 +625,31 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           eyeblossom scatter in dark forests (runtime biome filter).
           Out of scope on purpose: the full pale-garden biome needs the
           pale oak wood set (new logs/leaves/planks).
+37. [x] Round 6 — full pale garden for VoxeLibre (`next` branch):
+        - PALE OAK WOOD SET (pale_oak.lua): Mineclonia ships the complete
+          pale oak via its mcl_trees API; VL has nothing. Ported to VL
+          through VL's own wood APIs (mcl_core.register_tree_trunk/
+          stripped/planks/leaves/sapling, mcl_doors, mcl_stairs,
+          mcl_fences, mcl_signs): log/wood, stripped, planks, leaves,
+          sapling, door, trapdoor, fence + gate, stairs, slab, sign
+          (mcl_signs namespace, planks texture — Mineclonia ships no
+          sign art), pale moss + carpet, hanging moss + tip, block of
+          resin. Sapling growth ABM + bone-meal patch (mcl_core's
+          grow_sapling has no pale oak branch).
+        - TREE SCHEMATICS: the 3 Mineclonia .mts trees were rewritten
+          to our node ids by tools/port_pale_oak.py — the name table is
+          remapped, the zlib node blob + mappings are copied verbatim
+          (no decompression needed; documented MTSM layout).
+        - PALE GARDEN BIOME: registered a hair off RoofedForest's
+          heat/humidity point (rare dark-forest variant), moss as the
+          top node, pale oak schematic decorations + moss/carpet/
+          eyeblossom patches; the creaking-heart scatter now includes
+          PaleGarden.
+        - SKIP LOGIC: the module is a no-op when the game already
+          provides pale oak (Mineclonia) or lacks the VL wood API —
+          verified with a stub harness (25 assertions incl. the skip
+          path) and an in-engine probe spot-check (`pale_oak=true` on
+          both games).
 
 ## Model pipeline (done — reference for future mobs)
 

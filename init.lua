@@ -11,7 +11,7 @@ Implemented (see README work plan 1-31, all done as of 2026-08-08):
   spectator mode, nether lava + 100% item closure (1.0-1.21).
 Assets: models/ ships every .b3d (procedural via tools/gen_b3d.py where
 noted); textures from Pixel-Perfection-Legacy, CC BY-SA 4.0.
-Remaining TODO-tail (genuinely open): trader trade UI on VL.
+Remaining TODO-tail (genuinely open): none — see README work plan.
 
 API notes (verified 2026-08):
   - registration: mcl_mobs.register_mob("<mod>:<name>", def) — both games;
@@ -907,8 +907,17 @@ if mc_parity.feature_enabled("trail_ruins") then
 end
 
 -- ---------------------------------------------------------------------------
+-- PALE GARDEN (MC 1.21.4) — full pale oak wood set + biome port for
+-- VoxeLibre (see pale_oak.lua). Must load BEFORE mobs_pale.lua so the
+-- PaleGarden biome exists for the creaking-heart/eyeblossom scatter.
+-- ---------------------------------------------------------------------------
+if mc_parity.feature_enabled("pale_oak") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/pale_oak.lua")
+end
+
+-- ---------------------------------------------------------------------------
 -- PALE GARDEN TIE-IN (MC 1.21.4: creaking + heart + resin + eyeblossom) —
--- see mobs_pale.lua. No bloomery/wood set in scope (see file header).
+-- see mobs_pale.lua. No bloomery in scope (see file header).
 -- ---------------------------------------------------------------------------
 if mc_parity.feature_enabled("pale") then
 	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_pale.lua")

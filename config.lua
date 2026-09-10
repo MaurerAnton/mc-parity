@@ -19,6 +19,7 @@ local FEATURES = {
 	breeze          = { version = "1.21", desc = "Breeze + wind volley" },
 	trial_chambers  = { version = "1.21", desc = "Trial chambers + spawner + vault" },
 	pale            = { version = "1.21", desc = "Creaking + heart + resin + eyeblossom" },
+	pale_oak        = { version = "1.21", desc = "Pale garden: pale oak wood set + biome (VoxeLibre port)" },
 	-- 1.20 (Trails & Tales)
 	sniffer         = { version = "1.20", desc = "Sniffer" },
 	camel           = { version = "1.20", desc = "Camel + seats" },
@@ -88,7 +89,7 @@ local ITEM_VERSION = {
 	recovery_compass = "1.21", poison_arrow = "1.21",
 	creaking = "1.21", creaking_heart = "1.21",
 	resin_clump = "1.21", resin_brick = "1.21", resin_bricks = "1.21",
-	chiseled_resin_bricks = "1.21",
+	chiseled_resin_bricks = "1.21", block_of_resin = "1.21",
 	eyeblossom_open = "1.21", eyeblossom_closed = "1.21",
 	-- 1.20 (Trails & Tales)
 	sniffer = "1.20", camel = "1.20", brush = "1.20", decorated_pot = "1.20",
@@ -128,6 +129,7 @@ local ITEM_VERSION = {
 	["coral_block_"] = "1.13", ["coral_fan_"] = "1.13",
 	["candle_"] = "1.17", ["dripstone_top_"] = "1.17", ["dripstone_bottom_"] = "1.17",
 	["pottery_sherd_"] = "1.20", ["arrow_"] = "classic", ["shulker_box"] = "classic",
+	["pale_oak_"] = "1.21",
 }
 
 local VERSION_SHORT = {

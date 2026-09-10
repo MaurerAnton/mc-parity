@@ -62,6 +62,13 @@ grep -q 'register_mob("mc_parity:creaking"' "$SRC/mobs_pale.lua" && PASS "creaki
 grep -q 'register_node(HEART' "$SRC/mobs_pale.lua" && grep -q 'creaking_heart = "mc_parity:creaking_heart"\|HEART = "mc_parity:creaking_heart"' "$SRC/mobs_pale.lua" && PASS "creaking heart" || BAD "creaking heart"
 grep -q 'register_craftitem("mc_parity:resin_clump"' "$SRC/mobs_pale.lua" && PASS "resin" || BAD "resin"
 grep -q 'eyeblossom_open' "$SRC/mobs_pale.lua" && PASS "eyeblossom" || BAD "eyeblossom"
+grep -q 'register_tree_trunk("pale_oak_tree"' "$SRC/pale_oak.lua" && PASS "pale oak wood" || BAD "pale oak wood"
+grep -q 'name = "PaleGarden"' "$SRC/pale_oak.lua" && PASS "pale garden biome" || BAD "pale garden biome"
+grep -q 'register_node("mc_parity:block_of_resin"' "$SRC/mobs_pale.lua" && PASS "block of resin" || BAD "block of resin"
+for i in 1 2 3; do
+	[ -f "$SRC/schematics/mc_parity_pale_oak_$i.mts" ] || BAD "pale oak schematic $i"
+done
+[ -f "$SRC/schematics/mc_parity_pale_oak_1.mts" ] && PASS "pale oak schematics" || true
 grep -q 'register_mob("mc_parity:drowned"' "$SRC/mobs_121.lua" && PASS "drowned" || BAD "drowned"
 grep -q 'register_mob("mc_parity:bogged"' "$SRC/mobs_121.lua" && PASS "bogged" || BAD "bogged"
 grep -q 'register_mob("mc_parity:breeze"' "$SRC/mobs_121.lua" && PASS "breeze" || BAD "breeze"
@@ -138,6 +145,12 @@ else
 		else
 			BAD "$4 spawn: $(grep -o '\[verify_probe\] loaded=.*' "$3" | head -1)"
 		fi
+		# pale garden port (VL) or game-provided pale oak (Mineclonia)
+		if grep -q "\[verify_probe\] pale_oak=true" "$3"; then
+			PASS "pale oak present ($4)"
+		else
+			BAD "$4: pale oak missing ($(grep -o '\[verify_probe\] pale_oak=.*' "$3" | head -1))"
+		fi
 		if grep -q "ModError\|ERROR\[Main\]" "$3"; then
 			BAD "$4 errors"
 			grep "ModError\|ERROR\[Main\]" "$3" | head -5
@@ -194,6 +207,19 @@ minetest.register_on_mods_loaded(function()
 			end
 			minetest.log("action", "[verify_probe] loaded=" .. valid .. "/" .. #mobs)
 			for _, o in ipairs(objs) do if o:is_valid() then o:remove() end end
+
+			-- registration spot-checks: pale garden port (VL) or the
+			-- game's own pale oak (Mineclonia)
+			local function has_prefix(prefix)
+				for n in pairs(minetest.registered_nodes) do
+					if n:find(prefix, 1, true) == 1 then return true end
+				end
+				return false
+			end
+			local pale = minetest.registered_nodes["mc_parity:pale_oak_planks"] ~= nil
+				or has_prefix("mcl_pale_oak:")
+			minetest.log("action", "[verify_probe] pale_oak=" .. tostring(pale)
+				.. " biome=" .. tostring(minetest.registered_biomes["PaleGarden"] ~= nil))
 		end)
 	end)
 end)

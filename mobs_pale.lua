@@ -253,6 +253,27 @@ minetest.register_craft({
 	},
 })
 
+-- block of resin (MC 1.21.4; 9 clumps <-> block)
+minetest.register_node("mc_parity:block_of_resin", {
+	description = S("Block of Resin"),
+	tiles = { "mc_parity_resin_block.png" },
+	groups = { dig_immediate = 3, handy = 1 },
+	sounds = mcl_sounds.node_sound_wood_defaults(),
+	_mcl_hardness = 0,
+})
+minetest.register_craft({
+	output = "mc_parity:block_of_resin",
+	recipe = {
+		{ "mc_parity:resin_clump", "mc_parity:resin_clump", "mc_parity:resin_clump" },
+		{ "mc_parity:resin_clump", "mc_parity:resin_clump", "mc_parity:resin_clump" },
+		{ "mc_parity:resin_clump", "mc_parity:resin_clump", "mc_parity:resin_clump" },
+	},
+})
+minetest.register_craft({
+	output = "mc_parity:resin_clump 9",
+	recipe = { { "mc_parity:block_of_resin" } },
+})
+
 -- eyeblossom: closed by day, open by night (MC 1.21.4)
 minetest.register_node("mc_parity:eyeblossom_closed", {
 	description = S("Closed Eyeblossom"),
@@ -294,7 +315,8 @@ minetest.register_abm({
 })
 
 -- scatter in the dark forests both games share names with (VL: RoofedForest;
--- the mansion code hit missing-biome errors on Mineclonia, so filter at load)
+-- the mansion code hit missing-biome errors on Mineclonia, so filter at load).
+-- PaleGarden (pale_oak.lua, loaded first) is included when present.
 do
 	local want = { RoofedForest = true, RoofedForestM = true,
 		DarkForest = true, DarkOakForest = true, PaleGarden = true }
@@ -302,11 +324,15 @@ do
 	for name in pairs(minetest.registered_biomes) do
 		if want[name] then table.insert(biomes, name) end
 	end
-	if #biomes > 0 and minetest.registered_nodes["mcl_core:dirt_with_grass"] then
+	local place_on = { "mcl_core:dirt_with_grass" }
+	if minetest.registered_nodes["mc_parity:pale_oak_moss"] then
+		table.insert(place_on, "mc_parity:pale_oak_moss")
+	end
+	if #biomes > 0 then
 		minetest.register_decoration({
 			name = "mc_parity:pale_heart_scatter",
 			deco_type = "simple",
-			place_on = {"mcl_core:dirt_with_grass"},
+			place_on = place_on,
 			sidelen = 16,
 			fill_ratio = 0.0002,
 			biomes = biomes,
@@ -317,7 +343,7 @@ do
 		minetest.register_decoration({
 			name = "mc_parity:pale_eyeblossom_scatter",
 			deco_type = "simple",
-			place_on = {"mcl_core:dirt_with_grass"},
+			place_on = place_on,
 			sidelen = 16,
 			fill_ratio = 0.004,
 			biomes = biomes,
