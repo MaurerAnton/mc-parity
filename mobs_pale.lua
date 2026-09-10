@@ -244,7 +244,7 @@ minetest.register_craft({
 		{ "mc_parity:resin_brick", "mc_parity:resin_brick" },
 	},
 })
--- no slabs in scope: chiseled from two stacked brick blocks (documented)
+-- chiseled from two stacked brick blocks (MC recipe)
 minetest.register_craft({
 	output = "mc_parity:chiseled_resin_bricks",
 	recipe = {
@@ -252,6 +252,23 @@ minetest.register_craft({
 		{ "mc_parity:resin_bricks" },
 	},
 })
+
+-- resin stairs/slab/wall (MC 1.21.4; VL APIs, auto-crafted from the
+-- brick block by the mcl_stairs/mcl_walls helpers)
+if mcl_stairs and mcl_stairs.register_stair then
+	local rgroups = { pickaxe = 1, dig_by_pickaxe = 1, material_stone = 1 }
+	mcl_stairs.register_stair("resin_bricks", "mc_parity:resin_bricks",
+		table.merge(rgroups, {}), { "mc_parity_resin_bricks.png" },
+		S("Resin Brick Stairs"), mcl_sounds.node_sound_stone_defaults())
+	mcl_stairs.register_slab("resin_bricks", "mc_parity:resin_bricks",
+		table.merge(rgroups, {}), { "mc_parity_resin_bricks.png" },
+		S("Resin Brick Slab"), mcl_sounds.node_sound_stone_defaults(),
+		nil, nil, S("Double Resin Brick Slab"))
+end
+if mcl_walls and mcl_walls.register_wall then
+	mcl_walls.register_wall("mc_parity:resin_brick_wall",
+		S("Resin Brick Wall"), "mc_parity:resin_bricks")
+end
 
 -- block of resin (MC 1.21.4; 9 clumps <-> block)
 minetest.register_node("mc_parity:block_of_resin", {

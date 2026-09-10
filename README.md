@@ -670,6 +670,15 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           feature.
         - Verified with a 22-assertion stub harness (throw/cooldown/
           creative, burst damage + thrower immunity, hooks, lifetime).
+39. [x] Round 8 — pale garden polish (`next` branch):
+        - RESIN STAIRS/SLAB/WALL (mobs_pale.lua): the full MC 1.21.4
+          resin block family via the VL mcl_stairs/mcl_walls helpers
+          (crafts auto-generated from the brick block).
+        - HANGING MOSS GROWTH (pale_oak.lua): bone meal elongates the
+          strand by one node (cap 8, tip conversion), breaking a segment
+          removes the floating tail below it, placing under a tip
+          converts it to a body node (Mineclonia behavior adapted to
+          VL's APIs). Verified with a 12-assertion stub harness.
 
 ## Model pipeline (done — reference for future mobs)
 

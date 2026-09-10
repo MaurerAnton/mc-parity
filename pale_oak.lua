@@ -222,7 +222,37 @@ minetest.register_craft({
 })
 
 -- hanging moss: plantlike strands (the tree schematics place them under
--- leaves). Simplified vs Mineclonia: static, no bone-meal elongation.
+-- leaves). Growth: bone meal elongates the strand by one node (max 8),
+-- breaking a segment removes the floating tail below it (Mineclonia
+-- behavior, adapted to VL APIs).
+local MOSS_NODE = "mc_parity:pale_oak_hanging_moss"
+local TIP_NODE = "mc_parity:pale_oak_hanging_moss_tip"
+local MOSS_MAX = 8
+
+local function moss_len_below(pos)
+	local n = 0
+	local p = vector.offset(pos, 0, -1, 0)
+	while n < MOSS_MAX and minetest.get_item_group(
+			minetest.get_node(p).name, "pale_hanging_moss") > 0 do
+		n = n + 1
+		p = vector.offset(p, 0, -1, 0)
+	end
+	return n, p  -- strand length below pos + first non-moss position
+end
+
+local function grow_hanging_moss(pos)
+	local len, below = moss_len_below(pos)
+	-- len counts the strand below pos; pos itself is the +1
+	if len + 1 >= MOSS_MAX then return false end
+	if minetest.get_node(below).name ~= "air" then return false end
+	local tip_pos = vector.offset(below, 0, 1, 0)
+	if minetest.get_node(tip_pos).name == TIP_NODE then
+		minetest.swap_node(tip_pos, { name = MOSS_NODE })
+	end
+	minetest.set_node(below, { name = TIP_NODE })
+	return true
+end
+
 local hanging_tpl = {
 	description = S("Pale Hanging Moss"),
 	tiles = { TEX.hanging },
@@ -232,12 +262,41 @@ local hanging_tpl = {
 	paramtype = "light",
 	walkable = false,
 	groups = { dig_immediate = 3, shearsy = 1, deco_block = 1,
-		attached_node = 1 },
+		attached_node = 1, pale_hanging_moss = 1 },
 	sounds = mcl_sounds.node_sound_leaves_defaults(),
 	_mcl_hardness = 0,
+	-- bone meal elongates the strand (3-arg VL / 4-arg MCLN signatures)
+	_on_bone_meal = function(_, _, pointed_thing, pos4)
+		local pos = pos4
+		if type(pos) ~= "table" and type(pointed_thing) == "table" then
+			pos = pointed_thing.under
+		end
+		if pos then grow_hanging_moss(pos) end
+	end,
+	on_construct = function(pos)
+		local above = vector.offset(pos, 0, 1, 0)
+		if minetest.get_node(above).name == TIP_NODE then
+			minetest.swap_node(above, { name = MOSS_NODE })
+		end
+		minetest.swap_node(pos, { name = TIP_NODE })
+	end,
+	on_destruct = function(pos)
+		local above = vector.offset(pos, 0, 1, 0)
+		if minetest.get_item_group(minetest.get_node(above).name,
+				"pale_hanging_moss") > 0 then
+			minetest.swap_node(above, { name = TIP_NODE })
+		end
+		-- drop the tail below (would otherwise float)
+		local p = vector.offset(pos, 0, -1, 0)
+		while minetest.get_item_group(minetest.get_node(p).name,
+				"pale_hanging_moss") > 0 do
+			minetest.swap_node(p, { name = "air" })
+			p = vector.offset(p, 0, -1, 0)
+		end
+	end,
 }
-minetest.register_node("mc_parity:pale_oak_hanging_moss", hanging_tpl)
-minetest.register_node("mc_parity:pale_oak_hanging_moss_tip",
+minetest.register_node(MOSS_NODE, hanging_tpl)
+minetest.register_node(TIP_NODE,
 	table.merge(hanging_tpl, {
 		description = S("Pale Hanging Moss Tip"),
 		tiles = { TEX.hanging_tip },
