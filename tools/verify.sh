@@ -59,7 +59,7 @@ grep -q '_mca_dupe' "$SRC/allay.lua" && PASS "allay duplication" || BAD "allay d
 grep -q 'meta:set_string("description"' "$SRC/init.lua" && PASS "bundle tooltip" || BAD "bundle tooltip"
 grep -q '_mca_sniff_t' "$SRC/mobs_import.lua" && PASS "sniffer sniffing" || BAD "sniffer sniffing"
 grep -q 'register_mob("mc_parity:creaking"' "$SRC/mobs_pale.lua" && PASS "creaking" || BAD "creaking"
-grep -q 'register_node("mc_parity:creaking_heart"' "$SRC/mobs_pale.lua" && PASS "creaking heart" || BAD "creaking heart"
+grep -q 'register_node(HEART' "$SRC/mobs_pale.lua" && grep -q 'creaking_heart = "mc_parity:creaking_heart"\|HEART = "mc_parity:creaking_heart"' "$SRC/mobs_pale.lua" && PASS "creaking heart" || BAD "creaking heart"
 grep -q 'register_craftitem("mc_parity:resin_clump"' "$SRC/mobs_pale.lua" && PASS "resin" || BAD "resin"
 grep -q 'eyeblossom_open' "$SRC/mobs_pale.lua" && PASS "eyeblossom" || BAD "eyeblossom"
 grep -q 'register_mob("mc_parity:drowned"' "$SRC/mobs_121.lua" && PASS "drowned" || BAD "drowned"
