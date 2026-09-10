@@ -1,15 +1,18 @@
 --[[
 mc_parity — Extra Minecraft-style mobs for VoxeLibre / Mineclonia.
 
-Implemented (retexture of existing game models, assets from
-Pixel-Perfection-Legacy, CC BY-SA 4.0):
-  fox            (mesh base: mobs_mc_wolf.b3d)      — hunts chickens/rabbits
-  panda          (mesh base: mobs_mc_polarbear.b3d) — 7 personalities
-  camel          (mesh base: mobs_mc_llama.b3d)     — rideable (1 driver)
-  skeleton_horse (mesh base: mobs_mc_horse.b3d)     — lightning skeleton trap
-
-WIP (need new .b3d models in Blender — no model exists anywhere in Luanti):
-  allay, frog, warden, phantom, turtle, sniffer, goat
+Implemented (see README work plan 1-31, all done as of 2026-08-08):
+  fox, panda, camel (2 seats), skeleton_horse (+ trap), goat (+ horns),
+  allay, frog, warden (+ vibrations/sonic boom), phantom (3-nights),
+  turtle (+ eggs/scute/shell), sniffer, armadillo, bee, drowned,
+  bogged, breeze (+ trial chambers), creeper/enderman/blaze/pufferfish/
+  ravager/trader (VL ports), bundle, deep dark + ancient city,
+  woodland mansion, end city towers, trail ruins, glass chests,
+  spectator mode, nether lava + 100% item closure (1.0-1.21).
+Assets: models/ ships every .b3d (procedural via tools/gen_b3d.py where
+noted); textures from Pixel-Perfection-Legacy, CC BY-SA 4.0.
+Remaining TODO-tail (genuinely open): bundle shift-click insert,
+CC0 fox/bee/goat sound samples, trader trade UI on VL, tadpole.
 
 API notes (verified 2026-08):
   - registration: mcl_mobs.register_mob("<mod>:<name>", def) — both games;
@@ -295,7 +298,7 @@ local camel = {
 		eat = "mobs_mc_animal_eat_generic",
 		distance = 16,
 	},
-	-- Riding (llama driver pattern; MC camels seat 2 — TODO: second seat)
+	-- Riding (llama driver pattern; MC 2-seat: passenger handled in on_rightclick below)
 	do_custom = function(self, dtime)
 		if not self.v3 then
 			self.v3 = 0
@@ -841,19 +844,14 @@ else
 end
 
 -- ---------------------------------------------------------------------------
--- WIP — need new .b3d models (Blender, VL cuboid style). Textures are already
--- shipped in textures/:
---   allay     mc_parity_allay.png
---   frog      mc_parity_frog_{temperate,cold,warm}.png
---   warden    mc_parity_warden.png (+ _glow, _ears)
---   phantom   mc_parity_phantom.png (+ _eyes)
---   turtle    mc_parity_turtle.png
---   sniffer   mc_parity_sniffer.png
---   goat      mc_parity_goat.png
+-- MODEL PIPELINE (done — kept as reference for future mobs).
+-- All WIP mobs now ship their .b3d in models/ (Bettercraft imports +
+-- procedural tools/gen_b3d.py for goat/armadillo/bee/breeze). Textures in
+-- textures/. New mobs: follow the VL cuboid style.
 -- Model pipeline docs: https://docs.luanti.org/for-creators/models/
 --   Using Blender:      https://docs.luanti.org/for-creators/models/using-blender/
 --   Using Blockbench:   https://docs.luanti.org/for-creators/models/using-blockbench/
--- Registration template (uncomment once the model exists):
+-- Historical registration template (the warden now lives in warden.lua):
 --
 -- local warden = {
 --     description = S("Warden"),
@@ -868,7 +866,6 @@ end
 --     mesh = "mc_parity_warden.b3d",
 --     textures = {{"mc_parity_warden.png"}},
 --     visual_size = {x = 3.0, y = 3.0},
---     -- TODO: vibration sensing via mcl_sculk sensor events
 -- }
 -- mcl_mobs.register_mob("mc_parity:warden", warden)
 -- register_egg("mc_parity:warden", S("Warden"), "#0a3b2e", "#7ef0c8", 0)

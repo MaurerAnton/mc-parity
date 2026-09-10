@@ -54,10 +54,10 @@ grep -q 'register_node("mc_parity:vault"' "$SRC/mobs_trial.lua" && PASS "vault" 
 grep -q 'register_node("mc_parity:suspicious_sand"' "$SRC/mobs_ruins.lua" && PASS "suspicious sand" || BAD "suspicious sand"
 grep -q 'register_node("mc_parity:suspicious_gravel"' "$SRC/mobs_ruins.lua" && PASS "suspicious gravel" || BAD "suspicious gravel"
 grep -q 'register_tool("mc_parity:brush"' "$SRC/mobs_ruins.lua" && PASS "brush" || BAD "brush"
-grep -q 'register_record("Relic"' "$SRC/mobs_ruins.lua" && PASS "relic disc" || BAD "relic disc"
+grep -q 'title = "Relic"' "$SRC/mobs_ruins.lua" && PASS "relic disc" || BAD "relic disc"
 grep -q 'build_woodland_mansion' "$SRC/legacy.lua" && PASS "mansion builder" || BAD "mansion"
 grep -q 'build_end_city_tower' "$SRC/legacy.lua" && PASS "end city builder" || BAD "end city"
-grep -q 'register_record("Cat"' "$SRC/legacy.lua" && PASS "cat disc" || BAD "cat disc"
+grep -q 'title = "Cat"' "$SRC/legacy.lua" && PASS "cat disc" || BAD "cat disc"
 
 # ---- 3. in-engine (needs luanti + the games; skipped when unavailable) ----
 echo "== [3/5] in-engine checks =="
