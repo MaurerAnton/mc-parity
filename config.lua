@@ -143,6 +143,20 @@ function mc_parity.item_version_label(v)
 	return VERSION_SHORT[v]
 end
 
+-- jukebox discs, dual-game: Mineclonia takes the table form (its positional
+-- form is deprecated and warns on every start); VoxeLibre master only
+-- understands the positional form (verified: table form ModErrors in
+-- VL's mcl_jukebox/init.lua concatenating the identifier). The positional
+-- order (title, author, id, texture, sound) is identical on both games.
+function mc_parity.register_record(def)
+	if not (mcl_jukebox and mcl_jukebox.register_record) then return end
+	if mcl_mobs.register_spawner then
+		mcl_jukebox.register_record(def)
+	else
+		mcl_jukebox.register_record(def.title, def.author, def.id, def.texture, def.sound)
+	end
+end
+
 -- ---------------------------------------------------------------- config --
 local storage = minetest.get_mod_storage()
 local config = { versions = {}, disabled = {} }  -- disabled: set of feature ids

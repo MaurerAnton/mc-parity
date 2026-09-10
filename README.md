@@ -498,9 +498,13 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           spectral arrow (mcl_core vs mcl_nether glowstone_dust) resolve
           the item per game — fixes the mcl_craftguide "ingredient X
           doesn't exist" warnings on Mineclonia.
-        - MUSIC DISCS: all register_record calls use the table form
-          (the positional form is deprecated and spammed mcl_jukebox
-          warnings on every start).
+        - MUSIC DISCS: all disc registrations go through
+          mc_parity.register_record (config.lua) — table form on
+          Mineclonia (its positional form is deprecated and spammed
+          mcl_jukebox warnings on every start), positional
+          (title, author, id, texture, sound) on VoxeLibre master
+          (its register_record is positional-only — the table form
+          ModErrors concatenating the identifier).
         - MEDIA COMPLETION: turtle armor inventory icons
           (mc_parity_inv_*_turtle), chain inventory icon, heavy core
           block textures (procedural, tools/gen_heavy_core.py) — the
@@ -535,6 +539,11 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           Engine probe now finds `luantiserver` (the 5.16 server binary
           name) — before, the in-engine stage silently SKIPPED on every
           CI run because it only looked for `luanti-server`.
+        - JUKEBOX dual-game fix (legacy.lua, mobs_ruins.lua, config.lua):
+          the table-form discs ModErrored on VoxeLibre master (VL-only
+          API, Mineclonia-only table support) — found by the re-enabled
+          in-engine stage. Relic sound id normalized to extensionless
+          (matches both games' own record ids).
 
 ## Model pipeline (done — reference for future mobs)
 
