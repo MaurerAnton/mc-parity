@@ -532,6 +532,9 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
         - CI: verify.sh disc markers updated to the table form
           (title = "Relic"/"Cat") — the 0.1-beta jukebox fix changed the
           call shape without updating the markers (3 red runs on main).
+          Engine probe now finds `luantiserver` (the 5.16 server binary
+          name) — before, the in-engine stage silently SKIPPED on every
+          CI run because it only looked for `luanti-server`.
 
 ## Model pipeline (done — reference for future mobs)
 

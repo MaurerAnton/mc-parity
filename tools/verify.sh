@@ -61,7 +61,7 @@ grep -q 'title = "Cat"' "$SRC/legacy.lua" && PASS "cat disc" || BAD "cat disc"
 
 # ---- 3. in-engine (needs luanti + the games; skipped when unavailable) ----
 echo "== [3/5] in-engine checks =="
-ENGINE_BIN="$(command -v luanti-server || command -v luanti || command -v minetest || true)"
+ENGINE_BIN="$(command -v luantiserver || command -v luanti-server || command -v luanti || command -v minetest || true)"
 if [ -z "$ENGINE_BIN" ]; then
 	echo "SKIP: luanti/minetest not installed (luac checks only)"
 else
