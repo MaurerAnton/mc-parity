@@ -76,7 +76,11 @@ local BEE = {
 	run_velocity = 4,
 	armor = { fleshy = 100 },
 	damage = 2,
-	sounds = {},  -- no bee sounds in either game (TODO: CC0 synthesis)
+	-- CC0 synthesized loopable buzz (tools/gen_sounds.py — ours)
+	sounds = {
+		random = "mc_parity_bee_buzz",
+		distance = 16,
+	},
 
 	on_spawn = function(self)
 		self._bee_pollinated = nil   -- timestamp when pollen was picked up

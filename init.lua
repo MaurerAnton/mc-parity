@@ -11,8 +11,7 @@ Implemented (see README work plan 1-31, all done as of 2026-08-08):
   spectator mode, nether lava + 100% item closure (1.0-1.21).
 Assets: models/ ships every .b3d (procedural via tools/gen_b3d.py where
 noted); textures from Pixel-Perfection-Legacy, CC BY-SA 4.0.
-Remaining TODO-tail (genuinely open): CC0 fox/bee/goat sound samples,
-trader trade UI on VL, tadpole (frog breeding chain).
+Remaining TODO-tail (genuinely open): trader trade UI on VL.
 
 API notes (verified 2026-08):
   - registration: mcl_mobs.register_mob("<mod>:<name>", def) — both games;
@@ -141,11 +140,11 @@ local fox = {
 	fear_height = 4,
 	jump = true,
 	floats = 1,
-	-- Placeholder: game's wolf sounds (free, CC BY-SA). TODO: CC0 fox barks.
+	-- CC0 synthesized barks (tools/gen_sounds.py — ours, no external media)
 	sounds = {
-		random = "mobs_mc_wolf_bark",
-		damage = {name = "mobs_mc_wolf_hurt", gain = 0.6},
-		death = {name = "mobs_mc_wolf_death", gain = 0.6},
+		random = "mc_parity_fox_bark",
+		damage = {name = "mc_parity_fox_hurt", gain = 0.8},
+		death = {name = "mc_parity_fox_hurt", gain = 0.8},
 		distance = 16,
 	},
 	animation = {
@@ -403,9 +402,10 @@ local goat = {
 		run_start = 0, run_end = 0,
 	},
 	sounds = {
-		random = "mobs_mc_llama",
-		damage = { name = "mobs_mc_cow_hurt", gain = 0.6 },
-		death = { name = "mobs_mc_cow_hurt", gain = 0.6 },
+		-- CC0 synthesized bleats (tools/gen_sounds.py — ours)
+		random = "mc_parity_goat_bleat",
+		damage = { name = "mc_parity_goat_hurt", gain = 0.8 },
+		death = { name = "mc_parity_goat_hurt", gain = 0.8 },
 		distance = 16,
 	},
 	-- MC parity: horns come ONLY from charged rams (1-2), never on death
@@ -847,6 +847,15 @@ end
 -- see mobs_import.lua. Must load AFTER register_spawn helper + register_egg.
 -- ---------------------------------------------------------------------------
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_import.lua")
+
+-- ---------------------------------------------------------------------------
+-- TADPOLE CHAIN (frog breeding: slimeball -> frogspawn -> tadpole -> frog;
+-- bucket of tadpole) — see mobs_tadpole.lua. Loads after mobs_import so the
+-- frog entity exists for the breeding patch (no-op when frog is disabled).
+-- ---------------------------------------------------------------------------
+if mc_parity.feature_enabled("tadpole") then
+	dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/mobs_tadpole.lua")
+end
 
 -- ---------------------------------------------------------------------------
 -- ALLAY (Bettercraft import + movement rewrite for both games) — allay.lua

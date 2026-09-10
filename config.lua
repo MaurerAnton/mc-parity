@@ -27,6 +27,7 @@ local FEATURES = {
 	warden          = { version = "1.19", desc = "Warden + sonic boom + darkness" },
 	allay           = { version = "1.19", desc = "Allay" },
 	frog            = { version = "1.19", desc = "Frog" },
+	tadpole         = { version = "1.19", desc = "Tadpole + frogspawn + bucket (frog breeding)" },
 	deep_dark       = { version = "1.19", desc = "Deep dark biome + ancient city" },
 	sculk           = { version = "1.19", desc = "Sculk sensor/shrieker + vibrations + redstone" },
 	-- 1.17 (Caves & Cliffs)
@@ -91,6 +92,7 @@ local ITEM_VERSION = {
 	pitcher_plant = "1.20", torchflower = "1.20",
 	-- 1.19 (The Wild)
 	warden = "1.19", allay = "1.19", frog = "1.19",
+	tadpole = "1.19", bucket_tadpole = "1.19", frogspawn = "1.19",
 	sculk_sensor = "1.19", sculk_sensor_active = "1.19", sculk_shrieker = "1.19",
 	echo_shard = "1.19",
 	-- 1.17 (Caves & Cliffs)

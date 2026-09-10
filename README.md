@@ -11,24 +11,26 @@ implemented as a standalone addon mod. Works on top of the game's existing
 
 | Mob            | Model (shipped in `models/`)             | Texture (Pixel-Perfection-Legacy)       | Spawn        | Sounds |
 |----------------|------------------------------------------|-----------------------------------------|--------------|--------|
-| fox            | mc_parity_fox.b3d (VL wolf base)         | fox.png (+ snow/sleep variants shipped) | Taiga family | in-game*|
+| fox            | mc_parity_fox.b3d (VL wolf base)         | fox.png (+ snow/sleep variants shipped) | Taiga family | synthesized CC0 |
 |                |                                          | hunts chickens/rabbits (MC parity)     |              |        |
 | panda          | mc_parity_panda.b3d (real model)         | panda.png (+ 6 personality variants)   | BambooJungle | in-game*|
 | camel          | mc_parity_camel.b3d (real model)         | camel.png                               | Desert       | in-game*|
 |                |                                          | rideable, 2 seats (MC parity)          |              |        |
 | skeleton_horse | mc_parity_skeleton_horse.b3d (VL base)   | horse_skeleton.png                      | trap only    | in-game*|
 |                |                                          | lightning skeleton trap (both games)   |              |        |
-| goat           | mc_parity_goat.b3d (**procedural**, tools/gen_b3d.py) | goat.png (Pixel-Perfection) | ExtremeHills/#is_mountain | in-game* |
+| goat           | mc_parity_goat.b3d (**procedural**, tools/gen_b3d.py) | goat.png (Pixel-Perfection) | ExtremeHills/#is_mountain | synthesized CC0 |
 |                |                                          | ramming + horns (MC parity)            |              |        |
 | bundle (item)  | — (craftitem)                             | bundle.png                              | —            | —      |
 | allay          | mc_parity_allay.b3d                       | allay.png                               | egg only     | in-game* |
 | frog           | mc_parity_frog.b3d                        | frog_{temperate,cold,warm}.png          | Swampland    | in-game* |
+| tadpole        | mc_parity_tadpole.b3d (**procedural**)    | painted (tools/paint_tadpole.py)        | Swampland    | silent (MC) |
+|                | (+ frogspawn node, bucket, slimeball breeding) |                                    |              |        |
 | warden         | mc_parity_warden.b3d                      | warden.png (+ glow/ears layers)         | shrieker-only| synthesized CC0 |
 | phantom        | mc_parity_phantom.b3d                     | phantom.png (+ eyes)                    | night / 3 sleepless nights | in-game* |
 | turtle         | mc_parity_turtle.b3d                      | big_sea_turtle.png (+ eggs/shell)       | StoneBeach   | in-game* |
 | sniffer        | mc_parity_sniffer.b3d                     | sniffer.png                             | egg only     | in-game* |
 | armadillo      | mc_parity_armadillo.b3d (**procedural**)  | painted (tools/paint_121.py)            | Savanna      | in-game* |
-| bee            | mc_parity_bee.b3d (**procedural**)        | painted stripes + wings                 | flowers      | TODO (CC0 synthesis) |
+| bee            | mc_parity_bee.b3d (**procedural**)        | painted stripes + wings                 | flowers      | synthesized CC0 |
 | breeze         | mc_parity_breeze.b3d (**procedural**)     | painted white/blue                      | trial spawner + egg | in-game* |
 | bogged         | game skeleton model + overlay             | bogged.png (Bettercraft, GPLv3)         | Swampland    | in-game* |
 | creeper/enderman/blaze/pufferfish/ravager/trader | ported models (mobs_port.lua) | game textures | per-biome | in-game* |
@@ -56,8 +58,8 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
 ## Work plan (in order)
 
 1. [x] 4 retexture mobs registered (fox, panda, camel, skeleton_horse)
-2. [x] Sounds for all 4 mobs — in-game free sounds (CC BY-SA); *CC0 external
-        sounds remain optional (fox uses wolf barks as placeholder)
+2. [x] Sounds — CC0 synthesized barks/bleats/buzz (tools/gen_sounds.py,
+        ours, no external media); the rest use in-game free sounds (CC BY-SA)
 3. [x] Fox: chicken/rabbit hunting behavior (MC parity)
 4. [x] Panda personalities (variant textures already shipped)
 5. [x] Skeleton horse: lightning skeleton trap (VL; 4 skeletons, hostile)
@@ -177,7 +179,7 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
 17. [x] Goat polish (init.lua): MC ramming — provoked goats wind up 0.7s,
         charge (damage fleshy 2 + knockback), charged rams drop goat horns
         (new mc_parity:goat_horn item, Pixel-Perfection texture); horn
-        drop on death; llama/cow sounds (the game's own CC BY-SA media).
+        drop on death; CC0 synthesized bleats (tools/gen_sounds.py).
         Skeleton trap: confirmed working on BOTH games — Mineclonia ships a
         COMPAT "lightning" shim whose metatable resolves lightning.* to
         mcl_lightning (same register_on_strike API as VL).
@@ -212,9 +214,9 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           (MC parity). The patch covers any mcl_beds:* node.
         - GOAT HORN INSTRUMENT: the horn plays a random note from the
           game's own mesecons_noteblock sounds (CC BY-SA game media).
-        - CC0 goat sounds: searched OpenGameArt — only a CC-BY variant
-          with a broken attachment; the goat keeps the game's llama/cow
-          sounds (legal). Real CC0 samples: TODO.
+        - CC0 goat sounds: synthesized in-house (tools/gen_sounds.py:
+          bleat + hurt) after the OpenGameArt search turned up only a
+          CC-BY variant with a broken attachment.
         - CAMEL SEATS: tuned to the REAL camel model geometry (parsed the
           b3d vertex bounds: camel = 24.7 model units tall vs llama 21.7)
           — driver on the hump (y=22), passenger behind (y=19, z=6);
@@ -327,8 +329,8 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           MCLN-only targeting-rule API -> attack_player aggro; the
           raid/gwp/fish-movement machinery stripped; villager_base
           (a nil LOCAL) -> {}; the MCLN villager trade API guarded (the
-          trader wanders with llamas; the trade UI is MCLN-only for
-          now); spawn_class added (VL asserts); table.merge shim;
+          trader wanders with llamas; Mineclonia keeps its native trade
+          UI, VoxeLibre gets a minimal emerald trade UI (see 33); spawn_class added (VL asserts); table.merge shim;
           mcln_base_hp for all 8 entities; biome lists verified against
           BOTH games (RoofedForest, Nether, *_ocean variants).
         - PITFALLS: mob_class.X(self, ...) must call
@@ -544,6 +546,32 @@ Place `mc_parity/` into the game's `mods/` directory (VoxeLibre:
           API, Mineclonia-only table support) — found by the re-enabled
           in-engine stage. Relic sound id normalized to extensionless
           (matches both games' own record ids).
+33. [x] Round 2 — the last TODO-tail (`next` branch):
+        - CC0 SOUNDS (tools/gen_sounds.py — extended, still ours, still
+          no external media): fox barks + hurt whine, loopable bee buzz
+          (integer-cycle partials, no loop click), goat bleat + hurt;
+          wired into fox/goat/bee, replacing the wolf/llama/cow
+          placeholders. Also fixed along the way: the warden's
+          mc_parity_* oggs were never generated (only the stale
+          pre-rename mcl_mobs_addon_* files shipped — now deleted), and
+          the boom's per-sample RNG reseed froze its noise into a DC
+          offset (seed once: real noise sweep now).
+        - TADPOLE CHAIN (mobs_tadpole.lua — MC 1.19 frog breeding):
+          procedural tadpole model (tools/gen_b3d.py tadpole) + painted
+          tadpole/frogspawn/bucket textures (tools/paint_tadpole.py);
+          tadpole mob (swims, grows into a frog after ~20 min, bucket
+          pickup, swamp spawn + egg); frogspawn node (hatches 2-4
+          tadpoles); bucket of tadpole; slimeball feeding lays frogspawn
+          on nearby water (runtime patch of the live frog class —
+          wolf-variant pattern). New `tadpole` feature gate (1.19) +
+          tooltip versions.
+        - VL TRADE UI (mobs_port.lua): the wandering trader on VoxeLibre
+          had no trade UI at all (native API is Mineclonia-only).
+          Minimal emerald trade formspec: 2 buys + 4 sells rolled per
+          trader from an MC-plausible pool, runtime-filtered to items
+          that exist; inventory-checked execution with world-drop
+          fallback; stale-trader offers cleared. Mineclonia path
+          untouched.
 
 ## Model pipeline (done — reference for future mobs)
 

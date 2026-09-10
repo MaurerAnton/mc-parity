@@ -80,10 +80,6 @@ GOAT = [
     ((0.4, 0.0, 0.5), (0.75, 1.0, 0.9)),       # leg BR
 ]
 
-if __name__ == "__main__":
-    out = sys.argv[1] if len(sys.argv) > 1 else "mc_parity_goat.b3d"
-    write_b3d(out, GOAT)
-
 # --- Armadillo (MC 1.21; low oval body, small head + tail, 4 legs) ---
 # Model ~3.0 units tall; the mob def uses visual_size 0.75 -> ~0.55 node
 ARMADILLO = [
@@ -111,4 +107,21 @@ BREEZE = [
     ((-1.15, 2.2, -0.3), (-0.65, 2.6, 0.3)),      # limb BL
     ((0.65, 2.2, -0.3), (1.15, 2.6, 0.3)),        # limb BR
 ]
+
+# --- Tadpole (MC 1.19; tiny swimmer: round head-body + flat tail fin) ---
+# Model ~1.8 units long; the mob def uses visual_size 0.5 -> ~0.3 node long.
+TADPOLE = [
+    ((-0.3, 0.25, -0.1), (0.3, 0.85, 0.8)),       # head-body (front = +z)
+    ((-0.05, 0.35, -1.1), (0.05, 0.75, -0.1)),    # tail stem
+    ((-0.02, 0.15, -1.25), (0.02, 0.95, -0.9)),   # tail fin (thin, tall)
+]
+
+if __name__ == "__main__":
+    # gen_b3d.py out.b3d            -> goat (default, historical usage)
+    # gen_b3d.py tadpole out.b3d    -> tadpole
+    if len(sys.argv) > 2 and sys.argv[1] == "tadpole":
+        write_b3d(sys.argv[2], TADPOLE)
+    else:
+        out = sys.argv[1] if len(sys.argv) > 1 else "mc_parity_goat.b3d"
+        write_b3d(out, GOAT)
 
